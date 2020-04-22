@@ -6,7 +6,7 @@ import flo.no.kanji.model.Word;
 
 public interface WordService {
 
-	public List<Word> getWords();
+	public List<Word> getWords(Integer limit);
 
 	public Word addWord(Word word);
 }

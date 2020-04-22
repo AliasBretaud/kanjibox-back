@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -71,9 +72,12 @@ public class WordServiceImpl implements WordService {
 	}
 
 	@Override
-	public List<Word> getWords() {
-		return wordReposiory.findAllByOrderByTimeStampDesc().stream().map(wordMapper::toBusinessObject)
-				.collect(Collectors.toList());
+	public List<Word> getWords(Integer limit) {
+
+		List<WordEntity> result = limit != null ? wordReposiory.findAllByOrderByTimeStampDesc(PageRequest.of(0, limit))
+				: wordReposiory.findAllByOrderByTimeStampDesc();
+
+		return result.stream().map(wordMapper::toBusinessObject).collect(Collectors.toList());
 	}
 
 }
