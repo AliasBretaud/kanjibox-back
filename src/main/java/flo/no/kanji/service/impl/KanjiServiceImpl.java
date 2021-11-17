@@ -1,12 +1,13 @@
 package flo.no.kanji.service.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import com.moji4j.MojiConverter;
 
 import flo.no.kanji.api.KanjiApiClient;
 import flo.no.kanji.api.model.KanjiVO;
@@ -29,6 +30,8 @@ public class KanjiServiceImpl implements KanjiService {
 	@Autowired
 	private KanjiApiClient kanjiApiClient;
 
+	private MojiConverter converter = new MojiConverter();
+
 	@Override
 	public List<Kanji> searchKanji(String search) {
 
@@ -39,9 +42,12 @@ public class KanjiServiceImpl implements KanjiService {
 
 		} else if (CharacterUtils.isKatakana(search)) {
 			result = kanjiRepository.findByOnYomi(search);
-
+		} else if (CharacterUtils.isKanji(search)) {
+			result = List.of(kanjiRepository.findByValue(search));
 		} else {
-			result = Arrays.asList(kanjiRepository.findByValue(search));
+			var kunYomi = converter.convertRomajiToHiragana(search);
+			var onYomi = converter.convertRomajiToKatakana(search);
+			result = kanjiRepository.findByKunYomiOrOnYomi(kunYomi, onYomi);
 		}
 
 		return result.stream().map(kanjiMapper::toBusinessObject).collect(Collectors.toList());
@@ -49,24 +55,24 @@ public class KanjiServiceImpl implements KanjiService {
 
 	@Override
 	public Kanji addKanji(Kanji kanji, boolean autoDetectReadings) {
-		Kanji kan = autoDetectReadings ? autoFillKanjiReadigs(kanji) : kanji;
+		var kan = autoDetectReadings ? autoFillKanjiReadigs(kanji) : kanji;
 
 		return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kan)));
 	}
 
 	@Override
 	public Kanji findKanjiByValue(String kanjiValue) {
-		KanjiEntity kanjiEntity = kanjiRepository.findByValue(kanjiValue);
+		var kanjiEntity = kanjiRepository.findByValue(kanjiValue);
 		return kanjiEntity != null ? kanjiMapper.toBusinessObject(kanjiEntity) : null;
 	}
 
 	@Override
 	public Kanji autoFillKanjiReadigs(Kanji kanji) {
-		Kanji kan = new Kanji();
+		var kan = new Kanji();
 		kan.setId(kanji.getId());
 		kan.setValue(kanji.getValue());
 
-		KanjiVO kanjiVo = kanjiApiClient.searchKanjiReadings(kanji.getValue());
+		var kanjiVo = kanjiApiClient.searchKanjiReadings(kanji.getValue());
 		if (kanjiVo != null) {
 			kan.setKunYomi(kanjiVo.getKun_readings());
 			kan.setOnYomi(kanjiVo.getOn_readings());
@@ -77,8 +83,9 @@ public class KanjiServiceImpl implements KanjiService {
 	}
 
 	@Override
-	public List<Kanji> getRecentsKanjis(int limit) {
-		List<KanjiEntity> list = kanjiRepository.findAllByOrderByTimeStampDesc(PageRequest.of(0, limit));
+	public List<Kanji> getKanjis(Integer limit) {
+		List<KanjiEntity> list = limit == null ? kanjiRepository.findAll()
+				: kanjiRepository.findAllByOrderByTimeStampDesc(PageRequest.of(0, limit));
 
 		return list.stream().map(kanjiMapper::toBusinessObject).collect(Collectors.toList());
 	}

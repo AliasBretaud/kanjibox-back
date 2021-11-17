@@ -46,7 +46,7 @@ public class WordServiceImpl implements WordService {
 		}
 
 		List<KanjiEntity> kanjis = word.getKanjis().stream().map(k -> {
-			KanjiEntity kanjiEntity = kanjiRepository.findByValue(k.getValue());
+			var kanjiEntity = kanjiRepository.findByValue(k.getValue());
 
 			if (kanjiEntity == null) {
 				kanjiEntity = kanjiMapper.toEntity(kanjiService.autoFillKanjiReadigs(k));
@@ -55,7 +55,7 @@ public class WordServiceImpl implements WordService {
 			return kanjiEntity;
 		}).collect(Collectors.toList());
 
-		WordEntity wordEntity = wordMapper.toEntity(word);
+		var wordEntity = wordMapper.toEntity(word);
 		wordEntity.setKanjis(kanjis);
 
 		return wordMapper.toBusinessObject(wordReposiory.save(wordEntity));
@@ -63,12 +63,7 @@ public class WordServiceImpl implements WordService {
 
 	private List<Kanji> buildWordKanjisList(String wordValue) {
 		return wordValue.chars().mapToObj(i -> String.valueOf((char) i)).filter(s -> CharacterUtils.isKanji(s))
-				.map(s -> {
-					Kanji kanji = new Kanji();
-					kanji.setValue(s);
-
-					return kanji;
-				}).collect(Collectors.toList());
+				.map(s -> new Kanji(s)).collect(Collectors.toList());
 	}
 
 	@Override

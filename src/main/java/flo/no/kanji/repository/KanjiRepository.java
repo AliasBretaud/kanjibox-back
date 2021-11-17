@@ -15,6 +15,8 @@ public interface KanjiRepository extends JpaRepository<KanjiEntity, Long> {
 
 	public List<KanjiEntity> findByKunYomi(String kunYomi);
 
+	public List<KanjiEntity> findByKunYomiOrOnYomi(String kunYomi, String onYomi);
+
 	public KanjiEntity findByValue(String kanjiValue);
 
 	public List<KanjiEntity> findAllByOrderByTimeStampDesc(Pageable pageable);

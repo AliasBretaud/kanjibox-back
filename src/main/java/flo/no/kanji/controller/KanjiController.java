@@ -15,15 +15,13 @@ import flo.no.kanji.service.KanjiService;
 @RestController
 public class KanjiController {
 
-	private static final int RECENT_KANJIS_LIMIT = 10;
-
 	@Autowired
 	private KanjiService kanjiService;
 
-	@GetMapping("/kanjis/recents")
-	public List<Kanji> getRecentKanjis() {
+	@GetMapping("/kanjis")
+	public List<Kanji> getKanjis(@RequestParam(required = false, value = "limit") Integer limit) {
 
-		return kanjiService.getRecentsKanjis(RECENT_KANJIS_LIMIT);
+		return kanjiService.getKanjis(limit);
 	}
 
 	@PostMapping("/kanjis")

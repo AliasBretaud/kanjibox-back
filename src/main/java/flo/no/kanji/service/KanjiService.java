@@ -14,5 +14,5 @@ public interface KanjiService {
 
 	public Kanji autoFillKanjiReadigs(Kanji kanji);
 
-	public List<Kanji> getRecentsKanjis(int limit);
+	public List<Kanji> getKanjis(Integer limit);
 }
