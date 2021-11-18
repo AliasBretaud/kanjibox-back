@@ -6,13 +6,13 @@ import flo.no.kanji.model.Kanji;
 
 public interface KanjiService {
 
-	public List<Kanji> searchKanji(String search);
+	List<Kanji> searchKanji(String search);
 
-	public Kanji addKanji(Kanji kanji, boolean autodetectReadings);
+	Kanji addKanji(Kanji kanji, boolean autodetectReadings);
 
-	public Kanji findKanjiByValue(String kanjiValue);
+	Kanji findKanjiByValue(String kanjiValue);
 
-	public Kanji autoFillKanjiReadigs(Kanji kanji);
+	void autoFillKanjiReadigs(Kanji kanji);
 
-	public List<Kanji> getKanjis(Integer limit);
+	List<Kanji> getKanjis(Integer limit);
 }

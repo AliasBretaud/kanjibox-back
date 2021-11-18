@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.moji4j.MojiConverter;
 
 import flo.no.kanji.api.KanjiApiClient;
-import flo.no.kanji.api.model.KanjiVO;
 import flo.no.kanji.entity.KanjiEntity;
 import flo.no.kanji.mapper.KanjiMapper;
 import flo.no.kanji.model.Kanji;
@@ -55,9 +54,12 @@ public class KanjiServiceImpl implements KanjiService {
 
 	@Override
 	public Kanji addKanji(Kanji kanji, boolean autoDetectReadings) {
-		var kan = autoDetectReadings ? autoFillKanjiReadigs(kanji) : kanji;
 
-		return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kan)));
+		if (autoDetectReadings) {
+			autoFillKanjiReadigs(kanji);
+		}
+
+		return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
 	}
 
 	@Override
@@ -67,19 +69,14 @@ public class KanjiServiceImpl implements KanjiService {
 	}
 
 	@Override
-	public Kanji autoFillKanjiReadigs(Kanji kanji) {
-		var kan = new Kanji();
-		kan.setId(kanji.getId());
-		kan.setValue(kanji.getValue());
+	public void autoFillKanjiReadigs(Kanji kanji) {
 
 		var kanjiVo = kanjiApiClient.searchKanjiReadings(kanji.getValue());
 		if (kanjiVo != null) {
-			kan.setKunYomi(kanjiVo.getKun_readings());
-			kan.setOnYomi(kanjiVo.getOn_readings());
-			kan.setTranslations(kanjiVo.getMeanings());
+			kanji.setKunYomi(kanjiVo.getKun_readings());
+			kanji.setOnYomi(kanjiVo.getOn_readings());
+			kanji.setTranslations(kanjiVo.getMeanings());
 		}
-
-		return kan;
 	}
 
 	@Override

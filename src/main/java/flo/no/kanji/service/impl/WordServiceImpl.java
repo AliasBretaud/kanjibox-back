@@ -49,7 +49,8 @@ public class WordServiceImpl implements WordService {
 			var kanjiEntity = kanjiRepository.findByValue(k.getValue());
 
 			if (kanjiEntity == null) {
-				kanjiEntity = kanjiMapper.toEntity(kanjiService.autoFillKanjiReadigs(k));
+				kanjiService.autoFillKanjiReadigs(k);
+				kanjiEntity = kanjiMapper.toEntity(k);
 			}
 
 			return kanjiEntity;
@@ -62,8 +63,8 @@ public class WordServiceImpl implements WordService {
 	}
 
 	private List<Kanji> buildWordKanjisList(String wordValue) {
-		return wordValue.chars().mapToObj(i -> String.valueOf((char) i)).filter(s -> CharacterUtils.isKanji(s))
-				.map(s -> new Kanji(s)).collect(Collectors.toList());
+		return wordValue.chars().mapToObj(i -> String.valueOf((char) i)).filter(CharacterUtils::isKanji)
+				.map(Kanji::new).collect(Collectors.toList());
 	}
 
 	@Override
