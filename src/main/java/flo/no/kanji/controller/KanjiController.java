@@ -1,8 +1,8 @@
 package flo.no.kanji.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,9 +19,10 @@ public class KanjiController {
 	private KanjiService kanjiService;
 
 	@GetMapping("/kanjis")
-	public List<Kanji> getKanjis(@RequestParam(required = false, value = "limit") Integer limit) {
+	public Page<Kanji> getKanjis(@RequestParam(required = false, value = "search") final String search,
+			Pageable pageable) {
 
-		return kanjiService.getKanjis(limit);
+		return kanjiService.getKanjis(search, pageable);
 	}
 
 	@PostMapping("/kanjis")

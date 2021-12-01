@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.moji4j.MojiConverter;
@@ -80,11 +81,11 @@ public class KanjiServiceImpl implements KanjiService {
 	}
 
 	@Override
-	public List<Kanji> getKanjis(Integer limit) {
-		List<KanjiEntity> list = limit == null ? kanjiRepository.findAll()
-				: kanjiRepository.findAllByOrderByTimeStampDesc(PageRequest.of(0, limit));
+	public Page<Kanji> getKanjis(String search, Pageable pageable) {
 
-		return list.stream().map(kanjiMapper::toBusinessObject).collect(Collectors.toList());
+		Page<Kanji> kanjis = kanjiRepository.findAllByOrderByTimeStampDesc(pageable).map(kanjiMapper::toBusinessObject);
+
+		return kanjis;
 	}
 
 }
