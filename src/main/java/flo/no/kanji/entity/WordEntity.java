@@ -24,7 +24,7 @@ import lombok.Setter;
 public class WordEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String furiganaValue;

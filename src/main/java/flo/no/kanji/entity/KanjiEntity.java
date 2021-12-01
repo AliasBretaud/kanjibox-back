@@ -24,7 +24,7 @@ import lombok.Setter;
 public class KanjiEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ElementCollection
