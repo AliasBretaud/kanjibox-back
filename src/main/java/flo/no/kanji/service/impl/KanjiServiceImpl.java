@@ -1,5 +1,8 @@
 package flo.no.kanji.service.impl;
 
+import java.time.LocalDateTime;
+
+import javax.json.JsonMergePatch;
 import javax.persistence.criteria.JoinType;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import flo.no.kanji.model.Kanji;
 import flo.no.kanji.repository.KanjiRepository;
 import flo.no.kanji.service.KanjiService;
 import flo.no.kanji.util.CharacterUtils;
+import flo.no.kanji.util.PatchHelper;
 
 @Service
 public class KanjiServiceImpl implements KanjiService {
@@ -31,6 +35,9 @@ public class KanjiServiceImpl implements KanjiService {
 
 	@Autowired
 	private KanjiApiClient kanjiApiClient;
+	
+	@Autowired
+	private PatchHelper patchHelper;
 
 	private MojiConverter converter = new MojiConverter();
 
@@ -106,7 +113,7 @@ public class KanjiServiceImpl implements KanjiService {
 				yield builder.or(
 						builder.equal(kunYomiJoin, kunYomi),
 						builder.equal(onYomiJoin, onYomi),
-						builder.equal(builder.upper(translatesJoin), search.toUpperCase()));
+						builder.like(builder.upper(translatesJoin), "%" + search.toUpperCase() + "%"));
 			}
 			};
 			
@@ -117,6 +124,24 @@ public class KanjiServiceImpl implements KanjiService {
 
 		// Execute query, mapping and return results
 		return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
+	}
+
+	@Override
+	public Kanji patchKanji(Long kanjiId, JsonMergePatch patchRequest) {
+		
+		var initialKanji = this.findKanji(kanjiId);
+		var patchedKanji = patchHelper.mergePatch(patchRequest, initialKanji,
+				Kanji.class);
+		var patchedKanjiEntity = kanjiMapper.toEntity(patchedKanji);
+		patchedKanjiEntity.setTimeStamp(LocalDateTime.now());
+		patchedKanjiEntity = kanjiRepository.save(patchedKanjiEntity);
+		
+		return kanjiMapper.toBusinessObject(patchedKanjiEntity);
+	}
+	
+	private Kanji findKanji(Long kanjiId) {
+		return kanjiMapper.toBusinessObject(
+				kanjiRepository.findById(kanjiId).orElseThrow());
 	}
 
 }

@@ -11,13 +11,13 @@ import flo.no.kanji.entity.WordEntity;
 @Repository
 public interface WordRepository extends JpaRepository<WordEntity, Long> {
 
-	public List<WordEntity> findByValueContaining(String value);
+	List<WordEntity> findByValueContaining(String value);
 
-	public List<WordEntity> findByFuriganaValueContaining(String value);
+	List<WordEntity> findByFuriganaValueContaining(String value);
 
-	public List<WordEntity> findByTranslationContaining(String traduction);
+	List<WordEntity> findByTranslationContaining(String traduction);
 
-	public List<WordEntity> findAllByOrderByTimeStampDesc(Pageable pageable);
+	List<WordEntity> findAllByOrderByTimeStampDesc(Pageable pageable);
 
-	public List<WordEntity> findAllByOrderByTimeStampDesc();
+	List<WordEntity> findAllByOrderByTimeStampDesc();
 }

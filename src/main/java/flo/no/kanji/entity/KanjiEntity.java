@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -47,6 +48,7 @@ public class KanjiEntity {
 	private String value;
 
 	@PrePersist
+	@PreUpdate
 	private void setUp() {
 		this.timeStamp = LocalDateTime.now();
 	}

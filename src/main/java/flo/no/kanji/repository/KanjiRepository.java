@@ -1,7 +1,5 @@
 package flo.no.kanji.repository;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,15 +11,8 @@ import flo.no.kanji.entity.KanjiEntity;
 @Repository
 public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSpecificationExecutor<KanjiEntity> {
 
-	public List<KanjiEntity> findByOnYomi(String onYomi);
+	KanjiEntity findByValue(String kanjiValue);
 
-	public List<KanjiEntity> findByKunYomi(String kunYomi);
-
-	public List<KanjiEntity> findByKunYomiOrOnYomiOrTranslationsContaining(String kunYomi, String onYomi,
-			String translations);
-
-	public KanjiEntity findByValue(String kanjiValue);
-
-	public Page<KanjiEntity> findAllByOrderByTimeStampDesc(Pageable pageable);
+	Page<KanjiEntity> findAllByOrderByTimeStampDesc(Pageable pageable);
 
 }

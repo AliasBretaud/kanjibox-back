@@ -1,5 +1,7 @@
 package flo.no.kanji.service;
 
+import javax.json.JsonMergePatch;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,4 +16,6 @@ public interface KanjiService {
 	void autoFillKanjiReadigs(Kanji kanji);
 
 	Page<Kanji> getKanjis(String search, Pageable pageable);
+
+	Kanji patchKanji(Long kanjiId, JsonMergePatch patchRequest);
 }
