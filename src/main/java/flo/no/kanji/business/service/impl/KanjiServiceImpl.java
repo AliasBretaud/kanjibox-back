@@ -64,8 +64,8 @@ public class KanjiServiceImpl implements KanjiService {
 
 		var kanjiVo = kanjiApiClient.searchKanjiReadings(kanji.getValue());
 		if (kanjiVo != null) {
-			kanji.setKunYomi(kanjiVo.getKun_readings());
-			kanji.setOnYomi(kanjiVo.getOn_readings());
+			kanji.setKunYomi(kanjiVo.getKunReadings());
+			kanji.setOnYomi(kanjiVo.getOnReadings());
 			kanji.setTranslations(kanjiVo.getMeanings());
 		}
 	}
@@ -93,30 +93,30 @@ public class KanjiServiceImpl implements KanjiService {
 
 		Specification<KanjiEntity> spec = (root, query, builder) -> {
 			var predicate = switch (CharacterUtils.getCharacterType(search)) {
-			// If search is hiragana only then find in kun yomi readings
-			case HIRAGANA -> builder.equal(root.join(KanjiEntity_.kunYomi), search);
-			// If search is katakana only then find in on yomi readings
-			case KATAKANA -> builder.equal(root.join(KanjiEntity_.onYomi), search);
-			// If search is a kanji then find by its value
-			case KANJI -> builder.equal(root.get(KanjiEntity_.value), search);
-			// Presumed romaji
-			default -> {
-				query.distinct(true);
-				// Converting search in hiragana and katakana 
-				var kunYomi = converter.convertRomajiToHiragana(search);
-				var onYomi = converter.convertRomajiToKatakana(search);
+				// If search is hiragana only then find in kun yomi readings
+				case HIRAGANA -> builder.equal(root.join(KanjiEntity_.kunYomi), search);
+				// If search is katakana only then find in on yomi readings
+				case KATAKANA -> builder.equal(root.join(KanjiEntity_.onYomi), search);
+				// If search is a kanji then find by its value
+				case KANJI -> builder.equal(root.get(KanjiEntity_.value), search);
+				// Presumed romaji
+				default -> {
+					query.distinct(true);
+					// Converting search in hiragana and katakana 
+					var kunYomi = converter.convertRomajiToHiragana(search);
+					var onYomi = converter.convertRomajiToKatakana(search);
 				
-				// Joining tables kun/on yomi and translation for searching query
-				var kunYomiJoin = root.join(KanjiEntity_.kunYomi, JoinType.LEFT);
-				var onYomiJoin = root.join(KanjiEntity_.onYomi, JoinType.LEFT);
-				var translatesJoin = root.join(KanjiEntity_.translations, JoinType.LEFT);
+					// Joining tables kun/on yomi and translation for searching query
+					var kunYomiJoin = root.join(KanjiEntity_.kunYomi, JoinType.LEFT);
+					var onYomiJoin = root.join(KanjiEntity_.onYomi, JoinType.LEFT);
+					var translatesJoin = root.join(KanjiEntity_.translations, JoinType.LEFT);
 				
-				// Query building
-				yield builder.or(
+					// Query building
+					yield builder.or(
 						builder.equal(kunYomiJoin, kunYomi),
 						builder.equal(onYomiJoin, onYomi),
 						builder.like(builder.upper(translatesJoin), "%" + search.toUpperCase() + "%"));
-			}
+				}
 			};
 			
 			// Order results by insertion time
