@@ -1,8 +1,7 @@
-package flo.no.kanji.model;
+package flo.no.kanji.business.model;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

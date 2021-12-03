@@ -1,4 +1,4 @@
-package flo.no.kanji.service.impl;
+package flo.no.kanji.business.service.impl;
 
 import java.time.LocalDateTime;
 
@@ -9,18 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.moji4j.MojiConverter;
 
 import flo.no.kanji.api.KanjiApiClient;
-import flo.no.kanji.entity.KanjiEntity;
-import flo.no.kanji.entity.KanjiEntity_;
-import flo.no.kanji.mapper.KanjiMapper;
-import flo.no.kanji.model.Kanji;
-import flo.no.kanji.repository.KanjiRepository;
-import flo.no.kanji.service.KanjiService;
+import flo.no.kanji.business.mapper.KanjiMapper;
+import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.service.KanjiService;
+import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.entity.KanjiEntity_;
+import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.util.CharacterUtils;
 import flo.no.kanji.util.PatchHelper;
 
@@ -132,6 +134,12 @@ public class KanjiServiceImpl implements KanjiService {
 		var initialKanji = this.findKanji(kanjiId);
 		var patchedKanji = patchHelper.mergePatch(patchRequest, initialKanji,
 				Kanji.class);
+		
+		// Prevent ID update
+		if (patchedKanji.getId() != kanjiId) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		
 		var patchedKanjiEntity = kanjiMapper.toEntity(patchedKanji);
 		patchedKanjiEntity.setTimeStamp(LocalDateTime.now());
 		patchedKanjiEntity = kanjiRepository.save(patchedKanjiEntity);
@@ -140,8 +148,8 @@ public class KanjiServiceImpl implements KanjiService {
 	}
 	
 	private Kanji findKanji(Long kanjiId) {
-		return kanjiMapper.toBusinessObject(
-				kanjiRepository.findById(kanjiId).orElseThrow());
+		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
 	}
 
 }

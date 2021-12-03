@@ -1,4 +1,4 @@
-package flo.no.kanji.controller;
+package flo.no.kanji.web.controller;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import flo.no.kanji.model.Word;
-import flo.no.kanji.service.WordService;
+import flo.no.kanji.business.model.Word;
+import flo.no.kanji.business.service.WordService;
 
 @RestController
 public class WordController {

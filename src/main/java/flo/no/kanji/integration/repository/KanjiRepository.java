@@ -1,4 +1,4 @@
-package flo.no.kanji.repository;
+package flo.no.kanji.integration.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import flo.no.kanji.entity.KanjiEntity;
+import flo.no.kanji.integration.entity.KanjiEntity;
 
 @Repository
 public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSpecificationExecutor<KanjiEntity> {

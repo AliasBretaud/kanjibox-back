@@ -1,4 +1,4 @@
-package flo.no.kanji.controller;
+package flo.no.kanji.web.controller;
 
 import org.apache.johnzon.core.JsonMergePatchImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import flo.no.kanji.model.Kanji;
-import flo.no.kanji.service.KanjiService;
+import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.service.KanjiService;
 
 @RestController
 @RequestMapping("/kanjis")

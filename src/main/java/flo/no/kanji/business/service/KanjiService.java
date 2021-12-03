@@ -1,11 +1,11 @@
-package flo.no.kanji.service;
+package flo.no.kanji.business.service;
 
 import javax.json.JsonMergePatch;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import flo.no.kanji.model.Kanji;
+import flo.no.kanji.business.model.Kanji;
 
 public interface KanjiService {
 

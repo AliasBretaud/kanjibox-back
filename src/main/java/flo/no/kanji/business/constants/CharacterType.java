@@ -1,4 +1,4 @@
-package flo.no.kanji.constants;
+package flo.no.kanji.business.constants;
 
 public enum CharacterType {
 	HIRAGANA, KATAKANA, KANJI, ROMAJI

@@ -1,8 +1,8 @@
-package flo.no.kanji.service;
+package flo.no.kanji.business.service;
 
 import java.util.List;
 
-import flo.no.kanji.model.Word;
+import flo.no.kanji.business.model.Word;
 
 public interface WordService {
 

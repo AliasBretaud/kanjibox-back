@@ -1,4 +1,4 @@
-package flo.no.kanji.config;
+package flo.no.kanji.web.conf;
 
 import java.util.Arrays;
 import java.util.List;

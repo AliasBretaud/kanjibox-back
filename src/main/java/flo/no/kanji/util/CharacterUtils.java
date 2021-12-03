@@ -8,7 +8,7 @@ import java.lang.Character.UnicodeBlock;
 
 import org.springframework.util.ObjectUtils;
 
-import flo.no.kanji.constants.CharacterType;
+import flo.no.kanji.business.constants.CharacterType;
 
 public class CharacterUtils {
 

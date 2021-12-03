@@ -1,4 +1,4 @@
-package flo.no.kanji.repository;
+package flo.no.kanji.integration.repository;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import flo.no.kanji.entity.WordEntity;
+import flo.no.kanji.integration.entity.WordEntity;
 
 @Repository
 public interface WordRepository extends JpaRepository<WordEntity, Long> {

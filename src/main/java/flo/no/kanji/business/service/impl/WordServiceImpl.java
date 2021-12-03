@@ -1,4 +1,4 @@
-package flo.no.kanji.service.impl;
+package flo.no.kanji.business.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,16 +8,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import flo.no.kanji.entity.KanjiEntity;
-import flo.no.kanji.entity.WordEntity;
-import flo.no.kanji.mapper.KanjiMapper;
-import flo.no.kanji.mapper.WordMapper;
-import flo.no.kanji.model.Kanji;
-import flo.no.kanji.model.Word;
-import flo.no.kanji.repository.KanjiRepository;
-import flo.no.kanji.repository.WordRepository;
-import flo.no.kanji.service.KanjiService;
-import flo.no.kanji.service.WordService;
+import flo.no.kanji.business.mapper.KanjiMapper;
+import flo.no.kanji.business.mapper.WordMapper;
+import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.model.Word;
+import flo.no.kanji.business.service.KanjiService;
+import flo.no.kanji.business.service.WordService;
+import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.entity.WordEntity;
+import flo.no.kanji.integration.repository.KanjiRepository;
+import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.util.CharacterUtils;
 
 @Service

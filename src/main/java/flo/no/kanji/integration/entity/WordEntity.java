@@ -1,4 +1,4 @@
-package flo.no.kanji.entity;
+package flo.no.kanji.integration.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
