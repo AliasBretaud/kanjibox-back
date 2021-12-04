@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -41,6 +42,7 @@ public class WordEntity {
 	private String value;
 
 	@PrePersist
+	@PreUpdate
 	private void setUp() {
 		this.timeStamp = LocalDateTime.now();
 	}

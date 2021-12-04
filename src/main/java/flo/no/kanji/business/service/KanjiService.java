@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.integration.entity.KanjiEntity;
 
 public interface KanjiService {
 
@@ -18,4 +19,6 @@ public interface KanjiService {
 	Page<Kanji> getKanjis(String search, Pageable pageable);
 
 	Kanji patchKanji(Long kanjiId, JsonMergePatch patchRequest);
+
+	KanjiEntity findByValue(String value);
 }

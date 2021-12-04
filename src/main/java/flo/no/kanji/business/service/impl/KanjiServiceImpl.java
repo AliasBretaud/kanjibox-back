@@ -152,4 +152,9 @@ public class KanjiServiceImpl implements KanjiService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
 	}
 
+	@Override
+	public KanjiEntity findByValue(String value) {
+		return kanjiRepository.findByValue(value);
+	}
+
 }

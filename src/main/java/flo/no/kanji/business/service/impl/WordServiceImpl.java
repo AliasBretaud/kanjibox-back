@@ -4,9 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+
+import com.moji4j.MojiConverter;
 
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.WordMapper;
@@ -16,27 +21,28 @@ import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.WordService;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.WordEntity;
-import flo.no.kanji.integration.repository.KanjiRepository;
+import flo.no.kanji.integration.entity.WordEntity_;
 import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.util.CharacterUtils;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class WordServiceImpl implements WordService {
 
 	@Autowired
 	private KanjiService kanjiService;
-
+	
 	@Autowired
-	private KanjiRepository kanjiRepository;
-
-	@Autowired
-	private WordRepository wordReposiory;
+	private WordRepository wordRepository;
 
 	@Autowired
 	private WordMapper wordMapper;
 
 	@Autowired
 	private KanjiMapper kanjiMapper;
+	
+	private MojiConverter converter = new MojiConverter();
 
 	@Override
 	public Word addWord(Word word) {
@@ -46,7 +52,7 @@ public class WordServiceImpl implements WordService {
 		}
 
 		List<KanjiEntity> kanjis = word.getKanjis().stream().map(k -> {
-			var kanjiEntity = kanjiRepository.findByValue(k.getValue());
+			var kanjiEntity = kanjiService.findByValue(k.getValue());
 
 			if (kanjiEntity == null) {
 				kanjiService.autoFillKanjiReadigs(k);
@@ -59,7 +65,7 @@ public class WordServiceImpl implements WordService {
 		var wordEntity = wordMapper.toEntity(word);
 		wordEntity.setKanjis(kanjis);
 
-		return wordMapper.toBusinessObject(wordReposiory.save(wordEntity));
+		return wordMapper.toBusinessObject(wordRepository.save(wordEntity));
 	}
 
 	private List<Kanji> buildWordKanjisList(String wordValue) {
@@ -68,12 +74,43 @@ public class WordServiceImpl implements WordService {
 	}
 
 	@Override
-	public List<Word> getWords(Integer limit) {
+	public Page<Word> getWords(String search, Pageable pageable) {
 
-		List<WordEntity> result = limit != null ? wordReposiory.findAllByOrderByTimeStampDesc(PageRequest.of(0, limit))
-				: wordReposiory.findAllByOrderByTimeStampDesc();
-
-		return result.stream().map(wordMapper::toBusinessObject).collect(Collectors.toList());
+		return ObjectUtils.isEmpty(search)
+				? wordRepository.findAllByOrderByTimeStampDesc(pageable)
+						.map(wordMapper::toBusinessObject)
+				: this.searchWord(search, pageable);
+	}
+	
+	private Page<Word> searchWord(String search, Pageable pageable) {
+		
+		Specification<WordEntity> spec = (root, query, builder) -> {
+			var predicate = switch (CharacterUtils.getCharacterType(search)) {
+				// Kana value (search based on furigana reading)
+				case HIRAGANA, KATAKANA ->
+					builder.equal(root.get(WordEntity_.furiganaValue), this.convertKanaToFurigana(search));
+				// Kanji value
+				case KANJI, KANJI_WITH_OKURIGANA ->
+					builder.like(root.get(WordEntity_.value), "%" + search + "%");
+				// Romaji / translation
+				default -> {
+					var valueSearch = converter.convertRomajiToHiragana(search);
+					yield builder.or(
+							builder.equal(root.get(WordEntity_.furiganaValue), valueSearch),
+							builder.like(builder.upper(root.get(WordEntity_.translation)),
+									"%" + search.toUpperCase() + "%"));
+				}
+			};
+			query.orderBy(builder.desc(root.get(WordEntity_.timeStamp)));
+			return predicate;
+		};
+		
+		return wordRepository.findAll(spec, pageable).map(wordMapper::toBusinessObject);
+	}
+	
+	private String convertKanaToFurigana(final String value) {
+		return CharacterUtils.isHiragana(value) ? value :
+			converter.convertRomajiToHiragana(converter.convertKanaToRomaji(value));
 	}
 
 }

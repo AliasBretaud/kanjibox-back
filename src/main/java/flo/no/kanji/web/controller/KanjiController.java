@@ -26,7 +26,6 @@ public class KanjiController {
 	@GetMapping
 	public Page<Kanji> getKanjis(@RequestParam(required = false, value = "search") final String search,
 			Pageable pageable) {
-
 		return kanjiService.getKanjis(search, pageable);
 	}
 
