@@ -11,9 +11,18 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/**
+ * Defines API access controls
+ * 
+ * @author Florian
+ *
+ */
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+	/**
+	 * Configuring API requests authorizations
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.headers().frameOptions().disable().and()
@@ -21,6 +30,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.authorizeRequests().anyRequest().anonymous();
 	}
 
+	/**
+	 * Configuring CORS configuration
+	 * 
+	 * @return
+	 * 		CorsConfigurationSource
+	 */
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();

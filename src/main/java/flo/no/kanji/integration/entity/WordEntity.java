@@ -18,32 +18,49 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Word entity persistent database object
+ * 
+ * @author Florian
+ *
+ */
 @Entity
 @Table(name = "word")
 @Setter
 @Getter
 public class WordEntity {
 
+	/** Database technical identifier **/
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	/** Transcripted hiragana value of the word **/
 	private String furiganaValue;
 
+	/** Associated kanjis composing the word **/
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "word_kanji", joinColumns = { @JoinColumn(name = "word_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "kanji_id") })
 	private List<KanjiEntity> kanjis;
 
+	/**
+	 * Word creation/update timestamp
+	 */
 	private LocalDateTime timeStamp;
 
+	/** Word translation */
 	private String translation;
 
+	/**
+	 * Word japanese value (litteral kanjis and okuriganas)
+	 */
 	private String value;
 
 	@PrePersist
 	@PreUpdate
 	private void setUp() {
+		// Before each creation or upadte, setting current timestamp
 		this.timeStamp = LocalDateTime.now();
 	}
 }

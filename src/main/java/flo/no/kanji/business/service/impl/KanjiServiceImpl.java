@@ -26,23 +26,38 @@ import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.util.CharacterUtils;
 import flo.no.kanji.util.PatchHelper;
 
+/**
+ * Kanji business service implementation
+ * 
+ * @see KanjiService
+ * @author Florian
+ *
+ */
 @Service
 public class KanjiServiceImpl implements KanjiService {
 
+	/** Kanji JPA repository **/
 	@Autowired
 	private KanjiRepository kanjiRepository;
 
+	/** Kanji business/entity object mapper */
 	@Autowired
 	private KanjiMapper kanjiMapper;
 
+	/** External kanji readings/translations API client */
 	@Autowired
 	private KanjiApiClient kanjiApiClient;
 	
+	/** Kanji updating fields class helper */
 	@Autowired
 	private PatchHelper patchHelper;
 
+	/** Japanese alphabets converting service **/
 	private MojiConverter converter = new MojiConverter();
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Kanji addKanji(Kanji kanji, boolean autoDetectReadings) {
 
@@ -53,12 +68,18 @@ public class KanjiServiceImpl implements KanjiService {
 		return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Kanji findKanjiByValue(String kanjiValue) {
 		var kanjiEntity = kanjiRepository.findByValue(kanjiValue);
 		return kanjiEntity != null ? kanjiMapper.toBusinessObject(kanjiEntity) : null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void autoFillKanjiReadigs(Kanji kanji) {
 
@@ -70,6 +91,9 @@ public class KanjiServiceImpl implements KanjiService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Page<Kanji> getKanjis(String search, Pageable pageable) {
 
@@ -128,6 +152,9 @@ public class KanjiServiceImpl implements KanjiService {
 		return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Kanji patchKanji(Long kanjiId, JsonMergePatch patchRequest) {
 		
@@ -147,11 +174,22 @@ public class KanjiServiceImpl implements KanjiService {
 		return kanjiMapper.toBusinessObject(patchedKanjiEntity);
 	}
 	
+	/**
+	 * Find a single kanji by its technical ID
+	 * 
+	 * @param kanjiId
+	 * 			Kanji database identifier
+	 * @return
+	 * 			Retrived kanji business object
+	 */
 	private Kanji findKanji(Long kanjiId) {
 		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public KanjiEntity findByValue(String value) {
 		return kanjiRepository.findByValue(value);

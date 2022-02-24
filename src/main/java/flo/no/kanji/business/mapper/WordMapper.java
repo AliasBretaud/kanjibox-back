@@ -10,12 +10,26 @@ import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.integration.entity.WordEntity;
 
+/**
+ * Word object bidirectional mapper between Model objects and Entities
+ * 
+ * @author Florian
+ *
+ */
 @Service
 public class WordMapper {
 
 	@Autowired
 	private KanjiMapper kanjiMapper;
 
+	/**
+	 * Transforms a Word entity to business object
+	 * 
+	 * @param wordEntity
+	 * 			Input entity
+	 * @return
+	 * 			Transformed business word object
+	 */
 	public Word toBusinessObject(WordEntity wordEntity) {
 		Word word = new Word();
 		word.setId(wordEntity.getId());
@@ -29,7 +43,15 @@ public class WordMapper {
 
 		return word;
 	}
-
+	
+	/**
+	 * Transforms a Word business object to entity (before performing save in database)
+	 * 
+	 * @param word
+	 * 			Word business object
+	 * @return
+	 * 			Word entity converted object
+	 */
 	public WordEntity toEntity(Word word) {
 		WordEntity wordEntity = new WordEntity();
 		wordEntity.setId(word.getId());

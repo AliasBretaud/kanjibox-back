@@ -12,26 +12,73 @@ import com.moji4j.MojiDetector;
 
 import flo.no.kanji.business.constants.CharacterType;
 
+/**
+ * Japanese characters class utils
+ * 
+ * @author Florian
+ *
+ */
 public class CharacterUtils {
 	
+	/** Japanese alphabet (hiragana/katakana/kanji) detetor **/
 	private static MojiDetector mojiDetector = new MojiDetector();
 
+	/**
+	 * Determines if the input chain is strictly a kanji value
+	 * 
+	 * @param input
+	 * 			Input characters
+	 * @return
+	 * 			true if the input chain is strictly a kanji value, false otherwise
+	 */
 	public static boolean isKanji(String input) {
 		return input.chars().allMatch(c -> UnicodeBlock.of(c) == CJK_UNIFIED_IDEOGRAPHS);
 	}
 	
+	/**
+	 * Determines if the input chain is a japanese word containig kanji(s) and congugating hiragana(s) (okuriganas)
+	 * 
+	 * @param input
+	 * 			Input characters
+	 * @return
+	 * 			true if the input chain is kanji(s) with conjugating okurigana(s), false otherwise
+	 */
 	public static boolean isKanjiWithOkurigana(String input) {
 		return mojiDetector.hasKanji(input) && mojiDetector.hasKana(input) && !mojiDetector.hasLatin(input);
 	}
 
+	/**
+	 * Determines if the input chain is strictly hiragana value
+	 * 
+	 * @param input
+	 * 			Input chain
+	 * @return
+	 * 			true if the input chain is hiragana, false otherwise
+	 */
 	public static boolean isHiragana(String input) {
 		return input.chars().allMatch(c -> UnicodeBlock.of(c) == HIRAGANA);
 	}
 
+	/**
+	 * Determines if the input chain is strictly katakana value
+	 * 
+	 * @param input
+	 * 			Input chain
+	 * @return
+	 * 			true if the input chain is katakana, false otherwise
+	 */
 	public static boolean isKatakana(String input) {
 		return input.chars().allMatch(c -> UnicodeBlock.of(c) == KATAKANA);
 	}
 
+	/**
+	 * Determines the corresponding japanese alphabet type of input chain
+	 * 
+	 * @param input
+	 * 			String input
+	 * @return
+	 * 		The corresponding japanese alphabet type
+	 */
 	public static CharacterType getCharacterType(String input) {
 
 		CharacterType type = null;

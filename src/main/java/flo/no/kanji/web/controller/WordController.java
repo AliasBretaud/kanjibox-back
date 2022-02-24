@@ -13,19 +13,44 @@ import org.springframework.web.bind.annotation.RestController;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.WordService;
 
+/**
+ * Word REST Controller
+ * 
+ * @author Florian
+ *
+ */
 @RestController
 @RequestMapping("/words")
 public class WordController {
 
+	/** Word business service */
 	@Autowired
 	private WordService wordService;
 
+	/**
+	 * Seach words by its japanese value
+	 * 
+	 * @param search
+	 * 			Word japansese writing value
+	 * @param pageable
+	 * 			Returned page parameters (limit, number of items per page...)
+	 * @return
+	 * 			Spring page of retrieved corresponding words
+	 */
 	@GetMapping
 	public Page<Word> getWords(@RequestParam(required = false, value = "search") final String search,
 			Pageable pageable) {
 		return wordService.getWords(search, pageable);
 	}
 
+	/**
+	 * Saving new word
+	 * 
+	 * @param word
+	 * 			Word business object
+	 * @return
+	 * 			Created word
+	 */
 	@PostMapping
 	public Word addWord(@RequestBody Word word) {
 		return wordService.addWord(word);
