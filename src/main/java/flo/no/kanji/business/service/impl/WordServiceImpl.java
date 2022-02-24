@@ -24,10 +24,8 @@ import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.entity.WordEntity_;
 import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.util.CharacterUtils;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 public class WordServiceImpl implements WordService {
 
 	@Autowired

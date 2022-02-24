@@ -16,7 +16,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().cors().and().authorizeRequests().anyRequest().anonymous();
+		http.headers().frameOptions().disable().and()
+		.csrf().disable().cors().and()
+		.authorizeRequests().anyRequest().anonymous();
 	}
 
 	@Bean
