@@ -22,7 +22,7 @@ public interface KanjiService {
 	 * @param kanji
 	 * 			Kanji business object
 	 * @param autodetectReadings
-	 * 			Calling external API for auto readings/translations seting (optional)
+	 * 			Calling external API for auto readings/translations setting (optional)
 	 * @return
 	 * 			Created kanji
 	 */
@@ -34,7 +34,7 @@ public interface KanjiService {
 	 * @param kanjiValue
 	 * 			Kanji japansese writing value
 	 * @return
-	 * 			Finded kanji
+	 * 			Found kanji
 	 */
 	Kanji findKanjiByValue(String kanjiValue);
 
@@ -62,7 +62,7 @@ public interface KanjiService {
 	 * Modify an existing kanji attributes
 	 * 
 	 * @param kanjiId
-	 * 			Tehnical ID of the kanji persent in database
+	 * 			Technical ID of the kanji persent in database
 	 * @param patchRequest
 	 * 			Data which have to be modified
 	 * @return

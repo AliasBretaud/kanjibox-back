@@ -28,7 +28,7 @@ public class WordController {
 	private WordService wordService;
 
 	/**
-	 * Seach words by its japanese value
+	 * Search words by its japanese value
 	 * 
 	 * @param search
 	 * 			Word japansese writing value

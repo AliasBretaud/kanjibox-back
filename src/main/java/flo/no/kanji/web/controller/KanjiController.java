@@ -52,7 +52,7 @@ public class KanjiController {
 	 * @param kanji
 	 * 			Kanji business object
 	 * @param autodetectReadings
-	 * 			Calling external API for auto readings/translations seting (optional)
+	 * 			Calling external API for auto readings/translations setting (optional)
 	 * @return
 	 * 			Created kanji
 	 */
@@ -66,7 +66,7 @@ public class KanjiController {
 	 * Modify an existing kanji attributes
 	 * 
 	 * @param kanjiId
-	 * 			Tehnical ID of the kanji persent in database
+	 * 			Tehnical ID of the kanji present in database
 	 * @param patchRequest
 	 * 			Data which have to be modified
 	 * @return

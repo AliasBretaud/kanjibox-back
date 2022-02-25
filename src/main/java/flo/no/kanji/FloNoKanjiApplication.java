@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Kanji App Main class
- * Launches Sping Boot configuration
+ * Launches Spring Boot configuration
  * 
  * @author Florian
  *

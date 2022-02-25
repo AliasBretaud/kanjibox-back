@@ -180,7 +180,7 @@ public class KanjiServiceImpl implements KanjiService {
 	 * @param kanjiId
 	 * 			Kanji database identifier
 	 * @return
-	 * 			Retrived kanji business object
+	 * 			Retrieved kanji business object
 	 */
 	private Kanji findKanji(Long kanjiId) {
 		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)

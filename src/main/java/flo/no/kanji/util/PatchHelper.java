@@ -39,9 +39,9 @@ public class PatchHelper {
      * @param mergePatch
      * 			JSON merge path
      * @param targetBean
-     * 			Objec type
+     * 			Object type
      * @param beanClass
-     * 			Ouptut object class
+     * 			Output object class
      * @return
      * 			Validated updated object
      */

@@ -10,16 +10,53 @@ import org.springframework.stereotype.Repository;
 
 import flo.no.kanji.integration.entity.WordEntity;
 
+/**
+ * JPA repository for WORD table
+ * 
+ * @author Florian
+ *
+ */
 @Repository
 public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpecificationExecutor<WordEntity> {
 
+	/**
+	 * Find a word by its value containing an input string
+	 * 
+	 * @param value
+	 * 			Input contained in word
+	 * @return
+	 * 			Retrieved word list
+	 */
 	List<WordEntity> findByValueContaining(String value);
 
+	/**
+	 * Find a word by its hiragana transcription containing an input string
+	 * 
+	 * @param value
+	 * 			Input contained in word transcription
+	 * @return
+	 * 			Retrieved word list
+	 */
 	List<WordEntity> findByFuriganaValueContaining(String value);
 
+	/**
+	 * Find a word by its translation containing an input string
+	 * 
+	 * @param value
+	 * 			Input contained in word translation
+	 * @return
+	 * 			Retrieved word list
+	 */
 	List<WordEntity> findByTranslationContaining(String traduction);
 
+	/**
+	 * Find all words, ordered by creation/modification date
+	 * 
+	 * @param pageable
+	 * 			Spring pageable settings
+	 * @return
+	 * 			Words page
+	 */
 	Page<WordEntity> findAllByOrderByTimeStampDesc(Pageable pageable);
 
-	List<WordEntity> findAllByOrderByTimeStampDesc();
 }

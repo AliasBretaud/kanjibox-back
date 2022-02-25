@@ -36,12 +36,12 @@ public class CharacterUtils {
 	}
 	
 	/**
-	 * Determines if the input chain is a japanese word containig kanji(s) and congugating hiragana(s) (okuriganas)
+	 * Determines if the input chain is a japanese word containing kanji(s) and conjugation hiragana(s) (okuriganas)
 	 * 
 	 * @param input
 	 * 			Input characters
 	 * @return
-	 * 			true if the input chain is kanji(s) with conjugating okurigana(s), false otherwise
+	 * 			true if the input chain is kanji(s) with conjugation okurigana(s), false otherwise
 	 */
 	public static boolean isKanjiWithOkurigana(String input) {
 		return mojiDetector.hasKanji(input) && mojiDetector.hasKana(input) && !mojiDetector.hasLatin(input);

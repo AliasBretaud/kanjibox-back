@@ -91,7 +91,7 @@ public class WordServiceImpl implements WordService {
 	 * @param wordValue
 	 * 			Word japanese writing value
 	 * @return
-	 * 			List of kanji business obects composing the word
+	 * 			List of kanji business objects composing the word
 	 */
 	private List<Kanji> buildWordKanjisList(String wordValue) {
 		return wordValue.chars().mapToObj(i -> String.valueOf((char) i)).filter(CharacterUtils::isKanji)
@@ -150,7 +150,7 @@ public class WordServiceImpl implements WordService {
 	 * Converts a Kana value (hiragana or katakana) to a standard plain hiragana value
 	 * 
 	 * @param value
-	 * 			Kana string inpur
+	 * 			Kana string input
 	 * @return
 	 * 			Hiragana converted value
 	 */

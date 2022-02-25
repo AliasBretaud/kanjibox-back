@@ -14,7 +14,7 @@ import flo.no.kanji.business.model.Word;
 public interface WordService {
 
 	/**
-	 * Seach words by its japanese value
+	 * Search words by its japanese value
 	 * 
 	 * @param search
 	 * 			Word japansese writing value

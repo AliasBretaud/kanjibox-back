@@ -53,7 +53,7 @@ public class WordEntity {
 	private String translation;
 
 	/**
-	 * Word japanese value (litteral kanjis and okuriganas)
+	 * Word japanese value (literal kanjis and okuriganas)
 	 */
 	private String value;
 
