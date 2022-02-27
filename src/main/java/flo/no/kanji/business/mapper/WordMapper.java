@@ -1,12 +1,10 @@
 package flo.no.kanji.business.mapper;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.integration.entity.WordEntity;
 
@@ -31,17 +29,15 @@ public class WordMapper {
 	 * 			Transformed business word object
 	 */
 	public Word toBusinessObject(WordEntity wordEntity) {
-		Word word = new Word();
-		word.setId(wordEntity.getId());
-		word.setValue(wordEntity.getValue());
-		word.setFuriganaValue(wordEntity.getFuriganaValue());
-		word.setTranslation(wordEntity.getTranslation());
-
-		List<Kanji> kanjis = wordEntity.getKanjis().stream().map(kanjiMapper::toBusinessObject)
+		var kanjis = wordEntity.getKanjis().stream().map(kanjiMapper::toBusinessObject)
 				.collect(Collectors.toList());
-		word.setKanjis(kanjis);
-
-		return word;
+		return Word.builder()
+				.id(wordEntity.getId())
+				.value(wordEntity.getValue())
+				.furiganaValue(wordEntity.getFuriganaValue())
+				.translation(wordEntity.getTranslation())
+				.kanjis(kanjis)
+				.build();
 	}
 	
 	/**
@@ -53,12 +49,11 @@ public class WordMapper {
 	 * 			Word entity converted object
 	 */
 	public WordEntity toEntity(Word word) {
-		WordEntity wordEntity = new WordEntity();
-		wordEntity.setId(word.getId());
-		wordEntity.setValue(word.getValue());
-		wordEntity.setFuriganaValue(word.getFuriganaValue());
-		wordEntity.setTranslation(word.getTranslation());
-
-		return wordEntity;
+		return WordEntity.builder()
+				.id(word.getId())
+				.value(word.getValue())
+				.furiganaValue(word.getFuriganaValue())
+				.translation(word.getTranslation())
+				.build();
 	}
 }

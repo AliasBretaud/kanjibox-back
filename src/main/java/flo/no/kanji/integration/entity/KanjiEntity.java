@@ -15,8 +15,10 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Kanji entity persistent database object
@@ -26,8 +28,10 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "kanji")
-@Setter
-@Getter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class KanjiEntity {
 
 	/** Database technical identifier **/

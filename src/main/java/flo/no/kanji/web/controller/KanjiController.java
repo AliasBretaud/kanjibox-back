@@ -58,7 +58,7 @@ public class KanjiController {
 	 */
 	@PostMapping
 	public Kanji addKanji(@RequestBody Kanji kanji,
-			@RequestParam(defaultValue = "true", value = "autoDetectReadings") boolean autoDetect) {
+			@RequestParam(defaultValue = "false", value = "autoDetectReadings") boolean autoDetect) {
 		return kanjiService.addKanji(kanji, autoDetect);
 	}
 	

@@ -23,14 +23,13 @@ public class KanjiMapper {
 	 * 			Transformed business kanji object
 	 */
 	public Kanji toBusinessObject(KanjiEntity kanjiEntity) {
-		Kanji kanji = new Kanji();
-		kanji.setId(kanjiEntity.getId());
-		kanji.setKunYomi(kanjiEntity.getKunYomi());
-		kanji.setOnYomi(kanjiEntity.getOnYomi());
-		kanji.setTranslations(kanjiEntity.getTranslations());
-		kanji.setValue(kanjiEntity.getValue());
-
-		return kanji;
+		return Kanji.builder()
+				.id(kanjiEntity.getId())
+				.kunYomi(kanjiEntity.getKunYomi())
+				.onYomi(kanjiEntity.getOnYomi())
+				.translations(kanjiEntity.getTranslations())
+				.value(kanjiEntity.getValue())
+				.build();
 	};
 	
 	/**
@@ -42,13 +41,12 @@ public class KanjiMapper {
 	 * 			Kanji entity converted object
 	 */
 	public KanjiEntity toEntity(Kanji kanji) {
-		KanjiEntity kanjiEntity = new KanjiEntity();
-		kanjiEntity.setId(kanji.getId());
-		kanjiEntity.setKunYomi(kanji.getKunYomi());
-		kanjiEntity.setOnYomi(kanji.getOnYomi());
-		kanjiEntity.setTranslations(kanji.getTranslations());
-		kanjiEntity.setValue(kanji.getValue());
-
-		return kanjiEntity;
+		return KanjiEntity.builder()
+				.id(kanji.getId())
+				.kunYomi(kanji.getKunYomi())
+				.onYomi(kanji.getOnYomi())
+				.translations(kanji.getTranslations())
+				.value(kanji.getValue())
+				.build();
 	};
 }

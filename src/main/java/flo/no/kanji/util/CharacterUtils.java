@@ -82,15 +82,16 @@ public class CharacterUtils {
 	public static CharacterType getCharacterType(String input) {
 
 		CharacterType type = null;
-
-		if (!ObjectUtils.isEmpty(input)) {
-			if (isHiragana(input)) {
+		final var value = clearInput(input);
+		
+		if (!ObjectUtils.isEmpty(value)) {
+			if (isHiragana(value)) {
 				type = CharacterType.HIRAGANA;
-			} else if (isKatakana(input)) {
+			} else if (isKatakana(value)) {
 				type = CharacterType.KATAKANA;
-			} else if (isKanji(input)) {
+			} else if (isKanji(value)) {
 				type = CharacterType.KANJI;
-			} else if (isKanjiWithOkurigana(input)){
+			} else if (isKanjiWithOkurigana(value)){
 				type = CharacterType.KANJI_WITH_OKURIGANA;
 			} else {
 				type = CharacterType.ROMAJI;
@@ -98,5 +99,9 @@ public class CharacterUtils {
 		}
 
 		return type;
+	}
+	
+	private static String clearInput(final String input) {
+		return input.replaceAll("\\-|\\.", "");
 	}
 }

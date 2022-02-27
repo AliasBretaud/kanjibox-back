@@ -1,6 +1,7 @@
 package flo.no.kanji.business.service;
 
 import javax.json.JsonMergePatch;
+import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,17 +27,7 @@ public interface KanjiService {
 	 * @return
 	 * 			Created kanji
 	 */
-	Kanji addKanji(Kanji kanji, boolean autodetectReadings);
-
-	/**
-	 * Seach Kanji by its japanese value
-	 * 
-	 * @param kanjiValue
-	 * 			Kanji japansese writing value
-	 * @return
-	 * 			Found kanji
-	 */
-	Kanji findKanjiByValue(String kanjiValue);
+	Kanji addKanji(@Valid Kanji kanji, boolean autodetectReadings);
 
 	/**
 	 * Affecting auto-determined readings and translations to an existing kanji

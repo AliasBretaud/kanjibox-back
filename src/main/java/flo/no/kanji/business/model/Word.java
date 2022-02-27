@@ -2,8 +2,12 @@ package flo.no.kanji.business.model;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import javax.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Word (Kanji 1+ and optional okuriganas)  model object representation
@@ -11,14 +15,17 @@ import lombok.Setter;
  * @author Florian
  *
  */
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Word {
 
 	/** Word technical identifier */
 	private Long id;
 
 	/** Word japanese value */
+	@NotNull
 	private String value;
 
 	/** Word translations */

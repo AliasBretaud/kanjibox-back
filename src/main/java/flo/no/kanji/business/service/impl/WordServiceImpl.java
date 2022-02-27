@@ -52,7 +52,8 @@ public class WordServiceImpl implements WordService {
 	private KanjiMapper kanjiMapper;
 	
 	/** Japanese alphabets converting service **/
-	private MojiConverter converter = new MojiConverter();
+	@Autowired
+	private MojiConverter converter;
 
 	/**
 	 * {@inheritDoc}
