@@ -1,0 +1,215 @@
+package flo.no.kanji.unit.business.service;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.johnzon.core.JsonMergePatchImpl;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
+import com.moji4j.MojiConverter;
+
+import flo.no.kanji.api.KanjiApiClient;
+import flo.no.kanji.api.model.KanjiVO;
+import flo.no.kanji.business.exception.InvalidInputException;
+import flo.no.kanji.business.exception.ItemNotFoundException;
+import flo.no.kanji.business.mapper.KanjiMapper;
+import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.service.impl.KanjiServiceImpl;
+import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.mock.EntityGenerator;
+import flo.no.kanji.integration.repository.KanjiRepository;
+import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
+import flo.no.kanji.util.PatchHelper;
+
+@ExtendWith(MockitoExtension.class)
+public class KanjiServiceTest {
+	
+	@Mock
+	private KanjiRepository kanjiRepository;
+
+	@Spy
+	private KanjiMapper kanjiMapper;
+
+	@Mock
+	private KanjiApiClient kanjiApiClient;
+	
+	@Mock
+	private PatchHelper patchHelper;
+	
+	@Spy
+	private MojiConverter mojiConverter;
+	
+	@Spy
+	@InjectMocks
+	private KanjiServiceImpl kanjiServiceImpl;
+	
+	@Test
+	public void addKanjiTestOk1() {
+		// PREPARE
+		when(kanjiRepository.save(any(KanjiEntity.class)))
+			.thenReturn(EntityGenerator.getKanjiEntity());
+		var kanji = BusinessObjectGenerator.getKanji();
+		//EXECUTE
+		var created = kanjiServiceImpl.addKanji(kanji, false);
+		// ASSERT
+		assertEquals(kanji, created);
+	}
+	
+	@Test
+	public void addKanjiTestOk2() {
+		// PREPARE
+		when(kanjiRepository.save(any(KanjiEntity.class)))
+			.thenReturn(EntityGenerator.getKanjiEntity());
+		var kanji = BusinessObjectGenerator.getKanji();
+		//EXECUTE
+		var created = kanjiServiceImpl.addKanji(kanji, true);
+		BusinessObjectGenerator.resetKanji();
+		// ASSERT
+		assertEquals(kanji, created);
+		verify(kanjiServiceImpl, times(1)).autoFillKanjiReadigs(any(Kanji.class));
+	}
+	
+	@Test
+	public void addKanjiTestKo() {
+		// PREPARE
+		when(kanjiRepository.findByValue(anyString())).thenReturn(EntityGenerator.getKanjiEntity());
+		var kanji = BusinessObjectGenerator.getKanji();
+		// ASSERT
+		assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.addKanji(kanji, false));
+	}
+	
+	@Test
+	public void findByValueTest() {
+		// PREPARE
+		when(kanjiRepository.findByValue(anyString()))
+			.thenReturn(EntityGenerator.getKanjiEntity());
+		// EXECUTE
+		var kanjiEntity = kanjiServiceImpl.findByValue("");
+		// ASSERT
+		assertEquals(EntityGenerator.getKanjiEntity(), kanjiEntity);
+	}
+
+	@Test
+	public void autoFillKanjiReadigsTestOk1() {
+		// PREPARE
+		var kanVO = new KanjiVO();
+		var kunYomi = List.of("kunYOmi");
+		var onYomi = List.of("onYomi");
+		var translations = List.of("translation");
+		kanVO.setKunReadings(kunYomi);
+		kanVO.setOnReadings(onYomi);
+		kanVO.setMeanings(translations);
+		when(kanjiApiClient.searchKanjiReadings(anyString())).thenReturn(kanVO);
+		var kanji = new Kanji();
+		kanji.setValue("T");
+		// EXECUTE
+		kanjiServiceImpl.autoFillKanjiReadigs(kanji);
+		// ASSERT
+		assertEquals(kunYomi, kanji.getKunYomi());
+		assertEquals(onYomi, kanji.getOnYomi());
+		assertEquals(translations, kanji.getTranslations());
+	}
+	
+	@Test
+	public void autoFillKanjiReadigsTestOk2() {
+		// PREPARE
+		when(kanjiApiClient.searchKanjiReadings(anyString())).thenThrow(new RuntimeException("Exception"));
+		var kanji = new Kanji();
+		kanji.setValue("T");
+		// EXECUTE
+		kanjiServiceImpl.autoFillKanjiReadigs(kanji);
+		// ASSERT
+		assertNull(kanji.getKunYomi());
+		assertNull(kanji.getOnYomi());
+		assertNull(kanji.getTranslations());
+		
+	}
+
+	@Test
+	public void getKanjisTestOk1() {
+		// PREPARE
+		when(kanjiRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
+			.thenReturn(new PageImpl<KanjiEntity>(List.of(EntityGenerator.getKanjiEntity())));
+		var pageable = Pageable.ofSize(1);
+		// EXECUTE
+		var kanjis = kanjiServiceImpl.getKanjis(null, pageable).getContent();
+		var kanji = kanjis.get(0);
+		// ASSERT
+		assertEquals(1, kanjis.size());
+		assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getKanjisTestOk2() {
+		// PREPARE
+		when(kanjiRepository.findAll(any(Specification.class), any(Pageable.class)))
+			.thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
+		var pageable = Pageable.ofSize(1);
+		Kanji kanji = null;
+		// EXECUTE
+		var kanjisSearch = kanjiServiceImpl.getKanjis("T", pageable).getContent();
+		// ASSERT
+		assertEquals(1, kanjisSearch.size());
+		kanji = kanjisSearch.get(0);
+		assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
+	}
+
+	@Test
+	public void patchKanjiTestOk() {
+		// PREPARE
+		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
+		var patchRequest = mock(JsonMergePatchImpl.class);
+		when(patchHelper.mergePatch(any(JsonMergePatchImpl.class), any(Kanji.class), eq(Kanji.class)))
+			.thenReturn(BusinessObjectGenerator.getKanji());
+		when(kanjiRepository.save(any(KanjiEntity.class))).thenReturn(EntityGenerator.getKanjiEntity());
+		// EXECUTE
+		var kanji = kanjiServiceImpl.patchKanji(1L, patchRequest);
+		// ASSERT
+		assertEquals(BusinessObjectGenerator.getKanji(), kanji);
+	}
+	
+	@Test
+	public void patchKanjiTestKo1() {
+		// PREPARE
+		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.ofNullable(null));
+		var patchRequest = mock(JsonMergePatchImpl.class);
+		// EXECUTE
+		// ASSERT
+		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest));
+	}
+	
+	@Test
+	public void patchKanjiTestKo2() {
+		// PREPARE
+		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
+		var patchRequest = mock(JsonMergePatchImpl.class);
+		var kanjiMerge = Kanji.builder().id(111L).build();
+		when(patchHelper.mergePatch(any(JsonMergePatchImpl.class), any(Kanji.class), eq(Kanji.class)))
+			.thenReturn(kanjiMerge);
+		// EXECUTE
+		// ASSERT
+		assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest));
+	}
+	
+}
