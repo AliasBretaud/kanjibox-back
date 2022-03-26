@@ -13,9 +13,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Defines API access controls
- * 
  * @author Florian
- *
  */
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -32,7 +30,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	/**
 	 * Configuring CORS configuration
-	 * 
 	 * @return
 	 * 		CorsConfigurationSource
 	 */

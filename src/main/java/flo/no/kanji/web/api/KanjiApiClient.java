@@ -1,22 +1,24 @@
-package flo.no.kanji.api;
+package flo.no.kanji.web.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import flo.no.kanji.api.model.KanjiVO;
+import flo.no.kanji.web.api.model.KanjiVO;
 
 /**
  * Kanji readings and translations external API REST HTTP Client
- * 
  * @author Florian
- *
  */
 @Service
+@PropertySource("classpath:kanjiExternalApi.properties")
 public class KanjiApiClient {
 
 	/** resource URL **/
-	private static final String URL = "https://kanjiapi.dev/v1/kanji/%s";
+	@Value("${kanji.external.api.url}")
+	private String URL;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -30,7 +32,7 @@ public class KanjiApiClient {
 	 * 		KanjiVO containing translations and readings
 	 */
 	public KanjiVO searchKanjiReadings(String kanjiValue) {
-		return restTemplate.getForObject(String.format(URL, kanjiValue), KanjiVO.class);
+		return restTemplate.getForObject(URL + kanjiValue, KanjiVO.class);
 	}
 
 }

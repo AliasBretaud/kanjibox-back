@@ -6,9 +6,7 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Configuration class for default HTTP client
- * 
  * @author Florian
- *
  */
 @Configuration
 public class RestTemplateConfig {

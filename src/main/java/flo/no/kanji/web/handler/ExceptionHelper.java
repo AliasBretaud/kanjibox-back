@@ -14,10 +14,21 @@ import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Global controller for exceptions handling
+ * @author Florian
+ */
 @ControllerAdvice
 @Slf4j
 public class ExceptionHelper {
 	
+	/**
+	 * Handling User inputs relating exception
+	 * @param ex
+	 * 			Generated exception during the process of entity creation/update
+	 * @return
+	 * 			400 BAD_REQUEST status with returned error
+	 */
 	@ExceptionHandler(value = {
 			InvalidInputException.class,
 			ConstraintViolationException.class,
@@ -30,6 +41,13 @@ public class ExceptionHelper {
 	    return new ResponseEntity<Object>(apiException, status);
     }
 	
+	/**
+	 * Handling not found object exceptions
+	 * @param ex
+	 * 			Generated exception while retrieving object
+	 * @return
+	 * 			404 NOT_FOUND status with returned error
+	 */
 	@ExceptionHandler(value = ItemNotFoundException.class)
 	public ResponseEntity<Object> handleItemNotFoundException(ItemNotFoundException ex) {
 		var status = HttpStatus.NOT_FOUND;
@@ -37,6 +55,13 @@ public class ExceptionHelper {
 	    return new ResponseEntity<Object>(apiException, status);
 	}
 	
+	/**
+	 * Handling general Exceptions
+	 * @param ex
+	 * 			Exception
+	 * @return
+	 * 			500 INTERNAL_SERVER_ERROR status with returned error
+	 */
 	@ExceptionHandler(value = Exception.class)
 	public ResponseEntity<Object> handleException(Exception ex) {
 	    log.error("Exception: ", ex);
@@ -45,6 +70,15 @@ public class ExceptionHelper {
 	    return new ResponseEntity<Object>(apiException, status);
     }
 	
+	/**
+	 * Builds Exception to return via the API
+	 * @param status
+	 * 			Error HTTP status
+	 * @param ex
+	 * 			Returned exception
+	 * @return
+	 * 			Builded/converted API exception
+	 */
 	private ApiExceptionWrapper buildApiException(final HttpStatus status, final Exception ex) {
 		return new ApiExceptionWrapper(new Timestamp(System.currentTimeMillis()).toString(),
 	    		status.value(),	ex.getClass().getName(), ex.getMessage());

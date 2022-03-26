@@ -2,7 +2,7 @@ package flo.no.kanji.business.model;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Word (Kanji 1+ and optional okuriganas)  model object representation
- * 
  * @author Florian
- *
  */
 @Data
 @NoArgsConstructor
@@ -25,7 +23,7 @@ public class Word {
 	private Long id;
 
 	/** Word japanese value */
-	@NotNull
+	@NotBlank
 	private String value;
 
 	/** Word translations */

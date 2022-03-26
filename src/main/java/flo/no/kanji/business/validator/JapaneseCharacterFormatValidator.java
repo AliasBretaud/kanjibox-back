@@ -12,18 +12,28 @@ import org.springframework.util.ObjectUtils;
 import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.util.CharacterUtils;
 
+/**
+ * Japanese validating format class validation
+ * @author Florian
+ */
 @Component
-public class JapaneseCharacterFormatValidator
-	implements ConstraintValidator<JapaneseCharacterFormat, Object>{
+public class JapaneseCharacterFormatValidator implements ConstraintValidator<JapaneseCharacterFormat, Object>{
 	
+	/** Japanese format/alphabet used for validating **/
 	private CharacterType format;
 	
+	/**
+	 * @{inheritDoc}
+	 */
 	public void initialize(JapaneseCharacterFormat constraintAnnotation) {
         this.format = constraintAnnotation.format();
     }
 
 	@SuppressWarnings("unchecked")
 	@Override
+	/**
+	 * @{inheritDoc}
+	 */
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
 		if (value == null) {
 			return true;
@@ -32,6 +42,13 @@ public class JapaneseCharacterFormatValidator
 		return !ObjectUtils.isEmpty(input) && input.stream().allMatch(this::isValid);
 	}
 	
+	/**
+	 * Validates the input string compared to the given format
+	 * @param value
+	 * 			Input String
+	 * @return
+	 * 			True if the input String matches the given format/alphabet, false otherwise
+	 */
 	private boolean isValid(String value) {
 		return StringUtils.isNotEmpty(value)
 				&& CharacterUtils.getCharacterType(value) == this.format;

@@ -22,9 +22,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Word entity persistent database object
- * 
  * @author Florian
- *
  */
 @Entity
 @Table(name = "word")
@@ -61,6 +59,9 @@ public class WordEntity {
 	 */
 	private String value;
 
+	/**
+	 * Default method called before each persist or update operation
+	 */
 	@PrePersist
 	@PreUpdate
 	private void setUp() {

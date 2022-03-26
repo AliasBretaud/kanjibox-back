@@ -27,10 +27,8 @@ import flo.no.kanji.util.CharacterUtils;
 
 /**
  * Word business service implementation
- * 
  * @see WordService
  * @author Florian
- *
  */
 @Service
 public class WordServiceImpl implements WordService {

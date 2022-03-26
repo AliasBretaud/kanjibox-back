@@ -1,4 +1,4 @@
-package flo.no.kanji.api.model;
+package flo.no.kanji.web.api.model;
 
 import java.util.List;
 
@@ -11,9 +11,7 @@ import lombok.Setter;
 @Setter
 /**
  * Object returned by external Kanji readings/meanings API
- * 
  * @author Florian
- *
  */
 public class KanjiVO {
 	

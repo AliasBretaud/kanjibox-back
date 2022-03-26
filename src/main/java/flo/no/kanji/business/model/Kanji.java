@@ -14,9 +14,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Kanji model object representation
- * 
  * @author Florian
- *
  */
 @Data
 @NoArgsConstructor

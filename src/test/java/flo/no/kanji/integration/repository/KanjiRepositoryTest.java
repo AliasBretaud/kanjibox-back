@@ -14,13 +14,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 
+/**
+ * KankiRepository test class
+ * @author Florian
+ */
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 public class KanjiRepositoryTest {
 
+	/** Test class **/
 	@Autowired
 	private KanjiRepository kanjiRepository;
 	
+	/**
+	 * 
+	 */
 	@Test
 	public void searchKanjiByValueTest() {
 		// PREPARE

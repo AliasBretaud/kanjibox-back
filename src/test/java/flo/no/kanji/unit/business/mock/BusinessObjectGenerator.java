@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.model.Word;
 
 /**
  * Mock class generating dummy business objects
@@ -27,6 +28,19 @@ public class BusinessObjectGenerator {
 		}
 		
 		return (Kanji) objectMap.get("kanji");
+	}
+	
+	public static Word getWord() {
+		if (!objectMap.containsKey("word")) {
+			var word = new Word();
+			word.setId(1L);
+			word.setValue("火山");
+			word.setFuriganaValue("かざん");
+			word.setTranslation("Volcano");
+			objectMap.put("word", word);
+		}
+		
+		return (Word) objectMap.get("word");
 	}
 	
 	public static void resetKanji() {

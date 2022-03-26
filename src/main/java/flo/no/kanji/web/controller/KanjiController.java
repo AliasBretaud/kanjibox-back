@@ -18,9 +18,7 @@ import flo.no.kanji.business.service.KanjiService;
 
 /**
  * Kanji REST Controller
- * 
  * @author Florian
- *
  */
 @RestController
 @RequestMapping("/kanjis")
@@ -32,7 +30,6 @@ public class KanjiController {
 
 	/**
 	 * Search kanjis
-	 * 
 	 * @param search
 	 * 			Japanese kanji value
 	 * @param pageable
@@ -48,7 +45,6 @@ public class KanjiController {
 
 	/**
 	 * Saving new kanji
-	 * 
 	 * @param kanji
 	 * 			Kanji business object
 	 * @param autodetectReadings
@@ -64,7 +60,6 @@ public class KanjiController {
 	
 	/**
 	 * Modify an existing kanji attributes
-	 * 
 	 * @param kanjiId
 	 * 			Tehnical ID of the kanji present in database
 	 * @param patchRequest

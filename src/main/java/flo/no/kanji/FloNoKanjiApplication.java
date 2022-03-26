@@ -6,9 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Kanji App Main class
  * Launches Spring Boot configuration
- * 
  * @author Florian
- *
  */
 @SpringBootApplication
 public class FloNoKanjiApplication {

@@ -15,9 +15,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Converter class for JSON merge HTTP method
- * 
  * @author Florian
- *
  */
 @Component
 public class JsonMergePatchHttpMessageConverter extends AbstractHttpMessageConverter<JsonMergePatch> {

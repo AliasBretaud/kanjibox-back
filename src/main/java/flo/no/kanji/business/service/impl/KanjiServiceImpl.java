@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
-import flo.no.kanji.api.KanjiApiClient;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -23,14 +22,13 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.PatchHelper;
+import flo.no.kanji.web.api.KanjiApiClient;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Kanji business service implementation
- * 
  * @see KanjiService
  * @author Florian
- *
  */
 @Service
 @Slf4j

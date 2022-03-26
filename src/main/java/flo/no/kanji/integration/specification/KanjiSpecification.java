@@ -10,10 +10,22 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.KanjiEntity_;
 import flo.no.kanji.util.CharacterUtils;
 
+/**
+ * Kanji object JPA Specification utils class
+ * @author Florian
+ */
 public class KanjiSpecification {
 
+	/** Japanese/Latin character converter bean **/
 	private static MojiConverter converter = new MojiConverter();
 	
+	/**
+	 * Kanji search specification
+	 * @param search
+	 * 			Input character(s) search
+	 * @return
+	 * 			Builded search criteria specification
+	 */
 	public static Specification<KanjiEntity> getSearchKanjiSpecification(final String search) {
 		return (root, query, builder) -> {
 			var predicate = switch (CharacterUtils.getCharacterType(search)) {

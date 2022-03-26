@@ -12,16 +12,13 @@ import flo.no.kanji.integration.entity.WordEntity;
 
 /**
  * JPA repository for WORD table
- * 
  * @author Florian
- *
  */
 @Repository
 public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpecificationExecutor<WordEntity> {
 
 	/**
 	 * Find a word by its value containing an input string
-	 * 
 	 * @param value
 	 * 			Input contained in word
 	 * @return
@@ -31,7 +28,6 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
 
 	/**
 	 * Find a word by its hiragana transcription containing an input string
-	 * 
 	 * @param value
 	 * 			Input contained in word transcription
 	 * @return
@@ -41,7 +37,6 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
 
 	/**
 	 * Find a word by its translation containing an input string
-	 * 
 	 * @param value
 	 * 			Input contained in word translation
 	 * @return
@@ -51,7 +46,6 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
 
 	/**
 	 * Find all words, ordered by creation/modification date
-	 * 
 	 * @param pageable
 	 * 			Spring pageable settings
 	 * @return

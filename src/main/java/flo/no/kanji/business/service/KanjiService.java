@@ -11,9 +11,7 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 
 /**
  * Kanji operations business service
- * 
  * @author Florian
- *
  */
 public interface KanjiService {
 

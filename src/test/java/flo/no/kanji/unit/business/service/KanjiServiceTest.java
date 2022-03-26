@@ -28,8 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import com.moji4j.MojiConverter;
 
-import flo.no.kanji.api.KanjiApiClient;
-import flo.no.kanji.api.model.KanjiVO;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -40,6 +38,8 @@ import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.util.PatchHelper;
+import flo.no.kanji.web.api.KanjiApiClient;
+import flo.no.kanji.web.api.model.KanjiVO;
 
 @ExtendWith(MockitoExtension.class)
 public class KanjiServiceTest {

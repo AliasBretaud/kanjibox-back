@@ -14,9 +14,7 @@ import flo.no.kanji.business.constants.CharacterType;
 
 /**
  * Japanese characters class utils
- * 
  * @author Florian
- *
  */
 public class CharacterUtils {
 	
@@ -25,7 +23,6 @@ public class CharacterUtils {
 
 	/**
 	 * Determines if the input chain is strictly a kanji value
-	 * 
 	 * @param input
 	 * 			Input characters
 	 * @return
@@ -37,19 +34,20 @@ public class CharacterUtils {
 	
 	/**
 	 * Determines if the input chain is a japanese word containing kanji(s) and conjugation hiragana(s) (okuriganas)
-	 * 
 	 * @param input
 	 * 			Input characters
 	 * @return
 	 * 			true if the input chain is kanji(s) with conjugation okurigana(s), false otherwise
 	 */
 	public static boolean isKanjiWithOkurigana(String input) {
-		return mojiDetector.hasKanji(input) && mojiDetector.hasKana(input) && !mojiDetector.hasLatin(input);
+		return mojiDetector.hasKanji(input) && mojiDetector.hasKana(input) && input.chars().allMatch(c -> {
+					final var charType = UnicodeBlock.of(c);
+					return charType == HIRAGANA || charType == CJK_UNIFIED_IDEOGRAPHS;
+				});
 	}
 
 	/**
 	 * Determines if the input chain is strictly hiragana value
-	 * 
 	 * @param input
 	 * 			Input chain
 	 * @return
@@ -61,7 +59,6 @@ public class CharacterUtils {
 
 	/**
 	 * Determines if the input chain is strictly katakana value
-	 * 
 	 * @param input
 	 * 			Input chain
 	 * @return
@@ -73,7 +70,6 @@ public class CharacterUtils {
 
 	/**
 	 * Determines the corresponding japanese alphabet type of input chain
-	 * 
 	 * @param input
 	 * 			String input
 	 * @return
@@ -82,6 +78,7 @@ public class CharacterUtils {
 	public static CharacterType getCharacterType(String input) {
 
 		CharacterType type = null;
+		// Cleaning input from undesirable characters such as -; .
 		final var value = clearInput(input);
 		
 		if (!ObjectUtils.isEmpty(value)) {
@@ -101,6 +98,13 @@ public class CharacterUtils {
 		return type;
 	}
 	
+	/**
+	 * Cleans input from separating characters
+	 * @param input
+	 * 			Input String
+	 * @return
+	 * 			Cleaned output
+	 */
 	private static String clearInput(final String input) {
 		return input.replaceAll("\\-|\\.", "");
 	}

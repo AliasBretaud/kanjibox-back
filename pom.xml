@@ -136,8 +136,7 @@
 					<testFailureIgnore>true</testFailureIgnore>
 					<forkCount>2</forkCount>
 					<reuseForks>true</reuseForks>
-					<argLine>${surefireArgLine}</argLine>
-					<argLine>-Dfile.encoding=UTF-8</argLine>
+					<argLine>${surefireArgLine} -Dfile.encoding=UTF-8</argLine>
 				</configuration>
 			</plugin>
 

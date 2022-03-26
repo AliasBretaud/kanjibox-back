@@ -22,7 +22,6 @@ public class WordMapper {
 
 	/**
 	 * Transforms a Word entity to business object
-	 * 
 	 * @param wordEntity
 	 * 			Input entity
 	 * @return
@@ -42,7 +41,6 @@ public class WordMapper {
 	
 	/**
 	 * Transforms a Word business object to entity (before performing save in database)
-	 * 
 	 * @param word
 	 * 			Word business object
 	 * @return

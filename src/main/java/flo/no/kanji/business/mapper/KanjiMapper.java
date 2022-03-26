@@ -7,9 +7,7 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 
 /**
  * Kanji object bidirectional mapper between Model objects and Entities
- * 
  * @author Florian
- *
  */
 @Service
 public class KanjiMapper {

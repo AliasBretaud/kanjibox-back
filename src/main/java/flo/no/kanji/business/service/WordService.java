@@ -7,15 +7,12 @@ import flo.no.kanji.business.model.Word;
 
 /**
  * Word operations business service
- * 
  * @author Florian
- *
  */
 public interface WordService {
 
 	/**
 	 * Search words by its japanese value
-	 * 
 	 * @param search
 	 * 			Word japansese writing value
 	 * @param pageable
@@ -27,7 +24,6 @@ public interface WordService {
 
 	/**
 	 * Saving new word
-	 * 
 	 * @param word
 	 * 			Word business object
 	 * @return

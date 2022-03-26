@@ -15,9 +15,7 @@ import flo.no.kanji.business.service.WordService;
 
 /**
  * Word REST Controller
- * 
  * @author Florian
- *
  */
 @RestController
 @RequestMapping("/words")
@@ -29,7 +27,6 @@ public class WordController {
 
 	/**
 	 * Search words by its japanese value
-	 * 
 	 * @param search
 	 * 			Word japansese writing value
 	 * @param pageable
@@ -45,7 +42,6 @@ public class WordController {
 
 	/**
 	 * Saving new word
-	 * 
 	 * @param word
 	 * 			Word business object
 	 * @return

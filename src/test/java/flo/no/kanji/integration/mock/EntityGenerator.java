@@ -9,12 +9,16 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 /**
  * Mock class generating dummy entities
  * @author Florian
- *
  */
 public class EntityGenerator {
 
+	/** Object map containing generated test entities **/
 	private static Map<String, Object> objectMap = new HashMap<>();
 	
+	/**
+	 * Generating KanjiEntity dummy object
+	 * @return KanjiEntity
+	 */
 	public static KanjiEntity getKanjiEntity() {
 		if (!objectMap.containsKey("kanjiEntity")) {
 			var kanjiEntity = KanjiEntity.builder()

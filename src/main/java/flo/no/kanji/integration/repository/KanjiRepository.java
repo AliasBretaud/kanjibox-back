@@ -10,16 +10,13 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 
 /**
  * JPA repository for KANJI table
- * 
  * @author Florian
- *
  */
 @Repository
 public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSpecificationExecutor<KanjiEntity> {
 
 	/**
 	 * Find a kanji by its japanese writing value
-	 * 
 	 * @param kanjiValue
 	 * 			japanese writing value
 	 * @return
@@ -29,7 +26,6 @@ public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSp
 
 	/**
 	 * Find all kanjis, ordered by creation/modification date
-	 * 
 	 * @param pageable
 	 * 			Spring pageable settings
 	 * @return

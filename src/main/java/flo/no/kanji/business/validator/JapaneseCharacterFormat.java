@@ -11,6 +11,10 @@ import javax.validation.Payload;
 
 import flo.no.kanji.business.constants.CharacterType;
 
+/**
+ * Annotation used for validating input Japanese format of given String object
+ * @author Florian
+ */
 @Documented
 @Constraint(validatedBy = JapaneseCharacterFormatValidator.class)
 @Target( { ElementType.METHOD, ElementType.FIELD })
