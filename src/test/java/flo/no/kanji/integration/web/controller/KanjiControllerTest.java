@@ -105,4 +105,13 @@ public class KanjiControllerTest {
 				.content(objectMapper.writeValueAsString(kanji)))
         	.andExpect(status().isBadRequest());
 	}
+	
+	@Test
+	public void testPostKanjiKo5() throws Exception {
+		var kanji = new Kanji("");
+		mockMvc.perform(post("/kanjis")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(kanji)))
+        	.andExpect(status().isBadRequest());
+	}
 }

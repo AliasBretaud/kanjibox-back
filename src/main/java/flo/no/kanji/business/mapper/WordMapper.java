@@ -28,8 +28,8 @@ public class WordMapper {
 	 * 			Transformed business word object
 	 */
 	public Word toBusinessObject(WordEntity wordEntity) {
-		var kanjis = wordEntity.getKanjis().stream().map(kanjiMapper::toBusinessObject)
-				.collect(Collectors.toList());
+		var kanjis = wordEntity.getKanjis() != null ? wordEntity.getKanjis().stream().map(kanjiMapper::toBusinessObject)
+				.collect(Collectors.toList()) : null;
 		return Word.builder()
 				.id(wordEntity.getId())
 				.value(wordEntity.getValue())
