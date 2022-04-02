@@ -16,7 +16,10 @@ import flo.no.kanji.business.constants.CharacterType;
  * Japanese characters class utils
  * @author Florian
  */
-public class CharacterUtils {
+public final class CharacterUtils {
+	
+	/** Private constructor : The class provides only static methods so no instantiation needed **/
+	private CharacterUtils() {}
 	
 	/** Japanese alphabet (hiragana/katakana/kanji) detetor **/
 	private static MojiDetector mojiDetector = new MojiDetector();
@@ -67,6 +70,17 @@ public class CharacterUtils {
 	public static boolean isKatakana(String input) {
 		return input.chars().allMatch(c -> UnicodeBlock.of(c) == KATAKANA);
 	}
+	
+	/**
+	 * Determines if the input chain is strictly latin value
+	 * @param input
+	 * 			Input chain
+	 * @return
+	 * 			true if the input chain is latin, false otherwise
+	 */
+	public static boolean isRomaji(String input) {
+		return input.chars().allMatch(c -> (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
+	}
 
 	/**
 	 * Determines the corresponding japanese alphabet type of input chain
@@ -88,9 +102,9 @@ public class CharacterUtils {
 				type = CharacterType.KATAKANA;
 			} else if (isKanji(value)) {
 				type = CharacterType.KANJI;
-			} else if (isKanjiWithOkurigana(value)){
+			} else if (isKanjiWithOkurigana(value)) {
 				type = CharacterType.KANJI_WITH_OKURIGANA;
-			} else {
+			} else if (isRomaji(value)) {
 				type = CharacterType.ROMAJI;
 			}
 		}

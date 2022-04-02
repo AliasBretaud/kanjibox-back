@@ -21,7 +21,7 @@ import flo.no.kanji.business.constants.CharacterType;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JapaneseCharacterFormat {
 	String message() default "Invalid japanese format";
-	CharacterType format();
+	CharacterType[] format();
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

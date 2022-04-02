@@ -169,6 +169,22 @@ public class WordServiceTest {
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
 			.thenReturn(page);
 		// EXECUTE
+		var word = wordServiceImpl.getWords("会う", mock(Pageable.class)).getContent().get(0);
+		var specCaptor = ArgumentCaptor.forClass(Specification.class);
+		verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
+		executeSpecification(specCaptor.getValue());
+		// ASSERT
+		assertEquals(wordMapper.toBusinessObject(EntityGenerator.getWordEntity()), word);
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getWordsTest6() {
+		// PREPARE
+		var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
+		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
+			.thenReturn(page);
+		// EXECUTE
 		var word = wordServiceImpl.getWords("a", mock(Pageable.class)).getContent().get(0);
 		var specCaptor = ArgumentCaptor.forClass(Specification.class);
 		verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));

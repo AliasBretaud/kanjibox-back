@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 
+import flo.no.kanji.business.constants.CharacterType;
+import flo.no.kanji.business.validator.JapaneseCharacterFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,12 +26,15 @@ public class Word {
 
 	/** Word japanese value */
 	@NotBlank
+	@JapaneseCharacterFormat(format = {CharacterType.KANJI, CharacterType.KANJI_WITH_OKURIGANA})
 	private String value;
 
 	/** Word translations */
 	private String translation;
 
 	/** Word transcription in hiragana **/
+	@NotBlank
+	@JapaneseCharacterFormat(format = CharacterType.HIRAGANA)
 	private String furiganaValue;
 
 	/** Kanjis composing the word */

@@ -1125,69 +1125,67 @@ INSERT INTO kanji_translation (kanji_id, translation) VALUES (193, 'performance'
 INSERT INTO kanji_translation (kanji_id, translation) VALUES (14, 'or');
 INSERT INTO kanji_translation (kanji_id, translation) VALUES (14, 'argent (au sens monétaire)');
 
-
 --
--- TOC entry 3339 (class 0 OID 16586)
+-- TOC entry 3321 (class 0 OID 16586)
 -- Dependencies: 215
 -- Data for Name: word; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (42, 'ゆうびんきょく', '2020-04-15 01:35:16', 'Bureau de poste', '郵便局');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (43, 'かぞく', '2020-04-15 01:39:25', 'famille', '家族');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (44, 'おおさか', '2020-04-15 11:02:48', 'Osaka', '大阪');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (47, 'さっそく', '2020-04-15 11:04:52', 'Immédiatement', '早速');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (50, 'ちゅうとはんば', '2020-04-15 11:22:19', 'Incomplet, ne pas aller au bout', '中途半端');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (55, 'せかい', '2020-04-15 14:21:22', 'Monde', '世界');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (58, 'えがお', '2020-04-15 14:31:20', 'Sourire', '笑顔');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (61, 'ほしぞら', '2020-04-15 14:34:37', 'Ciel étoilé', '星空');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (64, 'すでに', '2020-04-15 15:44:53', 'Déjà', '既に');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (66, 'じょうきょう', '2020-04-15 20:38:50', 'Condition, circonstance, situation', '状況');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (69, 'いっさいがっさい', '2020-04-15 22:25:38', 'Tout ensemble, bout à bout', '一切合切');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (74, 'じょうほう', '2020-04-15 22:29:12', 'Information', '情報');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (77, 'でんたつ', '2020-04-15 22:30:00', 'Transfert, transmission', '伝達');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (80, 'なまえ', '2020-04-15 22:44:38', 'Nom', '名前');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (83, 'だいがく', '2020-04-15 22:45:59', 'Université', '大学');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (85, 'わがはい', '2020-04-16 00:38:36', 'Je (Gintama)', '吾輩');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (88, 'たいよう', '2020-04-16 00:46:23', 'Le soleil', '太陽');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (91, 'おとりこみちゅう', '2020-04-17 23:23:26', 'Être occupé, déranger', 'お取り込み中');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (94, 'いしょう', '2020-04-17 23:24:18', 'Déguisement', '衣装');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (97, 'ごうだつ', '2020-04-17 23:56:51', 'Vol, braquage', '強奪');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (100, 'あんしょう', '2020-04-18 00:00:30', 'Récif', '暗礁');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (103, 'はつあん', '2020-04-18 00:03:49', 'Proposition, suggestion, idée', '発案');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (106, 'はつめい', '2020-04-18 00:05:13', 'Invention', '発明');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (108, 'よかん', '2020-04-18 00:08:12', 'Pressentiment', '予感');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (110, 'おんびん', '2020-04-18 00:11:01', 'Amiable, amical, paisiblement', '穏便');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (112, 'きちょうひん', '2020-04-18 00:20:24', 'Objets de valeur', '貴重品');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (116, 'ようきゅう', '2020-04-18 00:27:39', 'Demande, requête', '要求');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (119, 'そうじ', '2020-04-18 00:30:35', 'Nettoyage, ménage', '掃除');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (122, 'おんせん', '2020-04-18 17:28:25', 'Source chaude, thermale', '温泉');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (125, 'ふにおちん', '2020-04-18 22:58:45', 'Ne pas digérer', '腑に落ちん');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (128, 'とうか', '2020-04-18 23:49:57', 'équivalent', '等価');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (131, 'すりかえる', '2020-04-18 23:59:51', 'Substituer', 'すり替える');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (133, 'でんじゅ', '2020-04-19 00:02:58', 'Initiation, enseignement', '伝授');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (135, 'なっとくする', '2020-04-19 22:55:36', 'être d''accord', '納得する');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (138, 'きょうはん', '2020-04-19 22:56:39', 'Complice', '共犯');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (141, 'きたい', '2020-04-19 23:07:13', 'Attentes (expectations)', '期待');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (144, 'このたび', '2020-04-19 23:10:39', 'Cette fois', 'この度');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (146, 'ほりおこす', '2020-04-19 23:41:28', 'Déterrer, creuser', '掘り起こす ');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (149, 'めんどう', '2020-04-19 23:42:44', 'Gêne, trouble', '面倒');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (152, 'ころがってる', '2020-04-19 23:56:39', 'Rouler sur le sol', '転がってる');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (154, 'みょうちょう', '2020-04-21 23:55:37', 'Demain matin', '明朝');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (155, 'しゅうごう', '2020-04-21 23:57:31', 'Ensemble, rassemblement', '集合');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (157, 'よくじつ', '2020-04-22 00:09:03', 'Le jour suivant', '翌日');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (160, 'こんせき', '2020-04-22 00:23:02', 'Trace', '痕跡');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (163, 'みのがす', '2020-04-22 00:34:14', 'Manquer (louper)', '見逃す');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (166, 'ゆうり', '2020-04-25 23:06:37', 'Avantageux, profitable', '有利');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (169, 'しゅび', '2020-04-25 23:18:30', 'Du début à la fin', '首尾');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (172, 'どうわ', '2020-04-25 23:25:18', 'Conte de fées, pour enfants', '童話');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (175, 'しんどう', '2020-04-26 00:04:18', 'Ocillation, vibration', '振動');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (178, 'かんしやく', '2020-04-26 00:17:14', 'Moniteur, superviseur', '監視役');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (182, 'どきょう', '2020-04-26 21:32:48', 'Courage', '度胸');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (184, 'ていぎ', '2020-04-26 21:57:23', 'Définition', '定義');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (187, 'くちあたり', '2020-04-27 22:56:16', 'Le goût', '口当たり');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (190, 'こい', '2020-04-27 23:04:38', 'Riche, profond, prononcé', '濃い');
-INSERT INTO kanji_translation (kanji_id, translation) VALUES (192, 'じゅぎょう', '2021-11-17 21:59:38', 'Cours (classe)', '授業');
-
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (42, 'ゆうびんきょく', '2020-04-15 01:35:16', 'Bureau de poste', '郵便局');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (43, 'かぞく', '2020-04-15 01:39:25', 'famille', '家族');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (44, 'おおさか', '2020-04-15 11:02:48', 'Osaka', '大阪');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (47, 'さっそく', '2020-04-15 11:04:52', 'Immédiatement', '早速');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (50, 'ちゅうとはんば', '2020-04-15 11:22:19', 'Incomplet, ne pas aller au bout', '中途半端');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (55, 'せかい', '2020-04-15 14:21:22', 'Monde', '世界');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (58, 'えがお', '2020-04-15 14:31:20', 'Sourire', '笑顔');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (61, 'ほしぞら', '2020-04-15 14:34:37', 'Ciel étoilé', '星空');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (64, 'すでに', '2020-04-15 15:44:53', 'Déjà', '既に');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (66, 'じょうきょう', '2020-04-15 20:38:50', 'Condition, circonstance, situation', '状況');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (69, 'いっさいがっさい', '2020-04-15 22:25:38', 'Tout ensemble, bout à bout', '一切合切');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (74, 'じょうほう', '2020-04-15 22:29:12', 'Information', '情報');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (77, 'でんたつ', '2020-04-15 22:30:00', 'Transfert, transmission', '伝達');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (80, 'なまえ', '2020-04-15 22:44:38', 'Nom', '名前');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (83, 'だいがく', '2020-04-15 22:45:59', 'Université', '大学');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (85, 'わがはい', '2020-04-16 00:38:36', 'Je (Gintama)', '吾輩');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (88, 'たいよう', '2020-04-16 00:46:23', 'Le soleil', '太陽');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (91, 'おとりこみちゅう', '2020-04-17 23:23:26', 'Être occupé, déranger', 'お取り込み中');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (94, 'いしょう', '2020-04-17 23:24:18', 'Déguisement', '衣装');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (97, 'ごうだつ', '2020-04-17 23:56:51', 'Vol, braquage', '強奪');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (100, 'あんしょう', '2020-04-18 00:00:30', 'Récif', '暗礁');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (103, 'はつあん', '2020-04-18 00:03:49', 'Proposition, suggestion, idée', '発案');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (106, 'はつめい', '2020-04-18 00:05:13', 'Invention', '発明');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (108, 'よかん', '2020-04-18 00:08:12', 'Pressentiment', '予感');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (110, 'おんびん', '2020-04-18 00:11:01', 'Amiable, amical, paisiblement', '穏便');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (112, 'きちょうひん', '2020-04-18 00:20:24', 'Objets de valeur', '貴重品');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (116, 'ようきゅう', '2020-04-18 00:27:39', 'Demande, requête', '要求');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (119, 'そうじ', '2020-04-18 00:30:35', 'Nettoyage, ménage', '掃除');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (122, 'おんせん', '2020-04-18 17:28:25', 'Source chaude, thermale', '温泉');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (125, 'ふにおちん', '2020-04-18 22:58:45', 'Ne pas digérer', '腑に落ちん');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (128, 'とうか', '2020-04-18 23:49:57', 'équivalent', '等価');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (131, 'すりかえる', '2020-04-18 23:59:51', 'Substituer', 'すり替える');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (133, 'でんじゅ', '2020-04-19 00:02:58', 'Initiation, enseignement', '伝授');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (135, 'なっとくする', '2020-04-19 22:55:36', 'être d''accord', '納得する');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (138, 'きょうはん', '2020-04-19 22:56:39', 'Complice', '共犯');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (141, 'きたい', '2020-04-19 23:07:13', 'Attentes (expectations)', '期待');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (144, 'このたび', '2020-04-19 23:10:39', 'Cette fois', 'この度');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (146, 'ほりおこす', '2020-04-19 23:41:28', 'Déterrer, creuser', '掘り起こす ');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (149, 'めんどう', '2020-04-19 23:42:44', 'Gêne, trouble', '面倒');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (152, 'ころがってる', '2020-04-19 23:56:39', 'Rouler sur le sol', '転がってる');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (154, 'みょうちょう', '2020-04-21 23:55:37', 'Demain matin', '明朝');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (155, 'しゅうごう', '2020-04-21 23:57:31', 'Ensemble, rassemblement', '集合');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (157, 'よくじつ', '2020-04-22 00:09:03', 'Le jour suivant', '翌日');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (160, 'こんせき', '2020-04-22 00:23:02', 'Trace', '痕跡');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (163, 'みのがす', '2020-04-22 00:34:14', 'Manquer (louper)', '見逃す');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (166, 'ゆうり', '2020-04-25 23:06:37', 'Avantageux, profitable', '有利');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (169, 'しゅび', '2020-04-25 23:18:30', 'Du début à la fin', '首尾');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (172, 'どうわ', '2020-04-25 23:25:18', 'Conte de fées, pour enfants', '童話');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (175, 'しんどう', '2020-04-26 00:04:18', 'Ocillation, vibration', '振動');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (178, 'かんしやく', '2020-04-26 00:17:14', 'Moniteur, superviseur', '監視役');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (182, 'どきょう', '2020-04-26 21:32:48', 'Courage', '度胸');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (184, 'ていぎ', '2020-04-26 21:57:23', 'Définition', '定義');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (187, 'くちあたり', '2020-04-27 22:56:16', 'Le goût', '口当たり');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (190, 'こい', '2020-04-27 23:04:38', 'Riche, profond, prononcé', '濃い');
+INSERT INTO word (id, furigana_value, time_stamp, translation, value) VALUES (192, 'じゅぎょう', '2021-11-17 21:59:38', 'Cours (classe)', '授業');
 
 --
 -- TOC entry 3340 (class 0 OID 16593)

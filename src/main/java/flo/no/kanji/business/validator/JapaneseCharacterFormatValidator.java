@@ -1,5 +1,6 @@
 package flo.no.kanji.business.validator;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.ConstraintValidator;
@@ -20,13 +21,13 @@ import flo.no.kanji.util.CharacterUtils;
 public class JapaneseCharacterFormatValidator implements ConstraintValidator<JapaneseCharacterFormat, Object>{
 	
 	/** Japanese format/alphabet used for validating **/
-	private CharacterType format;
+	private CharacterType[] formats;
 	
 	/**
 	 * @{inheritDoc}
 	 */
 	public void initialize(JapaneseCharacterFormat constraintAnnotation) {
-        this.format = constraintAnnotation.format();
+        this.formats = constraintAnnotation.format();
     }
 
 	@SuppressWarnings("unchecked")
@@ -51,7 +52,7 @@ public class JapaneseCharacterFormatValidator implements ConstraintValidator<Jap
 	 */
 	private boolean isValid(String value) {
 		return StringUtils.isNotEmpty(value)
-				&& CharacterUtils.getCharacterType(value) == this.format;
+				&& Arrays.stream(this.formats).anyMatch(f -> f == CharacterUtils.getCharacterType(value));
 	}
 
 }

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
+import com.moji4j.MojiConverter;
+
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -50,6 +52,10 @@ public class KanjiServiceImpl implements KanjiService {
 	/** Kanji updating fields class helper */
 	@Autowired
 	private PatchHelper patchHelper;
+	
+	/** Japanese alphabets converting service **/
+	@Autowired
+	private MojiConverter converter;
 
 	/**
 	 * {@inheritDoc}
@@ -114,7 +120,7 @@ public class KanjiServiceImpl implements KanjiService {
 	 */
 	private Page<Kanji> searchKanji(String search, Pageable pageable) {
 
-		var spec = KanjiSpecification.getSearchKanjiSpecification(search);
+		var spec = KanjiSpecification.getSearchKanjiSpecification(search, this.converter);
 		// Execute query, mapping and return results
 		return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
 	}

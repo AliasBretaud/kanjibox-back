@@ -53,4 +53,12 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
 	 */
 	Page<WordEntity> findAllByOrderByTimeStampDesc(Pageable pageable);
 
+	/**
+	 * Find a word by its value
+	 * @param value 
+	 * 			word value
+	 * @return retrieved word
+	 */
+	WordEntity findByValue(String value);
+
 }

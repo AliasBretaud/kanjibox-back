@@ -2,6 +2,7 @@ package flo.no.kanji.integration.web.controller;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -113,5 +114,49 @@ public class KanjiControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(kanji)))
         	.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void testPostKanjiKo6() throws Exception {
+		var kanji = Kanji.builder()
+				.value("kou")
+				.kunYomi(List.of("たかい"))
+				.onYomi(List.of("コウ"))
+				.translations(List.of("Test"))
+				.build();
+		mockMvc.perform(post("/kanjis")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(kanji)))
+        	.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void testPatchKanji() throws Exception {
+		var translationsPatch = "{\"translations\": [\"test patch\"]}";
+		mockMvc.perform(patch("/kanjis/84")
+				.contentType("application/merge-patch+json")
+				.content(translationsPatch))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.id", is(84)))
+		.andExpect(jsonPath("$.value", is("学")))
+		.andExpect(jsonPath("$.translations[0]", is("test patch")));
+	}
+	
+	@Test
+	public void testPatchKanjiKo() throws Exception {
+		var translationsPatch = "{\"id\": 85, \"\"translations\": [\"test patch\"]}";
+		mockMvc.perform(patch("/kanjis/84")
+				.contentType("application/merge-patch+json")
+				.content(translationsPatch))
+		.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void testPatchKanjiKo2() throws Exception {
+		var translationsPatch = "{\"translations\": [\"test patch\"]}";
+		mockMvc.perform(patch("/kanjis/-1")
+				.contentType("application/merge-patch+json")
+				.content(translationsPatch))
+		.andExpect(status().isNotFound());
 	}
 }
