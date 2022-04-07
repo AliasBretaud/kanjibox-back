@@ -1,5 +1,7 @@
 package flo.no.kanji.business.service;
 
+import javax.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -29,5 +31,5 @@ public interface WordService {
 	 * @return
 	 * 			Created word
 	 */
-	public Word addWord(Word word);
+	public Word addWord(@Valid Word word);
 }
