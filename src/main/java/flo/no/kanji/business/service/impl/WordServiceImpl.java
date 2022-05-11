@@ -29,6 +29,7 @@ import flo.no.kanji.util.CharacterUtils;
 
 /**
  * Word business service implementation
+ * 
  * @see WordService
  * @author Florian
  */
@@ -39,7 +40,7 @@ public class WordServiceImpl implements WordService {
 	/** Kanji operations business service */
 	@Autowired
 	private KanjiService kanjiService;
-	
+
 	/** Words JPA repository */
 	@Autowired
 	private WordRepository wordRepository;
@@ -51,11 +52,11 @@ public class WordServiceImpl implements WordService {
 	/** Kanji business/entity object mapper **/
 	@Autowired
 	private KanjiMapper kanjiMapper;
-	
+
 	/** Japanese alphabets converting service **/
 	@Autowired
 	private MojiConverter converter;
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -72,7 +73,8 @@ public class WordServiceImpl implements WordService {
 		List<KanjiEntity> kanjis = word.getKanjis().stream().map(k -> {
 			var kanjiEntity = kanjiService.findByValue(k.getValue());
 
-			// If a kanji composing the word is unknown from the database, calling external API for determining
+			// If a kanji composing the word is unknown from the database, calling external
+			// API for determining
 			// its readings and translations
 			if (kanjiEntity == null) {
 				kanjiService.autoFillKanjiReadigs(k);
@@ -88,7 +90,7 @@ public class WordServiceImpl implements WordService {
 		// Saving and return created word
 		return wordMapper.toBusinessObject(wordRepository.save(wordEntity));
 	}
-	
+
 	private void checkWordAlreadyPresent(final Word word) {
 		Optional.ofNullable(wordRepository.findByValue(word.getValue())).ifPresent(k -> {
 			throw new InvalidInputException(
@@ -100,9 +102,9 @@ public class WordServiceImpl implements WordService {
 	 * Builds a kanji list composing a word
 	 * 
 	 * @param wordValue
-	 * 			Word japanese writing value
+	 *                  Word japanese writing value
 	 * @return
-	 * 			List of kanji business objects composing the word
+	 *         List of kanji business objects composing the word
 	 */
 	private List<Kanji> buildWordKanjisList(String wordValue) {
 		return wordValue.chars().mapToObj(i -> String.valueOf((char) i)).filter(CharacterUtils::isKanji)
@@ -120,21 +122,21 @@ public class WordServiceImpl implements WordService {
 						.map(wordMapper::toBusinessObject)
 				: this.searchWord(search, pageable);
 	}
-	
+
 	/**
-	 * Perform a word search based on the japanese writing value 
+	 * Perform a word search based on the japanese writing value
 	 * 
 	 * @param search
-	 * 			Word's japanese writing value
+	 *                 Word's japanese writing value
 	 * @param pageable
-	 * 			Spring pageable request properties
+	 *                 Spring pageable request properties
 	 * @return
-	 * 			Spring page of retrieved corresponding words
+	 *         Spring page of retrieved corresponding words
 	 */
 	private Page<Word> searchWord(String search, Pageable pageable) {
-		
+
 		var spec = WordSpecification.getSearchWordSpecification(search, this.converter);
 		return wordRepository.findAll(spec, pageable).map(wordMapper::toBusinessObject);
 	}
-	
+
 }

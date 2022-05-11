@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * KankiRepository test class
+ * 
  * @author Florian
  */
 @ExtendWith(SpringExtension.class)
@@ -25,9 +26,9 @@ public class KanjiRepositoryTest {
 	/** Test class **/
 	@Autowired
 	private KanjiRepository kanjiRepository;
-	
+
 	private final MojiConverter converter = new MojiConverter();
-	
+
 	/**
 	 * 
 	 */
@@ -40,7 +41,7 @@ public class KanjiRepositoryTest {
 		// ASSERT
 		assertKanjiEquals(kanjis);
 	}
-	
+
 	@Test
 	public void searchKanjiByKunYomiTest() {
 		// PREPARE
@@ -50,7 +51,7 @@ public class KanjiRepositoryTest {
 		// ASSERT
 		assertKanjiEquals(kanjis);
 	}
-	
+
 	@Test
 	public void searchKanjiByOnYomiTest() {
 		// PREPARE
@@ -60,7 +61,7 @@ public class KanjiRepositoryTest {
 		// ASSERT
 		assertKanjiEquals(kanjis);
 	}
-	
+
 	@Test
 	public void searchKanjiByTranslationTest() {
 		// PREPARE
@@ -70,7 +71,7 @@ public class KanjiRepositoryTest {
 		// ASSERT
 		assertKanjiEquals(kanjis);
 	}
-	
+
 	@Test
 	public void searchKanjiByRomajiKunTest() {
 		// PREPARE
@@ -80,7 +81,7 @@ public class KanjiRepositoryTest {
 		// ASSERT
 		assertKanjiEquals(kanjis);
 	}
-	
+
 	@Test
 	public void searchKanjiByRomajiOnTest() {
 		// PREPARE
@@ -90,7 +91,7 @@ public class KanjiRepositoryTest {
 		// ASSERT
 		assertKanjiEquals(kanjis);
 	}
-	
+
 	private void assertKanjiEquals(final List<KanjiEntity> kanjis) {
 		assertEquals(1, kanjis.size());
 		var kanji = kanjis.get(0);
@@ -100,5 +101,5 @@ public class KanjiRepositoryTest {
 		assertEquals(List.of("mister", "you", "ruler", "male name suffix"), kanji.getTranslations());
 		assertEquals(LocalDateTime.of(2020, 4, 14, 1, 21, 52), kanji.getTimeStamp());
 	}
-	
+
 }

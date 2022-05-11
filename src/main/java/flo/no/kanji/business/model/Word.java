@@ -11,7 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Word (Kanji 1+ and optional okuriganas)  model object representation
+ * Word (Kanji 1+ and optional okuriganas) model object representation
+ * 
  * @author Florian
  */
 @Data
@@ -25,7 +26,7 @@ public class Word {
 
 	/** Word japanese value */
 	@NotBlank
-	@JapaneseCharacterFormat(format = {CharacterType.KANJI, CharacterType.KANJI_WITH_OKURIGANA})
+	@JapaneseCharacterFormat(format = { CharacterType.KANJI, CharacterType.KANJI_WITH_OKURIGANA })
 	private String value;
 
 	/** Word translations */
