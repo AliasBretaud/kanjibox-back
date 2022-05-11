@@ -40,7 +40,7 @@ public class JapaneseCharacterFormatValidator implements ConstraintValidator<Jap
 			return true;
 		}
 		var input = (List<String>) (value instanceof List ? value : List.of(value));
-		return !ObjectUtils.isEmpty(input) && input.stream().allMatch(this::isValid);
+		return ObjectUtils.isEmpty(input) || input.stream().allMatch(this::isValid);
 	}
 	
 	/**

@@ -120,6 +120,6 @@ public final class CharacterUtils {
 	 * 			Cleaned output
 	 */
 	private static String clearInput(final String input) {
-		return input.replaceAll("\\-|\\.", "");
+		return input.replaceAll("\\-|\\.|\\s+", "").trim();
 	}
 }
