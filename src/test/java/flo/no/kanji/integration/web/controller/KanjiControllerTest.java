@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import flo.no.kanji.business.model.Kanji;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest
 @TestPropertySource("classpath:testapi.properties")
 @AutoConfigureMockMvc
 public class KanjiControllerTest {
