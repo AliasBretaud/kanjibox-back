@@ -51,6 +51,7 @@ public class JapaneseCharacterFormatValidator implements ConstraintValidator<Jap
 	 * 			True if the input String matches the given format/alphabet, false otherwise
 	 */
 	private boolean isValid(String value) {
+		// Valid if not empty and format recognized
 		return StringUtils.isNotEmpty(value)
 				&& Arrays.stream(this.formats).anyMatch(f -> f == CharacterUtils.getCharacterType(value));
 	}
