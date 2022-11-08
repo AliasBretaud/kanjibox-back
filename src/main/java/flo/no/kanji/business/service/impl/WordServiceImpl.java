@@ -90,6 +90,11 @@ public class WordServiceImpl implements WordService {
 		return wordMapper.toBusinessObject(wordRepository.save(wordEntity));
 	}
 	
+	/**
+	 * Checks if a word exists in database
+	 * 
+	 * @param word
+	 */
 	private void checkWordAlreadyPresent(final Word word) {
 		Optional.ofNullable(wordRepository.findByValue(word.getValue())).ifPresent(k -> {
 			throw new InvalidInputException(
