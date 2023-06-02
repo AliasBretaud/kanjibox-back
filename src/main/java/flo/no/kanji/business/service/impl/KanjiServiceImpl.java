@@ -1,7 +1,6 @@
 package flo.no.kanji.business.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import javax.json.JsonMergePatch;
 import javax.validation.Valid;
@@ -72,10 +71,10 @@ public class KanjiServiceImpl implements KanjiService {
 	}
 	
 	private void checkKanjiAlreadyPresent(final Kanji kanji) {
-		Optional.ofNullable(kanjiRepository.findByValue(kanji.getValue())).ifPresent(k -> {
+		if (kanjiRepository.findByValue(kanji.getValue()) != null) {
 			throw new InvalidInputException(
 					String.format("Kanji with value '%s' already exists in database", k.getValue()));
-		});
+		};
 	}
 
 	/**
