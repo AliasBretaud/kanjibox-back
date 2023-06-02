@@ -73,7 +73,7 @@ public class KanjiServiceImpl implements KanjiService {
 	private void checkKanjiAlreadyPresent(final Kanji kanji) {
 		if (kanjiRepository.findByValue(kanji.getValue()) != null) {
 			throw new InvalidInputException(
-					String.format("Kanji with value '%s' already exists in database", k.getValue()));
+					String.format("Kanji with value '%s' already exists in database", kanji.getValue()));
 		};
 	}
 
