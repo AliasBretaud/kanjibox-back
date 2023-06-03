@@ -1,0 +1,92 @@
+= FloNoKanji
+
+== Description
+
+FloNoKanji is a Java-based REST API application developed with Spring Boot. This API allows performing CRUD operations on Japanese kanji (characters) and Japanese words.
+
+== Prerequisites
+
+- Java 18
+- Maven
+- PostgreSQL
+
+== Installation
+
+To install and run the application locally, follow the steps below:
+
+1. Clone the GitHub repository:
+
+[source,shell]
+----
+$ https://github.com/AliasBretaud/KanjiBox-back.git
+----
+
+2. Navigate to the project directory:
+
+[source,shell]
+----
+$ cd KanjiBox-back
+----
+
+3. Configure the PostgreSQL database by updating the access information in the `application.properties` file.
+
+4. Run the Maven command to build the project:
+
+[source,shell]
+----
+$ mvn clean install
+----
+
+5. Start the application:
+
+[source,shell]
+----
+$ mvn spring-boot:run
+----
+
+The application will be accessible at the following URL: `http://localhost:8080/kanjibox`.
+
+== API Documentation
+
+The API documentation is available using Swagger UI. Follow the steps below to access the documentation:
+
+1. Ensure the FloNoKanji application is running locally.
+
+2. Open a web browser and navigate to the Swagger UI URL: `http://localhost:8080/kanjibox/swagger-ui.html`.
+
+3. The Swagger UI page will display the available endpoints, request parameters, and response structures.
+
+== Usage
+
+The FloNoKanji API exposes the following endpoints:
+
+- `GET /words`: Retrieves the list of Japanese words.
+- `POST /words`: Adds a new Japanese word.
+- `GET /kanjis`: Retrieves the list of kanji.
+- `POST /kanjis`: Adds a new kanji.
+- `PATCH /kanjis/{kanjiId}`: Updates a specific kanji.
+
+Refer to the full API documentation available on Swagger UI for more details on parameters and responses.
+
+== Technologies Used
+
+- Java 18
+- Spring Boot
+- Spring Data JPA
+- PostgreSQL
+- Maven
+
+== Contributing
+
+Contributions to the project are welcome! If you'd like to contribute, please follow these steps:
+
+1. Fork the project
+2. Create a branch for your feature (`git checkout -b new-feature`)
+3. Commit your changes (`git commit -m "Add new feature"`)
+4. Push the branch (`git push origin new-feature`)
+5. Open a pull request on GitHub
+
+== Author
+
+Florian Bretaud
+
