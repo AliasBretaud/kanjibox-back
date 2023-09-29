@@ -76,16 +76,6 @@ Refer to the full API documentation available on Swagger UI for more details on 
 - PostgreSQL
 - Maven
 
-== Contributing
-
-Contributions to the project are welcome! If you'd like to contribute, please follow these steps:
-
-1. Fork the project
-2. Create a branch for your feature (`git checkout -b new-feature`)
-3. Commit your changes (`git commit -m "Add new feature"`)
-4. Push the branch (`git push origin new-feature`)
-5. Open a pull request on GitHub
-
 == Author
 
 Florian Bretaud
