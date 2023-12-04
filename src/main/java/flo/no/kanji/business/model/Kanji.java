@@ -2,11 +2,10 @@ package flo.no.kanji.business.model;
 
 import java.util.List;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

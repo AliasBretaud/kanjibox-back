@@ -1,11 +1,16 @@
 package flo.no.kanji.business.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
-import javax.json.JsonMergePatch;
-import javax.validation.Valid;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
+import jakarta.json.Json;
+import jakarta.json.JsonMergePatch;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -92,7 +97,7 @@ public class KanjiServiceImpl implements KanjiService {
 				kanji.setTranslations(kanjiVo.getMeanings());
 			}
 		} catch (Exception ex) {
-			log.error("Error occured while retrieving kanji informations from API", ex);
+			log.error("Error occurred while retrieving kanji information from API", ex);
 		}
 	}
 
@@ -129,14 +134,13 @@ public class KanjiServiceImpl implements KanjiService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Kanji patchKanji(Long kanjiId, JsonMergePatch patchRequest) {
-		
+	public Kanji patchKanji(Long kanjiId, JsonNode patch) {
+
 		var initialKanji = this.findKanji(kanjiId);
-		var patchedKanji = patchHelper.mergePatch(patchRequest, initialKanji,
-				Kanji.class);
+		var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
 		
 		// Prevent ID update
-		if (patchedKanji.getId() != kanjiId) {
+		if (!Objects.equals(patchedKanji.getId(), kanjiId)) {
 			throw new InvalidInputException("ID update is forbidden");
 		}
 		

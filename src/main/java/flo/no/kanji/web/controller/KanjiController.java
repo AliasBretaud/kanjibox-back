@@ -1,6 +1,6 @@
 package flo.no.kanji.web.controller;
 
-import org.apache.johnzon.core.JsonMergePatchImpl;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,15 +39,15 @@ public class KanjiController {
 	 */
 	@GetMapping
 	public Page<Kanji> getKanjis(@RequestParam(required = false, value = "search") final String search,
-			Pageable pageable) {
-		return kanjiService.getKanjis(search, pageable);
+								 @RequestParam(required = false) Pageable pageable) {
+		return kanjiService.getKanjis(search, pageable != null ? pageable : Pageable.ofSize(10));
 	}
 
 	/**
 	 * Saving new kanji
 	 * @param kanji
 	 * 			Kanji business object
-	 * @param autodetectReadings
+	 * @param autoDetect
 	 * 			Calling external API for auto readings/translations setting (optional)
 	 * @return
 	 * 			Created kanji
@@ -61,15 +61,15 @@ public class KanjiController {
 	/**
 	 * Modify an existing kanji attributes
 	 * @param kanjiId
-	 * 			Tehnical ID of the kanji present in database
-	 * @param patchRequest
+	 * 			Technical ID of the kanji present in database
+	 * @param patch
 	 * 			Data which have to be modified
 	 * @return
 	 * 			Updated Kanji
 	 */
-	@PatchMapping(path = "/{kanjiId}", consumes = "application/merge-patch+json")
+	@PatchMapping(path = "/{kanjiId}")
 	public Kanji updateKanji(@PathVariable Long kanjiId,
-			@RequestBody JsonMergePatchImpl patchRequest) {
-		return kanjiService.patchKanji(kanjiId, patchRequest);
+							 @RequestBody JsonNode patch) {
+		return kanjiService.patchKanji(kanjiId, patch);
 	}
 }

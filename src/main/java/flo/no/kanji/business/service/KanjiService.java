@@ -1,8 +1,11 @@
 package flo.no.kanji.business.service;
 
-import javax.json.JsonMergePatch;
-import javax.validation.Valid;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
+import jakarta.json.JsonMergePatch;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -52,12 +55,12 @@ public interface KanjiService {
 	 * 
 	 * @param kanjiId
 	 * 			Technical ID of the kanji persent in database
-	 * @param patchRequest
+	 * @param patch
 	 * 			Data which have to be modified
 	 * @return
 	 * 			Updated Kanji
 	 */
-	Kanji patchKanji(Long kanjiId, JsonMergePatch patchRequest);
+	Kanji patchKanji(Long kanjiId, JsonNode patch);
 
 	/**
 	 * Find a single unit kanji by its value

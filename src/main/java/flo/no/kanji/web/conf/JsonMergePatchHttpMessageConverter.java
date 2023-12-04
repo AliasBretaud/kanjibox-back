@@ -1,10 +1,9 @@
 package flo.no.kanji.web.conf;
 
-import javax.json.Json;
-import javax.json.JsonMergePatch;
-import javax.json.JsonReader;
-import javax.json.JsonWriter;
-
+import jakarta.json.Json;
+import jakarta.json.JsonMergePatch;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonWriter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;

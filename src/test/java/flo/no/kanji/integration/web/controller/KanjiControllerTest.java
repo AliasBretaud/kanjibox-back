@@ -1,14 +1,7 @@
 package flo.no.kanji.integration.web.controller;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import flo.no.kanji.business.model.Kanji;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,9 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 
-import flo.no.kanji.business.model.Kanji;
+import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @TestPropertySource("classpath:testapi.properties")
@@ -134,7 +130,7 @@ public class KanjiControllerTest {
 	public void testPatchKanji() throws Exception {
 		var translationsPatch = "{\"translations\": [\"test patch\"]}";
 		mockMvc.perform(patch("/kanjis/84")
-				.contentType("application/merge-patch+json")
+						.contentType(MediaType.APPLICATION_JSON)
 				.content(translationsPatch))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.id", is(84)))
@@ -146,7 +142,7 @@ public class KanjiControllerTest {
 	public void testPatchKanjiKo() throws Exception {
 		var translationsPatch = "{\"id\": 85, \"\"translations\": [\"test patch\"]}";
 		mockMvc.perform(patch("/kanjis/84")
-				.contentType("application/merge-patch+json")
+				.contentType("application/json-patch+json")
 				.content(translationsPatch))
 		.andExpect(status().isBadRequest());
 	}
@@ -155,7 +151,7 @@ public class KanjiControllerTest {
 	public void testPatchKanjiKo2() throws Exception {
 		var translationsPatch = "{\"translations\": [\"test patch\"]}";
 		mockMvc.perform(patch("/kanjis/-1")
-				.contentType("application/merge-patch+json")
+				.contentType("application/json-patch+json")
 				.content(translationsPatch))
 		.andExpect(status().isNotFound());
 	}

@@ -2,8 +2,6 @@ package flo.no.kanji.web.handler;
 
 import java.sql.Timestamp;
 
-import javax.validation.ConstraintViolationException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -13,6 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * Global controller for exceptions handling

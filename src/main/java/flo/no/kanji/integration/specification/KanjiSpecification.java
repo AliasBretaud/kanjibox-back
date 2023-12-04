@@ -1,7 +1,6 @@
 package flo.no.kanji.integration.specification;
 
-import javax.persistence.criteria.JoinType;
-
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.moji4j.MojiConverter;

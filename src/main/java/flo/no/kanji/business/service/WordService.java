@@ -1,7 +1,6 @@
 package flo.no.kanji.business.service;
 
-import javax.validation.Valid;
-
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

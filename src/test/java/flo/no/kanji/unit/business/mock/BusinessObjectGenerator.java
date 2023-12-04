@@ -14,7 +14,7 @@ import flo.no.kanji.business.model.Word;
  */
 public class BusinessObjectGenerator {
 	
-	private static Map<String, Object> objectMap = new HashMap<>();
+	private static final Map<String, Object> objectMap = new HashMap<>();
 
 	public static Kanji getKanji() {
 		if (!objectMap.containsKey("kanji")) {

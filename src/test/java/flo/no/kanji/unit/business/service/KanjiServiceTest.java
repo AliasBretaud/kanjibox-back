@@ -15,7 +15,10 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.johnzon.core.JsonMergePatchImpl;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -113,7 +116,7 @@ public class KanjiServiceTest {
 	public void autoFillKanjiReadigsTestOk1() {
 		// PREPARE
 		var kanVO = new KanjiVO();
-		var kunYomi = List.of("kunYOmi");
+		var kunYomi = List.of("kunYomi");
 		var onYomi = List.of("onYomi");
 		var translations = List.of("translation");
 		kanVO.setKunReadings(kunYomi);
@@ -131,7 +134,7 @@ public class KanjiServiceTest {
 	}
 	
 	@Test
-	public void autoFillKanjiReadigsTestOk2() {
+	public void autoFillKanjiReadingsTestOk2() {
 		// PREPARE
 		when(kanjiApiClient.searchKanjiReadings(anyString())).thenThrow(new RuntimeException("Exception"));
 		var kanji = new Kanji();
@@ -179,8 +182,8 @@ public class KanjiServiceTest {
 	public void patchKanjiTestOk() {
 		// PREPARE
 		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
-		var patchRequest = mock(JsonMergePatchImpl.class);
-		when(patchHelper.mergePatch(any(JsonMergePatchImpl.class), any(Kanji.class), eq(Kanji.class)))
+		var patchRequest = mock(JsonNode.class);
+		when(patchHelper.mergePatch(any(Kanji.class), any(JsonNode.class), eq(Kanji.class)))
 			.thenReturn(BusinessObjectGenerator.getKanji());
 		when(kanjiRepository.save(any(KanjiEntity.class))).thenReturn(EntityGenerator.getKanjiEntity());
 		// EXECUTE
@@ -193,7 +196,7 @@ public class KanjiServiceTest {
 	public void patchKanjiTestKo1() {
 		// PREPARE
 		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.ofNullable(null));
-		var patchRequest = mock(JsonMergePatchImpl.class);
+		var patchRequest = mock(JsonNode.class);
 		// EXECUTE
 		// ASSERT
 		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest));
@@ -203,9 +206,9 @@ public class KanjiServiceTest {
 	public void patchKanjiTestKo2() {
 		// PREPARE
 		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
-		var patchRequest = mock(JsonMergePatchImpl.class);
+		var patchRequest = mock(JsonNode.class);
 		var kanjiMerge = Kanji.builder().id(111L).build();
-		when(patchHelper.mergePatch(any(JsonMergePatchImpl.class), any(Kanji.class), eq(Kanji.class)))
+		when(patchHelper.mergePatch(any(Kanji.class), any(JsonNode.class), eq(Kanji.class)))
 			.thenReturn(kanjiMerge);
 		// EXECUTE
 		// ASSERT

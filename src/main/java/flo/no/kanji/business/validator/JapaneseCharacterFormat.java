@@ -6,10 +6,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
-
 import flo.no.kanji.business.constants.CharacterType;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 /**
  * Annotation used for validating input Japanese format of given String object

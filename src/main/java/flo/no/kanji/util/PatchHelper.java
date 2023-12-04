@@ -1,8 +1,7 @@
 package flo.no.kanji.util;
 
-import javax.json.JsonMergePatch;
-import javax.json.JsonValue;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -35,7 +34,7 @@ public class PatchHelper {
      * Merge modification using patch method
      * @param <T>
      * 			Object class type
-     * @param mergePatch
+     * @param patch
      * 			JSON merge path
      * @param targetBean
      * 			Object type
@@ -44,24 +43,11 @@ public class PatchHelper {
      * @return
      * 			Validated updated object
      */
-    public <T> T mergePatch(JsonMergePatch mergePatch, T targetBean, Class<T> beanClass) {
-        JsonValue target = mapper.convertValue(targetBean, JsonValue.class);
-        JsonValue patched = applyMergePatch(mergePatch, target);
-        return convertAndValidate(patched, beanClass);
-    }
-    
-    /**
-     * Update JSON merge to actual object
-     * @param mergePatch
-     * 			JSON merge path
-     * @param target
-     * 			Target object
-     * @return
-     * 			Merged object
-     */
-    private JsonValue applyMergePatch(JsonMergePatch mergePatch, JsonValue target) {
+    public <T> T mergePatch(T targetBean, JsonNode patch, Class<T> beanClass) {
         try {
-            return mergePatch.apply(target);
+            var mergePatch = JsonMergePatch.fromJson(patch);
+            var patched = mergePatch.apply(mapper.convertValue(targetBean, JsonNode.class));
+            return convertAndValidate(patched, beanClass);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -71,15 +57,14 @@ public class PatchHelper {
      * Converts and validates input value to output merged object
      * @param <T>
      * 			Return type
-     * @param jsonValue
+     * @param jsonNode
      * 			String JSON of input object
      * @param beanClass
      * 			Output bean class
      * @return
      * 		Merged entity
      */
-    private <T> T convertAndValidate(JsonValue jsonValue, Class<T> beanClass) {
-        T bean = mapper.convertValue(jsonValue, beanClass);
-        return bean;
+    private <T> T convertAndValidate(JsonNode jsonNode, Class<T> beanClass) {
+        return mapper.convertValue(jsonNode, beanClass);
     }
 }
