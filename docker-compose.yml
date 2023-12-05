@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: kanjibox-db
+    environment:
+      POSTGRES_DB: kanjidb
+      POSTGRES_USER: kanji
+      POSTGRES_PASSWORD: kanji
+    ports:
+      - "5432:5432"
+    networks:
+      - kanji_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      target: development
+    container_name: kanjibox-backend
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    networks:
+      - kanji_network
+    volumes:
+      - app_data:/app/data
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kanjidb
+      SPRING_DATASOURCE_USERNAME: kanji
+      SPRING_DATASOURCE_PASSWORD: kanji
+
+networks:
+  kanji_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  app_data:
