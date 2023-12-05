@@ -1,9 +1,8 @@
 package flo.no.kanji.business.mapper;
 
-import org.springframework.stereotype.Service;
-
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.integration.entity.KanjiEntity;
+import org.springframework.stereotype.Service;
 
 /**
  * Kanji object bidirectional mapper between Model objects and Entities
@@ -28,7 +27,7 @@ public class KanjiMapper {
 				.translations(kanjiEntity.getTranslations())
 				.value(kanjiEntity.getValue())
 				.build();
-	};
+	}
 	
 	/**
 	 * Transforms a Kanji business object to entity (before performing save in database)
@@ -46,5 +45,5 @@ public class KanjiMapper {
 				.translations(kanji.getTranslations())
 				.value(kanji.getValue())
 				.build();
-	};
+	}
 }

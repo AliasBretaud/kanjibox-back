@@ -1,16 +1,12 @@
 package flo.no.kanji.util;
 
-import static java.lang.Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS;
-import static java.lang.Character.UnicodeBlock.HIRAGANA;
-import static java.lang.Character.UnicodeBlock.KATAKANA;
+import com.moji4j.MojiDetector;
+import flo.no.kanji.business.constants.CharacterType;
+import org.springframework.util.ObjectUtils;
 
 import java.lang.Character.UnicodeBlock;
 
-import org.springframework.util.ObjectUtils;
-
-import com.moji4j.MojiDetector;
-
-import flo.no.kanji.business.constants.CharacterType;
+import static java.lang.Character.UnicodeBlock.*;
 
 /**
  * Japanese characters class utils
@@ -22,7 +18,7 @@ public final class CharacterUtils {
 	private CharacterUtils() {}
 	
 	/** Japanese alphabet (hiragana/katakana/kanji) detetor **/
-	private static MojiDetector mojiDetector = new MojiDetector();
+	private static final MojiDetector mojiDetector = new MojiDetector();
 
 	/**
 	 * Determines if the input chain is strictly a kanji value

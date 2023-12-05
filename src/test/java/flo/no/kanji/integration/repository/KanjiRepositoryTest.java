@@ -1,20 +1,18 @@
 package flo.no.kanji.integration.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
+import com.moji4j.MojiConverter;
+import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.specification.KanjiSpecification;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.moji4j.MojiConverter;
+import java.time.LocalDateTime;
+import java.util.List;
 
-import flo.no.kanji.integration.entity.KanjiEntity;
-import flo.no.kanji.integration.specification.KanjiSpecification;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * KankiRepository test class
@@ -28,7 +26,7 @@ public class KanjiRepositoryTest {
 	@Autowired
 	private KanjiRepository kanjiRepository;
 	
-	private MojiConverter converter = new MojiConverter();
+	private final MojiConverter converter = new MojiConverter();
 	
 	/**
 	 * 

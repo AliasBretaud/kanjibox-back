@@ -1,17 +1,11 @@
 package flo.no.kanji.web.controller;
 
+import flo.no.kanji.business.model.Word;
+import flo.no.kanji.business.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import flo.no.kanji.business.model.Word;
-import flo.no.kanji.business.service.WordService;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Word REST Controller
@@ -37,7 +31,7 @@ public class WordController {
 	@GetMapping
 	public Page<Word> getWords(@RequestParam(required = false, value = "search") final String search,
 			Pageable pageable) {
-		return wordService.getWords(search, pageable);
+		return wordService.getWords(search, pageable != null ? pageable : Pageable.ofSize(10));
 	}
 
 	/**

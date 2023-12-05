@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Global Exeption object returned whenever an exception is thrown within the application
+ * Global Exception object returned whenever an exception is thrown within the application
  * @author Florian
  *
  */
@@ -12,7 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ApiExceptionWrapper {
 
-	/** Exception tomestamp **/
+	/** Exception timestamp **/
 	private String timestamp;
 	
 	/** Returned HTTP status related to the exception**/

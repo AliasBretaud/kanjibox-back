@@ -1,12 +1,12 @@
 package flo.no.kanji.integration.mock;
 
+import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.entity.WordEntity;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import flo.no.kanji.integration.entity.KanjiEntity;
-import flo.no.kanji.integration.entity.WordEntity;
 
 /**
  * Mock class generating dummy entities
@@ -15,7 +15,7 @@ import flo.no.kanji.integration.entity.WordEntity;
 public class EntityGenerator {
 
 	/** Object map containing generated test entities **/
-	private static Map<String, Object> objectMap = new HashMap<>();
+	private static final Map<String, Object> objectMap = new HashMap<>();
 	
 	/**
 	 * Generating KanjiEntity dummy object
