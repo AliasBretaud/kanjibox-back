@@ -6,7 +6,7 @@ FloNoKanji is a Java-based REST API application developed with Spring Boot. This
 
 == Prerequisites
 
-- Java 18
+- Java 21
 - Maven
 - PostgreSQL
 
@@ -70,7 +70,7 @@ Refer to the full API documentation available on Swagger UI for more details on 
 
 == Technologies Used
 
-- Java 18
+- Java 21
 - Spring Boot
 - Spring Data JPA
 - PostgreSQL
