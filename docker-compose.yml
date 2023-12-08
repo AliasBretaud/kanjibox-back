@@ -5,7 +5,7 @@ services:
     image: postgres:latest
     container_name: kanjibox-db
     environment:
-      POSTGRES_DB: kanjidb
+      POSTGRES_DB: kanji
       POSTGRES_USER: kanji
       POSTGRES_PASSWORD: kanji
     ports:
@@ -14,6 +14,7 @@ services:
       - kanji_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
 
   app:
     build:
@@ -29,7 +30,7 @@ services:
     volumes:
       - app_data:/app/data
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kanjidb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kanji
       SPRING_DATASOURCE_USERNAME: kanji
       SPRING_DATASOURCE_PASSWORD: kanji
 
