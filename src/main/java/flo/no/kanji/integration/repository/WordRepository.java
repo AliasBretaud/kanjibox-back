@@ -1,14 +1,13 @@
 package flo.no.kanji.integration.repository;
 
-import java.util.List;
-
+import flo.no.kanji.integration.entity.WordEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import flo.no.kanji.integration.entity.WordEntity;
+import java.util.List;
 
 /**
  * JPA repository for WORD table
@@ -37,12 +36,12 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
 
 	/**
 	 * Find a word by its translation containing an input string
-	 * @param value
+	 * @param translation
 	 * 			Input contained in word translation
 	 * @return
 	 * 			Retrieved word list
 	 */
-	List<WordEntity> findByTranslationContaining(String traduction);
+	List<WordEntity> findByTranslationContaining(String translation);
 
 	/**
 	 * Find all words, ordered by creation/modification date

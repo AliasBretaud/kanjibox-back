@@ -28,7 +28,7 @@ public final class CharacterUtils {
 	 * 			true if the input chain is strictly a kanji value, false otherwise
 	 */
 	public static boolean isKanji(String input) {
-		return input.chars().allMatch(c -> UnicodeBlock.of(c) == CJK_UNIFIED_IDEOGRAPHS);
+		return input.chars().allMatch(c -> UnicodeBlock.of(c) == CJK_UNIFIED_IDEOGRAPHS || c == '々');
 	}
 	
 	/**
