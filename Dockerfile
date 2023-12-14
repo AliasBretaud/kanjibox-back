@@ -11,7 +11,6 @@ FROM base as development
 CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'"]
 
 FROM base as build
-RUN chmod +x mvnw
 RUN ./mvnw package
 
 FROM eclipse-temurin:21.0.1_12-jdk-jammy as production
