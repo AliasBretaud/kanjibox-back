@@ -2,6 +2,7 @@ package flo.no.kanji.web.controller;
 
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.WordService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class WordController {
 	 */
 	@GetMapping
 	public Page<Word> getWords(@RequestParam(required = false, value = "search") final String search,
-							   @PageableDefault(size = 10) final Pageable pageable) {
+							   @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
 		return wordService.getWords(search, pageable);
 	}
 
