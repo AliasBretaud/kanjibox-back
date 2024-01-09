@@ -3,6 +3,7 @@ package flo.no.kanji.web.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +33,7 @@ public class KanjiController {
 	 */
 	@GetMapping
 	public Page<Kanji> getKanjis(@RequestParam(required = false, value = "search") final String search,
-								 @PageableDefault(size = 10) final Pageable pageable) {
+								 @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
 		return kanjiService.getKanjis(search, pageable);
 	}
 
