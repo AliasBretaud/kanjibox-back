@@ -36,8 +36,6 @@ public class QuizEntity {
 
     private Integer incorrectAnswersCount;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "quiz_questions", joinColumns = { @JoinColumn(name = "quiz_id") }, inverseJoinColumns = {
-            @JoinColumn(name = "question_id") })
-    private List<QuestionEntity> questions;
+    @OneToMany(mappedBy = "quiz")
+    private List<QuizQuestionEntity> questions;
 }

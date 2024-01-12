@@ -32,7 +32,8 @@ public class QuestionEntity {
     private String reading;
 
     @ElementCollection
-    @CollectionTable(name = "question_propositions", joinColumns = @JoinColumn(name = "question_id"))
+    @CollectionTable(name = "quiz_question_propositions", joinColumns = @JoinColumn(name = "question_id"))
     @Column(name = "proposition")
     private List<String> propositions;
+
 }

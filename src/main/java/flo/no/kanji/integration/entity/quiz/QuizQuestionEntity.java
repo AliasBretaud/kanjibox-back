@@ -7,23 +7,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "quiz_question_answer")
+@Table(name = "quiz_quiz_question")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QuestionAnswerEntity {
+public class QuizQuestionEntity {
 
     /** Database technical identifier **/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "quiz_id")
+    private QuizEntity quiz;
+
+    @ManyToOne
     @JoinColumn(name = "question_id")
-    private QuizQuestionEntity quizQuestion;
+    private QuestionEntity question;
 
-    private String answered;
-
-    private Boolean isCorrect;
+    @OneToOne(mappedBy = "quizQuestion", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private QuestionAnswerEntity answer;
 }
