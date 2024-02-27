@@ -5,6 +5,9 @@
 FloNoKanji is a Java-based REST API application developed with Spring Boot. This API allows performing CRUD operations on Japanese kanji (characters) and Japanese words.
 
 == Prerequisites
+- Docker
+
+Or
 
 - Java 21
 - Maven
@@ -77,6 +80,7 @@ Refer to the full API documentation available on Swagger UI for more details on 
 - Spring Data JPA
 - PostgreSQL
 - Maven
+- Docker / Docker Compose
 
 == Author
 
