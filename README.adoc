@@ -44,7 +44,7 @@ $ mvn clean install
 $ mvn spring-boot:run
 ----
 
-The application will be accessible at the following URL: `http://localhost:8080/kanjibox`.
+The application will be accessible at the following URL: `http://localhost:8080/kanjibox/swagger-ui/index.html`.
 
 == API Documentation
 
