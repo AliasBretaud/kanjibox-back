@@ -12,7 +12,9 @@ FloNoKanji is a Java-based REST API application developed with Spring Boot. This
 
 == Installation
 
-To install and run the application locally, follow the steps below:
+You can pull the Docker image from the https://hub.docker.com/r/fbrtd/kanjibox-api[Docker Hub^] and run the container with the parameters described on the image page.
+
+Or if you prefer to install and run the application locally, follow the steps below:
 
 1. Clone the GitHub repository:
 
