@@ -1,36 +1,7 @@
 package flo.no.kanji.unit.business.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonpatch.JsonPatch;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-
 import com.moji4j.MojiConverter;
-
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -43,6 +14,22 @@ import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.util.PatchHelper;
 import flo.no.kanji.web.api.KanjiApiClient;
 import flo.no.kanji.web.api.model.KanjiVO;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class KanjiServiceTest {
@@ -156,7 +143,7 @@ public class KanjiServiceTest {
 		var pageable = Pageable.ofSize(1);
 		// EXECUTE
 		var kanjis = kanjiServiceImpl.getKanjis(null, pageable).getContent();
-		var kanji = kanjis.get(0);
+		var kanji = kanjis.getFirst();
 		// ASSERT
 		assertEquals(1, kanjis.size());
 		assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);

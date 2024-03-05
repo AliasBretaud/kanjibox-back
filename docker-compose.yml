@@ -20,7 +20,7 @@ services:
     build:
       context: .
       target: development
-    container_name: kanjibox-backend
+    container_name: kanjibox-api
     depends_on:
       - db
     ports:

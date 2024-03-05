@@ -1,16 +1,16 @@
 package flo.no.kanji.unit.business.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-
+import com.moji4j.MojiConverter;
+import flo.no.kanji.business.mapper.KanjiMapper;
+import flo.no.kanji.business.mapper.WordMapper;
+import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.model.Word;
+import flo.no.kanji.business.service.KanjiService;
+import flo.no.kanji.business.service.impl.WordServiceImpl;
+import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.entity.WordEntity;
+import flo.no.kanji.integration.mock.EntityGenerator;
+import flo.no.kanji.integration.repository.WordRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -25,18 +25,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import com.moji4j.MojiConverter;
+import java.util.List;
 
-import flo.no.kanji.business.mapper.KanjiMapper;
-import flo.no.kanji.business.mapper.WordMapper;
-import flo.no.kanji.business.model.Kanji;
-import flo.no.kanji.business.model.Word;
-import flo.no.kanji.business.service.KanjiService;
-import flo.no.kanji.business.service.impl.WordServiceImpl;
-import flo.no.kanji.integration.entity.KanjiEntity;
-import flo.no.kanji.integration.entity.WordEntity;
-import flo.no.kanji.integration.mock.EntityGenerator;
-import flo.no.kanji.integration.repository.WordRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class WordServiceTest {
@@ -101,7 +94,7 @@ public class WordServiceTest {
 	}
 	
 	@Test
-	public void getWordsTest1() {
+	public void getWordsWithoutSearchTest() {
 		// PREPARE
 		var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
 		when(wordRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
@@ -114,7 +107,7 @@ public class WordServiceTest {
 	
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getWordsTest2() {
+	public void getWordsWithKunSearchTest() {
 		// PREPARE
 		var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
@@ -130,7 +123,7 @@ public class WordServiceTest {
 	
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getWordsTest3() {
+	public void getWordsWithOnSearchTest() {
 		// PREPARE
 		var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
@@ -146,7 +139,7 @@ public class WordServiceTest {
 	
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getWordsTest4() {
+	public void getWordsWithKanjiSearchTest() {
 		// PREPARE
 		var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
@@ -162,7 +155,7 @@ public class WordServiceTest {
 	
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getWordsTest5() {
+	public void getWordsWithKanjiOkuriganaSearchTest() {
 		// PREPARE
 		var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
@@ -178,7 +171,7 @@ public class WordServiceTest {
 	
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getWordsTest6() {
+	public void getWordsWithRomajiSearchTest() {
 		// PREPARE
 		var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))

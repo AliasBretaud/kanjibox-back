@@ -1,20 +1,6 @@
 package flo.no.kanji.business.service.impl;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.validation.annotation.Validated;
-
 import com.moji4j.MojiConverter;
-
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.WordMapper;
@@ -26,6 +12,18 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.integration.specification.WordSpecification;
 import flo.no.kanji.util.CharacterUtils;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Word business service implementation
@@ -133,7 +131,7 @@ public class WordServiceImpl implements WordService {
 	 */
 	private Page<Word> searchWord(String search, Pageable pageable) {
 		
-		var spec = WordSpecification.getSearchWordSpecification(search, this.converter);
+		var spec = WordSpecification.searchWord(search, this.converter);
 		return wordRepository.findAll(spec, pageable).map(wordMapper::toBusinessObject);
 	}
 	

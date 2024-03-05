@@ -1,25 +1,7 @@
 package flo.no.kanji.business.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonpatch.JsonPatch;
-import jakarta.json.Json;
-import jakarta.json.JsonMergePatch;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
-import org.springframework.validation.annotation.Validated;
-
 import com.moji4j.MojiConverter;
-
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -30,7 +12,18 @@ import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.PatchHelper;
 import flo.no.kanji.web.api.KanjiApiClient;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Kanji business service implementation
@@ -125,7 +118,7 @@ public class KanjiServiceImpl implements KanjiService {
 	 */
 	private Page<Kanji> searchKanji(String search, Pageable pageable) {
 
-		var spec = KanjiSpecification.getSearchKanjiSpecification(search, this.converter);
+		var spec = KanjiSpecification.searchKanji(search, this.converter);
 		// Execute query, mapping and return results
 		return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
 	}

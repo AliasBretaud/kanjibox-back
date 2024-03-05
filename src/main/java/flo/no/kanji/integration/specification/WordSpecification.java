@@ -1,13 +1,11 @@
 package flo.no.kanji.integration.specification;
 
-import org.springframework.data.jpa.domain.Specification;
-
 import com.moji4j.MojiConverter;
-
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.entity.WordEntity_;
 import flo.no.kanji.util.CharacterUtils;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Word object JPA Specification utils class
@@ -15,8 +13,8 @@ import flo.no.kanji.util.CharacterUtils;
  */
 public class WordSpecification {
 	
-	public static Specification<WordEntity> getSearchWordSpecification(final String search,
-			final MojiConverter converter) {
+	public static Specification<WordEntity> searchWord(final String search,
+													   final MojiConverter converter) {
 		return (root, query, builder) -> {
 			var characterTypSearch = CharacterUtils.getCharacterType(search);
 			if (characterTypSearch == null) {
@@ -53,7 +51,7 @@ public class WordSpecification {
 	 * 			Hiragana converted value
 	 */
 	private static String convertKanaToFurigana(final String value, final MojiConverter converter) {
-		// Since MojiConverter library doens't provide a katakana to hiragana converting method we first convert
+		// Since MojiConverter library doesn't provide a katakana to hiragana converting method we first convert
 		// to romaji
 		return CharacterUtils.isHiragana(value) ? value :
 			converter.convertRomajiToHiragana(converter.convertKanaToRomaji(value));

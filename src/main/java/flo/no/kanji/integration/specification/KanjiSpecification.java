@@ -1,14 +1,12 @@
 package flo.no.kanji.integration.specification;
 
-import jakarta.persistence.criteria.JoinType;
-import org.springframework.data.jpa.domain.Specification;
-
 import com.moji4j.MojiConverter;
-
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.KanjiEntity_;
 import flo.no.kanji.util.CharacterUtils;
+import jakarta.persistence.criteria.JoinType;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Kanji object JPA Specification utils class
@@ -23,8 +21,8 @@ public class KanjiSpecification {
 	 * @return
 	 * 			Builded search criteria specification
 	 */
-	public static Specification<KanjiEntity> getSearchKanjiSpecification(final String search,
-			final MojiConverter converter) {
+	public static Specification<KanjiEntity> searchKanji(final String search,
+														 final MojiConverter converter) {
 		return (root, query, builder) -> {
 			var characterTypeSearch = CharacterUtils.getCharacterType(search);
 			if (characterTypeSearch == null) {

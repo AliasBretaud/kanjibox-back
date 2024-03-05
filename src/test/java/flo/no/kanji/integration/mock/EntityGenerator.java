@@ -22,7 +22,8 @@ public class EntityGenerator {
 	 * @return KanjiEntity
 	 */
 	public static KanjiEntity getKanjiEntity() {
-		if (!objectMap.containsKey("kanjiEntity")) {
+		var key = "kanjiEntity";
+		if (!objectMap.containsKey(key)) {
 			var kanjiEntity = KanjiEntity.builder()
 					.id(1L)
 					.value("人")
@@ -31,9 +32,9 @@ public class EntityGenerator {
 					.translations(List.of("People"))
 					.timeStamp(LocalDateTime.now())
 					.build();
-			objectMap.put("kanjiEntity", kanjiEntity);
+			objectMap.put(key, kanjiEntity);
 		}
-		return (KanjiEntity) objectMap.get("kanjiEntity");
+		return (KanjiEntity) objectMap.get(key);
 	}
 	
 	/**
@@ -41,7 +42,8 @@ public class EntityGenerator {
 	 * @return WordEntity
 	 */
 	public static WordEntity getWordEntity() {
-		if (!objectMap.containsKey("wordEntity")) {
+		var key = "wordEntity";
+		if (!objectMap.containsKey(key)) {
 			var wordEntity = WordEntity.builder()
 					.id(1L)
 					.value("火山")
@@ -49,8 +51,8 @@ public class EntityGenerator {
 					.translation("Volcano")
 					.timeStamp(LocalDateTime.now())
 					.build();
-			objectMap.put("wordEntity", wordEntity);
+			objectMap.put(key, wordEntity);
 		}
-		return (WordEntity) objectMap.get("wordEntity");
+		return (WordEntity) objectMap.get(key);
 	}
 }

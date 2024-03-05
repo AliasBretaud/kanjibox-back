@@ -34,7 +34,7 @@ public class KanjiRepositoryTest {
 	@Test
 	public void searchKanjiByValueTest() {
 		// PREPARE
-		var spec = KanjiSpecification.getSearchKanjiSpecification("君", converter);
+		var spec = KanjiSpecification.searchKanji("君", converter);
 		// EXECUTE
 		var kanjis = kanjiRepository.findAll(spec);
 		// ASSERT
@@ -44,7 +44,7 @@ public class KanjiRepositoryTest {
 	@Test
 	public void searchKanjiByKunYomiTest() {
 		// PREPARE
-		var spec = KanjiSpecification.getSearchKanjiSpecification("きみ", converter);
+		var spec = KanjiSpecification.searchKanji("きみ", converter);
 		// EXECUTE
 		var kanjis = kanjiRepository.findAll(spec);
 		// ASSERT
@@ -54,7 +54,7 @@ public class KanjiRepositoryTest {
 	@Test
 	public void searchKanjiByOnYomiTest() {
 		// PREPARE
-		var spec = KanjiSpecification.getSearchKanjiSpecification("クン", converter);
+		var spec = KanjiSpecification.searchKanji("クン", converter);
 		// EXECUTE
 		var kanjis = kanjiRepository.findAll(spec);
 		// ASSERT
@@ -64,7 +64,7 @@ public class KanjiRepositoryTest {
 	@Test
 	public void searchKanjiByTranslationTest() {
 		// PREPARE
-		var spec = KanjiSpecification.getSearchKanjiSpecification("mister", converter);
+		var spec = KanjiSpecification.searchKanji("mister", converter);
 		// EXECUTE
 		var kanjis = kanjiRepository.findAll(spec);
 		// ASSERT
@@ -74,7 +74,7 @@ public class KanjiRepositoryTest {
 	@Test
 	public void searchKanjiByRomajiKunTest() {
 		// PREPARE
-		var spec = KanjiSpecification.getSearchKanjiSpecification("kimi", converter);
+		var spec = KanjiSpecification.searchKanji("kimi", converter);
 		// EXECUTE
 		var kanjis = kanjiRepository.findAll(spec);
 		// ASSERT
@@ -84,7 +84,7 @@ public class KanjiRepositoryTest {
 	@Test
 	public void searchKanjiByRomajiOnTest() {
 		// PREPARE
-		var spec = KanjiSpecification.getSearchKanjiSpecification("kun", converter);
+		var spec = KanjiSpecification.searchKanji("kun", converter);
 		// EXECUTE
 		var kanjis = kanjiRepository.findAll(spec);
 		// ASSERT
