@@ -129,7 +129,7 @@ public class KanjiServiceImpl implements KanjiService {
 	@Override
 	public Kanji patchKanji(Long kanjiId, JsonNode patch) {
 
-		var initialKanji = this.findKanji(kanjiId);
+		var initialKanji = this.findById(kanjiId);
 		var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
 		
 		// Prevent ID update
@@ -152,7 +152,8 @@ public class KanjiServiceImpl implements KanjiService {
 	 * @return
 	 * 			Retrieved kanji business object
 	 */
-	private Kanji findKanji(Long kanjiId) {
+	@Override
+	public Kanji findById(Long kanjiId) {
 		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
 				.orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
 	}

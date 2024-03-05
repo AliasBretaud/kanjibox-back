@@ -23,6 +23,18 @@ public class KanjiController {
 	private KanjiService kanjiService;
 
 	/**
+	 * Find kanji
+	 * @param kanjiId
+	 * 			Kanji database identifier
+	 * @return
+	 * 		Retrieved kanji business object
+	 */
+	@GetMapping(path = "/{kanjiId}")
+	public Kanji getKanji(@PathVariable("kanjiId") final Long kanjiId) {
+		return kanjiService.findById(kanjiId);
+	}
+
+	/**
 	 * Search kanjis
 	 * @param search
 	 * 			Japanese kanji value
@@ -32,7 +44,7 @@ public class KanjiController {
 	 * 			Spring page of retrieved corresponding kanjis
 	 */
 	@GetMapping
-	public Page<Kanji> getKanjis(@RequestParam(required = false, value = "search") final String search,
+	public Page<Kanji> searchKanjis(@RequestParam(required = false, value = "search") final String search,
 								 @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
 		return kanjiService.getKanjis(search, pageable);
 	}

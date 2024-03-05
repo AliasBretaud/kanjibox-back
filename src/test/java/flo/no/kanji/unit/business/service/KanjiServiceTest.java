@@ -100,6 +100,26 @@ public class KanjiServiceTest {
 	}
 
 	@Test
+	public void findByIdTestOk() {
+		// PREPARE
+		when(kanjiRepository.findById(anyLong()))
+				.thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
+		// EXECUTE
+		var kanji = kanjiServiceImpl.findById(1L);
+		// ASSERT
+		assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
+	}
+
+	@Test
+	public void findByIdTestKo() {
+		// PREPARE
+		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.empty());
+		// EXECUTE
+		// ASSERT
+		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L));
+	}
+
+	@Test
 	public void autoFillKanjiReadigsTestOk1() {
 		// PREPARE
 		var kanVO = new KanjiVO();

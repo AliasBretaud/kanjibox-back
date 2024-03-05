@@ -28,11 +28,24 @@ public class KanjiControllerTest {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Test
-    public void testGetKanjiOk() throws Exception {
+    public void testSearchKanjiOk() throws Exception {
         mockMvc.perform(get("/kanjis?search=話"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content[0].translations[0]", is("tale")));
     }
+
+	@Test
+	public void testGetKanjiByIdOk() throws Exception {
+		mockMvc.perform(get("/kanjis/188"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("value", is("口")));
+	}
+
+	@Test
+	public void testGetKanjiByIdKo() throws Exception {
+		mockMvc.perform(get("/kanjis/-1"))
+				.andExpect(status().isNotFound());
+	}
 	
 	@Test
 	public void testPostKanjiOk1() throws Exception {

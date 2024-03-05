@@ -1,16 +1,11 @@
 package flo.no.kanji.business.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonpatch.JsonPatch;
-import jakarta.json.JsonMergePatch;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
+import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.integration.entity.KanjiEntity;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import flo.no.kanji.business.model.Kanji;
-import flo.no.kanji.integration.entity.KanjiEntity;
 
 /**
  * Kanji operations business service
@@ -71,4 +66,14 @@ public interface KanjiService {
 	 * 			Kanji entity returned from database
 	 */
 	KanjiEntity findByValue(String value);
+
+	/**
+	 * Find a single unit kanji by its ID
+	 *
+	 * @param kanjiId
+	 * 			Kanji ID
+	 * @return
+	 * 			Kanji entity returned from database
+	 */
+	Kanji findById(Long kanjiId);
 }
