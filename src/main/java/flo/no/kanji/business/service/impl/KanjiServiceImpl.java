@@ -1,5 +1,7 @@
 package flo.no.kanji.business.service.impl;
 
+import com.deepl.api.LanguageCode;
+import com.deepl.api.Translator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
@@ -16,6 +18,7 @@ import flo.no.kanji.web.api.KanjiApiClient;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,6 +61,13 @@ public class KanjiServiceImpl implements KanjiService {
 	@Autowired
 	private MojiConverter converter;
 
+	@Value("${kanji.translation.auto.enable}")
+	private Boolean enableAutoDefaultTranslation;
+
+	/** DeepL translator **/
+	@Autowired
+	private Translator translator;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -64,6 +75,7 @@ public class KanjiServiceImpl implements KanjiService {
 	public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings) {
 
 		checkKanjiAlreadyPresent(kanji);
+		checkDefaultTranslation(kanji);
 		if (autoDetectReadings) {
 			autoFillKanjiReadigs(kanji);
 		}
@@ -93,6 +105,27 @@ public class KanjiServiceImpl implements KanjiService {
 			}
 		} catch (Exception ex) {
 			log.error("Error occurred while retrieving kanji information from API", ex);
+		}
+	}
+
+	private void checkDefaultTranslation(Kanji kanji) {
+		if (!kanji.getTranslations().containsKey(Language.EN)) {
+			boolean error = false;
+			if (enableAutoDefaultTranslation) {
+				try {
+					var translation = translator.translateText(
+							kanji.getValue(), LanguageCode.Japanese, LanguageCode.EnglishAmerican);
+					kanji.getTranslations().put(Language.EN, List.of(translation.getText()));
+				} catch (Exception ex) {
+					log.error("Error occurred while retrieving information from deepL", ex);
+					error = true;
+				}
+			} else {
+				error = true;
+			}
+			if (error) {
+				throw new InvalidInputException("Please add at least one 'en' translation");
+			}
 		}
 	}
 
@@ -131,7 +164,7 @@ public class KanjiServiceImpl implements KanjiService {
 	@Override
 	public Kanji patchKanji(Long kanjiId, JsonNode patch) {
 
-		var initialKanji = this.findById(kanjiId, null);
+		var initialKanji = this.findById(kanjiId);
 		var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
 		
 		// Prevent ID update
@@ -150,7 +183,7 @@ public class KanjiServiceImpl implements KanjiService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Kanji findById(Long kanjiId, Language language) {
+	public Kanji findById(Long kanjiId) {
 		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
 				.orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
 	}

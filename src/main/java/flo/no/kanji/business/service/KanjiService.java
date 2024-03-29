@@ -70,8 +70,7 @@ public interface KanjiService {
 	 * Find a single unit kanji by its ID
 	 *
 	 * @param kanjiId  Kanji ID
-	 * @param language Filter for translations language
 	 * @return Kanji entity returned from database
 	 */
-	Kanji findById(Long kanjiId, Language language);
+	Kanji findById(Long kanjiId);
 }

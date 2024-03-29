@@ -108,7 +108,7 @@ public class KanjiServiceTest {
 		when(kanjiRepository.findById(anyLong()))
 				.thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
 		// EXECUTE
-		var kanji = kanjiServiceImpl.findById(1L, null);
+		var kanji = kanjiServiceImpl.findById(1L);
 		// ASSERT
 		assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
 	}
@@ -119,7 +119,7 @@ public class KanjiServiceTest {
 		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.empty());
 		// EXECUTE
 		// ASSERT
-		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L, null));
+		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L));
 	}
 
 	@Test

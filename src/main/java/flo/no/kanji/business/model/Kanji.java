@@ -4,6 +4,7 @@ import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,7 @@ public class Kanji {
 	private String value;
 
 	/** Kanji translations **/
+	@NotNull
 	private Map<Language, List<String>> translations;
 
 	/** Kanji japanese style reading styles (in hiragana) **/

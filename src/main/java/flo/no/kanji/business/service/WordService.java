@@ -16,6 +16,8 @@ public interface WordService {
 	 * Search words by its japanese value
 	 * @param search
 	 * 			Word japansese writing value
+	 * @param language
+	 * 			Translations language filter
 	 * @param pageable
 	 * 			Returned page parameters (limit, number of items per page...)
 	 * @return

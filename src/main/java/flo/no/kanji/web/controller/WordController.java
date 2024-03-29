@@ -10,8 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 /**
  * Word REST Controller
  * @author Florian
@@ -37,8 +35,7 @@ public class WordController {
 	public Page<Word> getWords(@RequestParam(required = false, value = "search") final String search,
 							   @RequestParam(required = false, value = "lang") final Language lang,
 							   @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
-		return wordService.getWords(search, Optional.ofNullable(lang).orElse(Language.EN),
-				pageable);
+		return wordService.getWords(search, lang, pageable);
 	}
 
 	/**
