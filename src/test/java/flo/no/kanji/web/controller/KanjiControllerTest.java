@@ -1,6 +1,7 @@
 package flo.no.kanji.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Translation;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ public class KanjiControllerTest {
 	public void testPostKanjiOk1() throws Exception {
 		var kanji = Kanji.builder()
 				.value("風")
-				.translations(List.of(new Translation("wind", "en")))
+				.translations(List.of(new Translation("wind", Language.EN)))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -66,7 +67,7 @@ public class KanjiControllerTest {
 				.value("古")
 				.kunYomi(List.of("ふる.い"))
 				.onYomi(List.of("コ"))
-				.translations(List.of(new Translation("Test", "en")))
+				.translations(List.of(new Translation("Test", Language.EN)))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +99,7 @@ public class KanjiControllerTest {
 				.value("高")
 				.kunYomi(List.of("tst"))
 				.onYomi(List.of("コウ"))
-				.translations(List.of(new Translation("Test", "en")))
+				.translations(List.of(new Translation("Test", Language.EN)))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -112,7 +113,7 @@ public class KanjiControllerTest {
 				.value("高")
 				.kunYomi(List.of("たか.い"))
 				.onYomi(List.of("tst"))
-				.translations(List.of(new Translation("Test", "en")))
+				.translations(List.of(new Translation("Test", Language.EN)))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +136,7 @@ public class KanjiControllerTest {
 				.value("kou")
 				.kunYomi(List.of("たかい"))
 				.onYomi(List.of("コウ"))
-				.translations(List.of(new Translation("Test", "en")))
+				.translations(List.of(new Translation("Test", Language.EN)))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)

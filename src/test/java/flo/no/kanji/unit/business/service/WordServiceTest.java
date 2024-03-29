@@ -1,6 +1,7 @@
 package flo.no.kanji.unit.business.service;
 
 import com.moji4j.MojiConverter;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.TranslationMapper;
 import flo.no.kanji.business.mapper.WordMapper;
@@ -67,7 +68,7 @@ public class WordServiceTest {
 		doReturn(new Word()).when(wordMapper).toBusinessObject(any(WordEntity.class));
 		var word = new Word();
 		word.setValue("きれいな火山");
-		word.setTranslations(List.of(new Translation("beautiful volcano", "en")));
+		word.setTranslations(List.of(new Translation("beautiful volcano", Language.EN)));
 		// EXECUTE
 		wordServiceImpl.addWord(word);
 		var wordCaptor = ArgumentCaptor.forClass(WordEntity.class);
@@ -94,9 +95,9 @@ public class WordServiceTest {
 		var word = new Word();
 		word.setValue("きれいな火山");
 		word.setKanjis(List.of(
-				Kanji.builder().value("火").translations(List.of(new Translation("fire", "en"))).build(),
-				Kanji.builder().value("山").translations(List.of(new Translation("mountain", "en"))).build()));
-		word.setTranslations(List.of(new Translation("beautiful volcano", "en")));
+				Kanji.builder().value("火").translations(List.of(new Translation("fire", Language.EN))).build(),
+				Kanji.builder().value("山").translations(List.of(new Translation("mountain", Language.EN))).build()));
+		word.setTranslations(List.of(new Translation("beautiful volcano", Language.EN)));
 		// EXECUTE
 		wordServiceImpl.addWord(word);
 		// ASSERT
@@ -110,7 +111,7 @@ public class WordServiceTest {
 		when(wordRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
 			.thenReturn(page);
 		// EXECUTE
-		var word = wordServiceImpl.getWords(null, mock(Pageable.class)).getContent().get(0);
+		var word = wordServiceImpl.getWords(null, null, mock(Pageable.class)).getContent().get(0);
 		// ASSERT
 		assertEquals(wordMapper.toBusinessObject(EntityGenerator.getWordEntity()), word);
 	}
@@ -123,7 +124,7 @@ public class WordServiceTest {
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
 			.thenReturn(page);
 		// EXECUTE
-		var word = wordServiceImpl.getWords("あ", mock(Pageable.class)).getContent().get(0);
+		var word = wordServiceImpl.getWords("あ", null, mock(Pageable.class)).getContent().get(0);
 		var specCaptor = ArgumentCaptor.forClass(Specification.class);
 		verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
 		executeSpecification(specCaptor.getValue(), false);
@@ -139,7 +140,7 @@ public class WordServiceTest {
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
 			.thenReturn(page);
 		// EXECUTE
-		var word = wordServiceImpl.getWords("ア", mock(Pageable.class)).getContent().get(0);
+		var word = wordServiceImpl.getWords("ア", null, mock(Pageable.class)).getContent().get(0);
 		var specCaptor = ArgumentCaptor.forClass(Specification.class);
 		verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
 		executeSpecification(specCaptor.getValue(), false);
@@ -155,7 +156,7 @@ public class WordServiceTest {
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
 			.thenReturn(page);
 		// EXECUTE
-		var word = wordServiceImpl.getWords("亜", mock(Pageable.class)).getContent().get(0);
+		var word = wordServiceImpl.getWords("亜", null, mock(Pageable.class)).getContent().get(0);
 		var specCaptor = ArgumentCaptor.forClass(Specification.class);
 		verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
 		executeSpecification(specCaptor.getValue(), false);
@@ -171,7 +172,7 @@ public class WordServiceTest {
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
 			.thenReturn(page);
 		// EXECUTE
-		var word = wordServiceImpl.getWords("会う", mock(Pageable.class)).getContent().get(0);
+		var word = wordServiceImpl.getWords("会う", null, mock(Pageable.class)).getContent().get(0);
 		var specCaptor = ArgumentCaptor.forClass(Specification.class);
 		verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
 		executeSpecification(specCaptor.getValue(), false);
@@ -187,7 +188,7 @@ public class WordServiceTest {
 		when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
 			.thenReturn(page);
 		// EXECUTE
-		var word = wordServiceImpl.getWords("a", mock(Pageable.class)).getContent().get(0);
+		var word = wordServiceImpl.getWords("a", null, mock(Pageable.class)).getContent().get(0);
 		var specCaptor = ArgumentCaptor.forClass(Specification.class);
 		verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
 		executeSpecification(specCaptor.getValue(), true);

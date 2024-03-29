@@ -1,6 +1,7 @@
 package flo.no.kanji.web.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
 import org.springdoc.core.annotations.ParameterObject;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 /**
  * Kanji REST Controller
@@ -31,14 +34,16 @@ public class KanjiController {
 	 */
 	@GetMapping(path = "/{kanjiId}")
 	public Kanji getKanji(@PathVariable("kanjiId") final Long kanjiId,
-						  @RequestParam(required = false, value = "lang") final String language) {
-		return kanjiService.findById(kanjiId, language);
+						  @RequestParam(required = false, value = "lang") final Language lang) {
+		return kanjiService.findById(kanjiId, Optional.ofNullable(lang).orElse(Language.EN));
 	}
 
 	/**
 	 * Search kanjis
 	 * @param search
 	 * 			Japanese kanji value
+	 * @param lang
+	 * 			Translation language filter
 	 * @param pageable
 	 * 			Returned page parameters (limit, number of items per page...)
 	 * @return
@@ -46,9 +51,10 @@ public class KanjiController {
 	 */
 	@GetMapping
 	public Page<Kanji> searchKanjis(@RequestParam(required = false, value = "search") final String search,
-									@RequestParam(required = false, value = "lang") final String language,
+									@RequestParam(required = false, value = "lang") final Language lang,
 								 @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
-		return kanjiService.getKanjis(search, language, pageable);
+		return kanjiService.getKanjis(search,
+				Optional.ofNullable(lang).orElse(Language.EN), pageable);
 	}
 
 	/**

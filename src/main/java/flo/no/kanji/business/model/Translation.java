@@ -1,5 +1,6 @@
 package flo.no.kanji.business.model;
 
+import flo.no.kanji.business.constants.Language;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,5 @@ public class Translation {
 
     private String text;
 
-    private String language;
+    private Language language;
 }

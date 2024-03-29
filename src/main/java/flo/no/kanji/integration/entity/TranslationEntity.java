@@ -1,7 +1,10 @@
 package flo.no.kanji.integration.entity;
 
+import flo.no.kanji.business.constants.Language;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +21,6 @@ public class TranslationEntity {
     private String translation;
 
     @Column(name = "translation_lang")
-    private String language;
+    @Enumerated(EnumType.STRING)
+    private Language language;
 }

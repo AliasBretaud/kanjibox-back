@@ -2,6 +2,7 @@ package flo.no.kanji.unit.business.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moji4j.MojiConverter;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -131,7 +132,7 @@ public class KanjiServiceTest {
 		var kanVO = new KanjiVO();
 		var kunYomi = List.of("kunYomi");
 		var onYomi = List.of("onYomi");
-		List<Translation> translations = List.of(new Translation("translation", "en"));
+		List<Translation> translations = List.of(new Translation("translation", Language.EN));
 		kanVO.setKunReadings(kunYomi);
 		kanVO.setOnReadings(onYomi);
 		kanVO.setMeanings(translations.stream().map(Translation::getText).toList());

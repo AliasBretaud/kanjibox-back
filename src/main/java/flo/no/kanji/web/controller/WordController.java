@@ -1,5 +1,6 @@
 package flo.no.kanji.web.controller;
 
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.WordService;
 import org.springdoc.core.annotations.ParameterObject;
@@ -8,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 /**
  * Word REST Controller
@@ -32,8 +35,10 @@ public class WordController {
 	 */
 	@GetMapping
 	public Page<Word> getWords(@RequestParam(required = false, value = "search") final String search,
+							   @RequestParam(required = false, value = "lang") final Language lang,
 							   @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
-		return wordService.getWords(search, pageable);
+		return wordService.getWords(search, Optional.ofNullable(lang).orElse(Language.EN),
+				pageable);
 	}
 
 	/**

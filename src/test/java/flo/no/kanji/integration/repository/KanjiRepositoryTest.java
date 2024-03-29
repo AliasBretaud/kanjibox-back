@@ -100,10 +100,7 @@ public class KanjiRepositoryTest {
 		assertEquals(List.of("クン"), kanji.getOnYomi());
 		assertEquals(
 				List.of("mister", "you", "ruler", "male name suffix"),
-				kanji.getTranslations().stream()
-						.filter(t -> t.getLanguage().equals("en"))
-						.map(TranslationEntity::getTranslation)
-						.toList());
+				kanji.getTranslations().stream().map(TranslationEntity::getTranslation).toList());
 		assertEquals(LocalDateTime.of(2020, 4, 14, 1, 21, 52), kanji.getTimeStamp());
 	}
 	

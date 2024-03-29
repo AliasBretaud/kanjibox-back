@@ -1,6 +1,7 @@
 package flo.no.kanji.business.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import jakarta.validation.Valid;
@@ -41,7 +42,7 @@ public interface KanjiService {
 	 * @param pageable Returned page parameters (limit, number of items per page...)
 	 * @return Spring page of retrieved corresponding kanjis
 	 */
-	Page<Kanji> getKanjis(String search, String language, Pageable pageable);
+	Page<Kanji> getKanjis(String search, Language language, Pageable pageable);
 
 	/**
 	 * Modify an existing kanji attributes
@@ -72,5 +73,5 @@ public interface KanjiService {
 	 * @param language Filter for translations language
 	 * @return Kanji entity returned from database
 	 */
-	Kanji findById(Long kanjiId, String language);
+	Kanji findById(Long kanjiId, Language language);
 }

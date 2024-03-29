@@ -1,6 +1,7 @@
 package flo.no.kanji.integration.specification;
 
 import com.moji4j.MojiConverter;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.KanjiEntity_;
@@ -21,12 +22,12 @@ import java.util.List;
  */
 public class KanjiSpecification {
 
-	private static Predicate languageFilter(String language, Root<KanjiEntity> root, CriteriaBuilder cb) {
+	private static Predicate languageFilter(Language language, Root<KanjiEntity> root, CriteriaBuilder cb) {
 		var tr = root.join(KanjiEntity_.translations, JoinType.INNER);
 		return cb.equal(tr.get(TranslationEntity_.language), language);
 	}
 
-	public static Specification<KanjiEntity> findById(final Long id, final String language) {
+	public static Specification<KanjiEntity> findById(final Long id, final Language language) {
 		return  (root, query, criteriaBuilder) -> {
 			List<Predicate> predicates = new ArrayList<>();
 			predicates.add(criteriaBuilder.equal(root.get(KanjiEntity_.id), id));
@@ -45,7 +46,7 @@ public class KanjiSpecification {
 	 * 			Builded search criteria specification
 	 */
 	public static Specification<KanjiEntity> searchKanji(final String search,
-														 final String language,
+														 final Language language,
 														 final MojiConverter converter) {
 		return (root, query, builder) -> {
 			List<Predicate> predicates = new ArrayList<>();

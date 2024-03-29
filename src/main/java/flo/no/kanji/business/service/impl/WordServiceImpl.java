@@ -1,6 +1,7 @@
 package flo.no.kanji.business.service.impl;
 
 import com.moji4j.MojiConverter;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.WordMapper;
@@ -111,7 +112,7 @@ public class WordServiceImpl implements WordService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Page<Word> getWords(String search, Pageable pageable) {
+	public Page<Word> getWords(String search, Language language, Pageable pageable) {
 
 		return ObjectUtils.isEmpty(search)
 				? wordRepository.findAllByOrderByTimeStampDesc(pageable)

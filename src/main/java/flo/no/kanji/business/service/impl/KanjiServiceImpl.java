@@ -2,6 +2,7 @@ package flo.no.kanji.business.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moji4j.MojiConverter;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -90,7 +91,7 @@ public class KanjiServiceImpl implements KanjiService {
 				kanji.setOnYomi(kanjiVo.getOnReadings());
 				kanji.setTranslations(kanjiVo.getMeanings()
 						.stream()
-						.map(s -> new Translation(s, "en")).toList());
+						.map(s -> new Translation(s, Language.EN)).toList());
 			}
 		} catch (Exception ex) {
 			log.error("Error occurred while retrieving kanji information from API", ex);
@@ -101,7 +102,7 @@ public class KanjiServiceImpl implements KanjiService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Page<Kanji> getKanjis(String search, String language, Pageable pageable) {
+	public Page<Kanji> getKanjis(String search, Language language, Pageable pageable) {
 
 		return ObjectUtils.isEmpty(search)
 				? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
@@ -119,7 +120,7 @@ public class KanjiServiceImpl implements KanjiService {
 	 * @return
 	 * 		The result of search
 	 */
-	private Page<Kanji> searchKanji(String search, String language, Pageable pageable) {
+	private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
 
 		var spec = KanjiSpecification.searchKanji(search, language, this.converter);
 		// Execute query, mapping and return results
@@ -151,7 +152,7 @@ public class KanjiServiceImpl implements KanjiService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Kanji findById(Long kanjiId, String language) {
+	public Kanji findById(Long kanjiId, Language language) {
 		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
 				.orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
 	}
