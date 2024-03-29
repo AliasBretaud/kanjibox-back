@@ -1,12 +1,12 @@
 package flo.no.kanji.business.mapper;
 
-import java.util.stream.Collectors;
-
+import flo.no.kanji.business.model.Word;
+import flo.no.kanji.integration.entity.TranslationEntity;
+import flo.no.kanji.integration.entity.WordEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import flo.no.kanji.business.model.Word;
-import flo.no.kanji.integration.entity.WordEntity;
+import java.util.stream.Collectors;
 
 /**
  * Word object bidirectional mapper between Model objects and Entities
@@ -34,7 +34,10 @@ public class WordMapper {
 				.id(wordEntity.getId())
 				.value(wordEntity.getValue())
 				.furiganaValue(wordEntity.getFuriganaValue())
-				.translation(wordEntity.getTranslation())
+				.translations(wordEntity.getTranslations().stream()
+					.collect(Collectors.groupingBy(TranslationEntity::getLanguage,
+						Collectors.mapping(TranslationEntity::getTranslation, Collectors.toList())
+				)))
 				.kanjis(kanjis)
 				.build();
 	}
@@ -51,7 +54,10 @@ public class WordMapper {
 				.id(word.getId())
 				.value(word.getValue())
 				.furiganaValue(word.getFuriganaValue())
-				.translation(word.getTranslation())
+				.translations(word.getTranslations().entrySet().stream()
+						.flatMap(entry -> entry.getValue().stream()
+								.map(value -> new TranslationEntity(value, entry.getKey())))
+						.collect(Collectors.toList()))
 				.build();
 	}
 }

@@ -1,18 +1,16 @@
 package flo.no.kanji.web.handler;
 
-import java.sql.Timestamp;
-
+import flo.no.kanji.business.exception.InvalidInputException;
+import flo.no.kanji.business.exception.ItemNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import flo.no.kanji.business.exception.InvalidInputException;
-import flo.no.kanji.business.exception.ItemNotFoundException;
-import lombok.extern.slf4j.Slf4j;
-
-import jakarta.validation.ConstraintViolationException;
+import java.sql.Timestamp;
 
 /**
  * Global controller for exceptions handling
@@ -38,7 +36,7 @@ public class ExceptionHelper {
 	    log.error("Invalid Input Exception: ", ex);
 	    var status = HttpStatus.BAD_REQUEST;
 	    var apiException = buildApiException(status, ex);
-	    return new ResponseEntity<Object>(apiException, status);
+	    return new ResponseEntity<>(apiException, status);
     }
 	
 	/**
@@ -52,7 +50,7 @@ public class ExceptionHelper {
 	public ResponseEntity<Object> handleItemNotFoundException(ItemNotFoundException ex) {
 		var status = HttpStatus.NOT_FOUND;
 	    var apiException = buildApiException(status, ex);
-	    return new ResponseEntity<Object>(apiException, status);
+	    return new ResponseEntity<>(apiException, status);
 	}
 	
 	/**
@@ -67,7 +65,7 @@ public class ExceptionHelper {
 	    log.error("Exception: ", ex);
 	    var status = HttpStatus.INTERNAL_SERVER_ERROR;
 	    var apiException = buildApiException(status, ex);
-	    return new ResponseEntity<Object>(apiException, status);
+	    return new ResponseEntity<>(apiException, status);
     }
 	
 	/**

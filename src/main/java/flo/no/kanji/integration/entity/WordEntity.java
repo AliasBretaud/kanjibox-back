@@ -1,13 +1,13 @@
 package flo.no.kanji.integration.entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Word entity persistent database object
@@ -40,8 +40,12 @@ public class WordEntity {
 	 */
 	private LocalDateTime timeStamp;
 
-	/** Word translation */
-	private String translation;
+	/**
+	 * Word translations
+	 */
+	@ElementCollection
+	@CollectionTable(name = "word_translation", joinColumns = @JoinColumn(name = "word_id"))
+	private List<TranslationEntity> translations;
 
 	/**
 	 * Word japanese value (literal kanjis and okuriganas)

@@ -1,6 +1,7 @@
 package flo.no.kanji.web.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
 import org.springdoc.core.annotations.ParameterObject;
@@ -38,6 +39,8 @@ public class KanjiController {
 	 * Search kanjis
 	 * @param search
 	 * 			Japanese kanji value
+	 * @param lang
+	 * 			Translation language filter
 	 * @param pageable
 	 * 			Returned page parameters (limit, number of items per page...)
 	 * @return
@@ -45,8 +48,9 @@ public class KanjiController {
 	 */
 	@GetMapping
 	public Page<Kanji> searchKanjis(@RequestParam(required = false, value = "search") final String search,
+									@RequestParam(required = false, value = "lang") final Language lang,
 								 @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
-		return kanjiService.getKanjis(search, pageable);
+		return kanjiService.getKanjis(search, lang, pageable);
 	}
 
 	/**

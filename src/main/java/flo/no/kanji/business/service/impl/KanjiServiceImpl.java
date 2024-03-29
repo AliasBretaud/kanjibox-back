@@ -1,7 +1,10 @@
 package flo.no.kanji.business.service.impl;
 
+import com.deepl.api.LanguageCode;
+import com.deepl.api.Translator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moji4j.MojiConverter;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -15,6 +18,7 @@ import flo.no.kanji.web.api.KanjiApiClient;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -55,6 +61,13 @@ public class KanjiServiceImpl implements KanjiService {
 	@Autowired
 	private MojiConverter converter;
 
+	@Value("${kanji.translation.auto.enable}")
+	private Boolean enableAutoDefaultTranslation;
+
+	/** DeepL translator **/
+	@Autowired
+	private Translator translator;
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -62,6 +75,7 @@ public class KanjiServiceImpl implements KanjiService {
 	public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings) {
 
 		checkKanjiAlreadyPresent(kanji);
+		checkDefaultTranslation(kanji);
 		if (autoDetectReadings) {
 			autoFillKanjiReadigs(kanji);
 		}
@@ -87,10 +101,31 @@ public class KanjiServiceImpl implements KanjiService {
 			if (kanjiVo != null) {
 				kanji.setKunYomi(kanjiVo.getKunReadings());
 				kanji.setOnYomi(kanjiVo.getOnReadings());
-				kanji.setTranslations(kanjiVo.getMeanings());
+				kanji.setTranslations(Map.of(Language.EN, kanjiVo.getMeanings()));
 			}
 		} catch (Exception ex) {
 			log.error("Error occurred while retrieving kanji information from API", ex);
+		}
+	}
+
+	private void checkDefaultTranslation(Kanji kanji) {
+		if (!kanji.getTranslations().containsKey(Language.EN)) {
+			boolean error = false;
+			if (enableAutoDefaultTranslation) {
+				try {
+					var translation = translator.translateText(
+							kanji.getValue(), LanguageCode.Japanese, LanguageCode.EnglishAmerican);
+					kanji.getTranslations().put(Language.EN, List.of(translation.getText()));
+				} catch (Exception ex) {
+					log.error("Error occurred while retrieving information from deepL", ex);
+					error = true;
+				}
+			} else {
+				error = true;
+			}
+			if (error) {
+				throw new InvalidInputException("Please add at least one 'en' translation");
+			}
 		}
 	}
 
@@ -98,12 +133,12 @@ public class KanjiServiceImpl implements KanjiService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Page<Kanji> getKanjis(String search, Pageable pageable) {
+	public Page<Kanji> getKanjis(String search, Language language, Pageable pageable) {
 
 		return ObjectUtils.isEmpty(search)
 				? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
 						.map(kanjiMapper::toBusinessObject)
-				: this.searchKanji(search, pageable);
+				: this.searchKanji(search, language, pageable);
 	}
 
 	/**
@@ -116,9 +151,9 @@ public class KanjiServiceImpl implements KanjiService {
 	 * @return
 	 * 		The result of search
 	 */
-	private Page<Kanji> searchKanji(String search, Pageable pageable) {
+	private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
 
-		var spec = KanjiSpecification.searchKanji(search, this.converter);
+		var spec = KanjiSpecification.searchKanji(search, language, this.converter);
 		// Execute query, mapping and return results
 		return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
 	}
@@ -143,14 +178,9 @@ public class KanjiServiceImpl implements KanjiService {
 		
 		return kanjiMapper.toBusinessObject(patchedKanjiEntity);
 	}
-	
+
 	/**
-	 * Find a single kanji by its technical ID
-	 * 
-	 * @param kanjiId
-	 * 			Kanji database identifier
-	 * @return
-	 * 			Retrieved kanji business object
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Kanji findById(Long kanjiId) {

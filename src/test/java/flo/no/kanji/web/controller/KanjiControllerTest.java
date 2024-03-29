@@ -1,6 +1,7 @@
 package flo.no.kanji.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -31,7 +33,7 @@ public class KanjiControllerTest {
     public void testSearchKanjiOk() throws Exception {
         mockMvc.perform(get("/kanjis?search=話"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content[0].translations[0]", is("tale")));
+            .andExpect(jsonPath("$.content[0].translations.en[0]", is("tale")));
     }
 
 	@Test
@@ -49,7 +51,10 @@ public class KanjiControllerTest {
 	
 	@Test
 	public void testPostKanjiOk1() throws Exception {
-		var kanji = new Kanji("風");
+		var kanji = Kanji.builder()
+				.value("風")
+				.translations(Map.of(Language.EN, List.of("wind")))
+				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(kanji)))
@@ -62,7 +67,7 @@ public class KanjiControllerTest {
 				.value("古")
 				.kunYomi(List.of("ふる.い"))
 				.onYomi(List.of("コ"))
-				.translations(List.of("Test"))
+				.translations(Map.of(Language.EN, List.of("Test")))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -94,7 +99,7 @@ public class KanjiControllerTest {
 				.value("高")
 				.kunYomi(List.of("tst"))
 				.onYomi(List.of("コウ"))
-				.translations(List.of("Test"))
+				.translations(Map.of(Language.EN, List.of("Test")))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +113,7 @@ public class KanjiControllerTest {
 				.value("高")
 				.kunYomi(List.of("たか.い"))
 				.onYomi(List.of("tst"))
-				.translations(List.of("Test"))
+				.translations(Map.of(Language.EN, List.of("Test")))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +136,7 @@ public class KanjiControllerTest {
 				.value("kou")
 				.kunYomi(List.of("たかい"))
 				.onYomi(List.of("コウ"))
-				.translations(List.of("Test"))
+				.translations(Map.of(Language.EN, List.of("Test")))
 				.build();
 		mockMvc.perform(post("/kanjis")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -141,14 +146,14 @@ public class KanjiControllerTest {
 	
 	@Test
 	public void testPatchKanji() throws Exception {
-		var translationsPatch = "{\"translations\": [\"test patch\"]}";
+		var translationsPatch = "{\"translations\": {\"en\": [\"test patch\"]}}";
 		mockMvc.perform(patch("/kanjis/84")
 						.contentType(MediaType.APPLICATION_JSON)
 				.content(translationsPatch))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.id", is(84)))
 		.andExpect(jsonPath("$.value", is("学")))
-		.andExpect(jsonPath("$.translations[0]", is("test patch")));
+		.andExpect(jsonPath("$.translations.en[0]", is("test patch")));
 	}
 	
 	@Test

@@ -1,6 +1,8 @@
 package flo.no.kanji.integration.mock;
 
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.entity.WordEntity;
 
 import java.time.LocalDateTime;
@@ -29,7 +31,7 @@ public class EntityGenerator {
 					.value("人")
 					.kunYomi(List.of("ひと"))
 					.onYomi(List.of("ジン"))
-					.translations(List.of("People"))
+					.translations(List.of(new TranslationEntity("People", Language.EN)))
 					.timeStamp(LocalDateTime.now())
 					.build();
 			objectMap.put(key, kanjiEntity);
@@ -48,7 +50,7 @@ public class EntityGenerator {
 					.id(1L)
 					.value("火山")
 					.furiganaValue("かざん")
-					.translation("Volcano")
+					.translations(List.of(new TranslationEntity("Volcano", Language.EN)))
 					.timeStamp(LocalDateTime.now())
 					.build();
 			objectMap.put(key, wordEntity);
