@@ -1,13 +1,13 @@
 package flo.no.kanji.integration.entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Kanji entity persistent database object
@@ -47,8 +47,7 @@ public class KanjiEntity {
 	 */
 	@ElementCollection
 	@CollectionTable(name = "kanji_translation", joinColumns = @JoinColumn(name = "kanji_id"))
-	@Column(name = "translation")
-	private List<String> translations;
+	private List<TranslationEntity> translations;
 
 	/**
 	 * Kanji creation/update timestamp

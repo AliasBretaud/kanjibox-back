@@ -2,9 +2,11 @@ package flo.no.kanji.integration.specification;
 
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.exception.InvalidInputException;
+import flo.no.kanji.integration.entity.TranslationEntity_;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.entity.WordEntity_;
 import flo.no.kanji.util.CharacterUtils;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
@@ -30,9 +32,11 @@ public class WordSpecification {
 					// Romaji / translation
 				case ROMAJI -> {
 					var valueSearch = converter.convertRomajiToHiragana(search);
+					var translations = root.join(WordEntity_.translations, JoinType.LEFT)
+							.get(TranslationEntity_.translation);
 					yield builder.or(
 							builder.equal(root.get(WordEntity_.furiganaValue), valueSearch),
-							builder.like(builder.upper(root.get(WordEntity_.translation)),
+							builder.like(builder.upper(translations),
 									"%" + search.toUpperCase() + "%"));
 				}
 			};

@@ -1,7 +1,5 @@
 package flo.no.kanji.business.model;
 
-import java.util.List;
-
 import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * Kanji model object representation
@@ -31,7 +31,7 @@ public class Kanji {
 	private String value;
 
 	/** Kanji translations **/
-	private List<String> translations;
+	private List<Translation> translations;
 
 	/** Kanji japanese style reading styles (in hiragana) **/
 	@JapaneseCharacterFormat(format = CharacterType.HIRAGANA)
@@ -40,7 +40,7 @@ public class Kanji {
 	/** Kanji chinese style reading styles (in hiragana) **/
 	@JapaneseCharacterFormat(format = CharacterType.KATAKANA)
 	private List<String> onYomi;
-	
+
 	public Kanji(final String value) {
 		this.value = value;
 	}

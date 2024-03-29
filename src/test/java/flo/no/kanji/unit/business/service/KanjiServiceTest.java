@@ -5,7 +5,9 @@ import com.moji4j.MojiConverter;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
+import flo.no.kanji.business.mapper.TranslationMapper;
 import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.model.Translation;
 import flo.no.kanji.business.service.impl.KanjiServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
@@ -33,12 +36,15 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class KanjiServiceTest {
-	
-	@Mock
-	private KanjiRepository kanjiRepository;
 
 	@Spy
-	private KanjiMapper kanjiMapper;
+	private TranslationMapper translationMapper = new TranslationMapper();
+
+	@InjectMocks
+	private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
+
+	@Mock
+	private KanjiRepository kanjiRepository;
 
 	@Mock
 	private KanjiApiClient kanjiApiClient;
@@ -48,9 +54,9 @@ public class KanjiServiceTest {
 	
 	@Spy
 	private MojiConverter mojiConverter;
-	
-	@Spy
+
 	@InjectMocks
+	@Spy
 	private KanjiServiceImpl kanjiServiceImpl;
 	
 	@Test
@@ -105,7 +111,7 @@ public class KanjiServiceTest {
 		when(kanjiRepository.findById(anyLong()))
 				.thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
 		// EXECUTE
-		var kanji = kanjiServiceImpl.findById(1L);
+		var kanji = kanjiServiceImpl.findById(1L, null);
 		// ASSERT
 		assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
 	}
@@ -116,7 +122,7 @@ public class KanjiServiceTest {
 		when(kanjiRepository.findById(anyLong())).thenReturn(Optional.empty());
 		// EXECUTE
 		// ASSERT
-		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L));
+		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L, null));
 	}
 
 	@Test
@@ -125,10 +131,10 @@ public class KanjiServiceTest {
 		var kanVO = new KanjiVO();
 		var kunYomi = List.of("kunYomi");
 		var onYomi = List.of("onYomi");
-		var translations = List.of("translation");
+		List<Translation> translations = List.of(new Translation("translation", "en"));
 		kanVO.setKunReadings(kunYomi);
 		kanVO.setOnReadings(onYomi);
-		kanVO.setMeanings(translations);
+		kanVO.setMeanings(translations.stream().map(Translation::getText).toList());
 		when(kanjiApiClient.searchKanjiReadings(anyString())).thenReturn(kanVO);
 		var kanji = new Kanji();
 		kanji.setValue("T");
@@ -162,7 +168,7 @@ public class KanjiServiceTest {
 			.thenReturn(new PageImpl<KanjiEntity>(List.of(EntityGenerator.getKanjiEntity())));
 		var pageable = Pageable.ofSize(1);
 		// EXECUTE
-		var kanjis = kanjiServiceImpl.getKanjis(null, pageable).getContent();
+		var kanjis = kanjiServiceImpl.getKanjis(null, null, pageable).getContent();
 		var kanji = kanjis.getFirst();
 		// ASSERT
 		assertEquals(1, kanjis.size());
@@ -178,7 +184,7 @@ public class KanjiServiceTest {
 		var pageable = Pageable.ofSize(1);
 		Kanji kanji = null;
 		// EXECUTE
-		var kanjisSearch = kanjiServiceImpl.getKanjis("T", pageable).getContent();
+		var kanjisSearch = kanjiServiceImpl.getKanjis("T", null, pageable).getContent();
 		// ASSERT
 		assertEquals(1, kanjisSearch.size());
 		kanji = kanjisSearch.get(0);

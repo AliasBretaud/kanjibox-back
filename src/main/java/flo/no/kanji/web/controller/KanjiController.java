@@ -30,8 +30,9 @@ public class KanjiController {
 	 * 		Retrieved kanji business object
 	 */
 	@GetMapping(path = "/{kanjiId}")
-	public Kanji getKanji(@PathVariable("kanjiId") final Long kanjiId) {
-		return kanjiService.findById(kanjiId);
+	public Kanji getKanji(@PathVariable("kanjiId") final Long kanjiId,
+						  @RequestParam(required = false, value = "lang") final String language) {
+		return kanjiService.findById(kanjiId, language);
 	}
 
 	/**
@@ -45,8 +46,9 @@ public class KanjiController {
 	 */
 	@GetMapping
 	public Page<Kanji> searchKanjis(@RequestParam(required = false, value = "search") final String search,
+									@RequestParam(required = false, value = "lang") final String language,
 								 @ParameterObject @PageableDefault(size = 10) final Pageable pageable) {
-		return kanjiService.getKanjis(search, pageable);
+		return kanjiService.getKanjis(search, language, pageable);
 	}
 
 	/**

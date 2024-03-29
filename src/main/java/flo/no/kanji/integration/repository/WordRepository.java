@@ -41,7 +41,7 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
 	 * @return
 	 * 			Retrieved word list
 	 */
-	List<WordEntity> findByTranslationContaining(String translation);
+	List<WordEntity> findByTranslationsContaining(String translation);
 
 	/**
 	 * Find all words, ordered by creation/modification date

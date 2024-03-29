@@ -6,6 +6,7 @@ import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.model.Translation;
 import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
@@ -87,7 +88,9 @@ public class KanjiServiceImpl implements KanjiService {
 			if (kanjiVo != null) {
 				kanji.setKunYomi(kanjiVo.getKunReadings());
 				kanji.setOnYomi(kanjiVo.getOnReadings());
-				kanji.setTranslations(kanjiVo.getMeanings());
+				kanji.setTranslations(kanjiVo.getMeanings()
+						.stream()
+						.map(s -> new Translation(s, "en")).toList());
 			}
 		} catch (Exception ex) {
 			log.error("Error occurred while retrieving kanji information from API", ex);
@@ -98,12 +101,12 @@ public class KanjiServiceImpl implements KanjiService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Page<Kanji> getKanjis(String search, Pageable pageable) {
+	public Page<Kanji> getKanjis(String search, String language, Pageable pageable) {
 
 		return ObjectUtils.isEmpty(search)
 				? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
 						.map(kanjiMapper::toBusinessObject)
-				: this.searchKanji(search, pageable);
+				: this.searchKanji(search, language, pageable);
 	}
 
 	/**
@@ -116,9 +119,9 @@ public class KanjiServiceImpl implements KanjiService {
 	 * @return
 	 * 		The result of search
 	 */
-	private Page<Kanji> searchKanji(String search, Pageable pageable) {
+	private Page<Kanji> searchKanji(String search, String language, Pageable pageable) {
 
-		var spec = KanjiSpecification.searchKanji(search, this.converter);
+		var spec = KanjiSpecification.searchKanji(search, language, this.converter);
 		// Execute query, mapping and return results
 		return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
 	}
@@ -129,7 +132,7 @@ public class KanjiServiceImpl implements KanjiService {
 	@Override
 	public Kanji patchKanji(Long kanjiId, JsonNode patch) {
 
-		var initialKanji = this.findById(kanjiId);
+		var initialKanji = this.findById(kanjiId, null);
 		var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
 		
 		// Prevent ID update
@@ -143,17 +146,12 @@ public class KanjiServiceImpl implements KanjiService {
 		
 		return kanjiMapper.toBusinessObject(patchedKanjiEntity);
 	}
-	
+
 	/**
-	 * Find a single kanji by its technical ID
-	 * 
-	 * @param kanjiId
-	 * 			Kanji database identifier
-	 * @return
-	 * 			Retrieved kanji business object
+	 * {@inheritDoc}
 	 */
 	@Override
-	public Kanji findById(Long kanjiId) {
+	public Kanji findById(Long kanjiId, String language) {
 		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
 				.orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
 	}

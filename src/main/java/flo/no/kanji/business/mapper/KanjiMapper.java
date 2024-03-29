@@ -2,6 +2,7 @@ package flo.no.kanji.business.mapper;
 
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.integration.entity.KanjiEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class KanjiMapper {
+
+	@Autowired
+	TranslationMapper translationMapper;
 
 	/**
 	 * Transforms a Kanji entity to business object
@@ -24,7 +28,8 @@ public class KanjiMapper {
 				.id(kanjiEntity.getId())
 				.kunYomi(kanjiEntity.getKunYomi())
 				.onYomi(kanjiEntity.getOnYomi())
-				.translations(kanjiEntity.getTranslations())
+				.translations(kanjiEntity.getTranslations().stream()
+						.map(translationMapper::toBusinessObject).toList())
 				.value(kanjiEntity.getValue())
 				.build();
 	}
@@ -42,7 +47,8 @@ public class KanjiMapper {
 				.id(kanji.getId())
 				.kunYomi(kanji.getKunYomi())
 				.onYomi(kanji.getOnYomi())
-				.translations(kanji.getTranslations())
+				.translations(kanji.getTranslations().stream()
+						.map(translationMapper::toEntity).toList())
 				.value(kanji.getValue())
 				.build();
 	}
