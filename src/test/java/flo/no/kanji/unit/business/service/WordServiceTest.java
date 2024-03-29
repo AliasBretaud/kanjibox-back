@@ -3,10 +3,8 @@ package flo.no.kanji.unit.business.service;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.mapper.KanjiMapper;
-import flo.no.kanji.business.mapper.TranslationMapper;
 import flo.no.kanji.business.mapper.WordMapper;
 import flo.no.kanji.business.model.Kanji;
-import flo.no.kanji.business.model.Translation;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.impl.WordServiceImpl;
@@ -26,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,10 +33,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class WordServiceTest {
 
-	@Spy
-	private TranslationMapper translationMapper = new TranslationMapper();
-
-	@InjectMocks
 	@Spy
 	private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
 
@@ -68,7 +63,7 @@ public class WordServiceTest {
 		doReturn(new Word()).when(wordMapper).toBusinessObject(any(WordEntity.class));
 		var word = new Word();
 		word.setValue("きれいな火山");
-		word.setTranslations(List.of(new Translation("beautiful volcano", Language.EN)));
+		word.setTranslations(Map.of(Language.EN, List.of("beautiful volcano")));
 		// EXECUTE
 		wordServiceImpl.addWord(word);
 		var wordCaptor = ArgumentCaptor.forClass(WordEntity.class);
@@ -78,7 +73,7 @@ public class WordServiceTest {
 		assertEquals(word.getValue(), savedWord.getValue());
 		assertEquals(word.getFuriganaValue(), savedWord.getFuriganaValue());
 		assertEquals(
-				word.getTranslations().stream().map(Translation::getText).toList(),
+				word.getTranslations().get(Language.EN),
 				savedWord.getTranslations().stream().map(TranslationEntity::getTranslation).toList());
 		var kanjiList = savedWord.getKanjis();
 		assertEquals(2, kanjiList.size());
@@ -95,9 +90,9 @@ public class WordServiceTest {
 		var word = new Word();
 		word.setValue("きれいな火山");
 		word.setKanjis(List.of(
-				Kanji.builder().value("火").translations(List.of(new Translation("fire", Language.EN))).build(),
-				Kanji.builder().value("山").translations(List.of(new Translation("mountain", Language.EN))).build()));
-		word.setTranslations(List.of(new Translation("beautiful volcano", Language.EN)));
+				Kanji.builder().value("火").translations(Map.of(Language.EN, List.of("fire"))).build(),
+				Kanji.builder().value("山").translations(Map.of(Language.EN, List.of("mountain"))).build()));
+		word.setTranslations(Map.of(Language.EN, List.of("Volcano")));
 		// EXECUTE
 		wordServiceImpl.addWord(word);
 		// ASSERT

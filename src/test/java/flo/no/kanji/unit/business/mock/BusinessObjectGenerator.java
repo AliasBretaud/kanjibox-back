@@ -2,7 +2,6 @@ package flo.no.kanji.unit.business.mock;
 
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
-import flo.no.kanji.business.model.Translation;
 import flo.no.kanji.business.model.Word;
 
 import java.util.HashMap;
@@ -25,7 +24,7 @@ public class BusinessObjectGenerator {
 			kanji.setValue("人");
 			kanji.setKunYomi(List.of("ひと"));
 			kanji.setOnYomi(List.of("ジン"));
-			kanji.setTranslations(List.of(new Translation("People", Language.EN)));
+			kanji.setTranslations(Map.of(Language.EN, List.of("People")));
 			objectMap.put("kanji", kanji);
 		}
 		
@@ -38,7 +37,7 @@ public class BusinessObjectGenerator {
 			word.setId(1L);
 			word.setValue("火山");
 			word.setFuriganaValue("かざん");
-			word.setTranslations(List.of(new Translation("Volcano", Language.EN)));
+			word.setTranslations(Map.of(Language.EN, List.of("Volcano")));
 			objectMap.put("word", word);
 		}
 		

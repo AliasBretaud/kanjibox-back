@@ -2,8 +2,10 @@ package flo.no.kanji.business.mapper;
 
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.integration.entity.KanjiEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import flo.no.kanji.integration.entity.TranslationEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 /**
  * Kanji object bidirectional mapper between Model objects and Entities
@@ -11,9 +13,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class KanjiMapper {
-
-	@Autowired
-	TranslationMapper translationMapper;
 
 	/**
 	 * Transforms a Kanji entity to business object
@@ -28,8 +27,11 @@ public class KanjiMapper {
 				.id(kanjiEntity.getId())
 				.kunYomi(kanjiEntity.getKunYomi())
 				.onYomi(kanjiEntity.getOnYomi())
-				.translations(kanjiEntity.getTranslations().stream()
-						.map(translationMapper::toBusinessObject).toList())
+				.translations(
+						kanjiEntity.getTranslations().stream()
+							.collect(Collectors.groupingBy(TranslationEntity::getLanguage,
+								Collectors.mapping(TranslationEntity::getTranslation, Collectors.toList())
+							)))
 				.value(kanjiEntity.getValue())
 				.build();
 	}
@@ -47,8 +49,11 @@ public class KanjiMapper {
 				.id(kanji.getId())
 				.kunYomi(kanji.getKunYomi())
 				.onYomi(kanji.getOnYomi())
-				.translations(kanji.getTranslations().stream()
-						.map(translationMapper::toEntity).toList())
+				.translations(kanji.getTranslations()
+						.entrySet().stream()
+						.flatMap(entry -> entry.getValue().stream()
+								.map(value -> new TranslationEntity(value, entry.getKey())))
+						.collect(Collectors.toList()))
 				.value(kanji.getValue())
 				.build();
 	}

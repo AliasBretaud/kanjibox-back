@@ -1,6 +1,7 @@
 package flo.no.kanji.business.model;
 
 import flo.no.kanji.business.constants.CharacterType;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Word (Kanji 1+ and optional okuriganas)  model object representation
@@ -29,7 +31,7 @@ public class Word {
 	private String value;
 
 	/** Word translations */
-	private List<Translation> translations;
+	private Map<Language, List<String>> translations;
 
 	/** Word transcription in hiragana **/
 	@NotBlank

@@ -7,7 +7,6 @@ import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
-import flo.no.kanji.business.model.Translation;
 import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
@@ -24,6 +23,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -89,9 +89,7 @@ public class KanjiServiceImpl implements KanjiService {
 			if (kanjiVo != null) {
 				kanji.setKunYomi(kanjiVo.getKunReadings());
 				kanji.setOnYomi(kanjiVo.getOnReadings());
-				kanji.setTranslations(kanjiVo.getMeanings()
-						.stream()
-						.map(s -> new Translation(s, Language.EN)).toList());
+				kanji.setTranslations(Map.of(Language.EN, kanjiVo.getMeanings()));
 			}
 		} catch (Exception ex) {
 			log.error("Error occurred while retrieving kanji information from API", ex);

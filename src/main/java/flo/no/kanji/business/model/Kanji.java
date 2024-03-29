@@ -1,6 +1,7 @@
 package flo.no.kanji.business.model;
 
 import flo.no.kanji.business.constants.CharacterType;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -10,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Kanji model object representation
@@ -31,7 +33,7 @@ public class Kanji {
 	private String value;
 
 	/** Kanji translations **/
-	private List<Translation> translations;
+	private Map<Language, List<String>> translations;
 
 	/** Kanji japanese style reading styles (in hiragana) **/
 	@JapaneseCharacterFormat(format = CharacterType.HIRAGANA)

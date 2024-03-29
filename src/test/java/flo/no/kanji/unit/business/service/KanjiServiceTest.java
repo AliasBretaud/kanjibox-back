@@ -6,9 +6,7 @@ import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
-import flo.no.kanji.business.mapper.TranslationMapper;
 import flo.no.kanji.business.model.Kanji;
-import flo.no.kanji.business.model.Translation;
 import flo.no.kanji.business.service.impl.KanjiServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
@@ -29,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,9 +38,6 @@ import static org.mockito.Mockito.*;
 public class KanjiServiceTest {
 
 	@Spy
-	private TranslationMapper translationMapper = new TranslationMapper();
-
-	@InjectMocks
 	private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
 
 	@Mock
@@ -132,10 +128,10 @@ public class KanjiServiceTest {
 		var kanVO = new KanjiVO();
 		var kunYomi = List.of("kunYomi");
 		var onYomi = List.of("onYomi");
-		List<Translation> translations = List.of(new Translation("translation", Language.EN));
+		var translations = Map.of(Language.EN, List.of("transation"));
 		kanVO.setKunReadings(kunYomi);
 		kanVO.setOnReadings(onYomi);
-		kanVO.setMeanings(translations.stream().map(Translation::getText).toList());
+		kanVO.setMeanings(translations.get(Language.EN));
 		when(kanjiApiClient.searchKanjiReadings(anyString())).thenReturn(kanVO);
 		var kanji = new Kanji();
 		kanji.setValue("T");
