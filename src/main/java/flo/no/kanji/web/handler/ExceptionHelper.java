@@ -1,5 +1,6 @@
 package flo.no.kanji.web.handler;
 
+import flo.no.kanji.business.exception.ExternalServiceError;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -52,18 +53,26 @@ public class ExceptionHelper {
 	    var apiException = buildApiException(status, ex);
 	    return new ResponseEntity<>(apiException, status);
 	}
+
+	/**
+	 * Handling external services exceptions
+	 * @param ex
+	 * 			Generated exception while retrieving object
+	 * @return
+	 * 			503 NOT_FOUND status with returned error
+	 */
 	
 	/**
 	 * Handling general Exceptions
 	 * @param ex
 	 * 			Exception
 	 * @return
-	 * 			500 INTERNAL_SERVER_ERROR status with returned error
+	 * 			500 SERVICE_UNAVAILABLE status with returned error
 	 */
-	@ExceptionHandler(value = Exception.class)
-	public ResponseEntity<Object> handleException(Exception ex) {
-	    log.error("Exception: ", ex);
-	    var status = HttpStatus.INTERNAL_SERVER_ERROR;
+	@ExceptionHandler(value = ExternalServiceError.class)
+	public ResponseEntity<Object> handleExternalServiceException(Exception ex) {
+	    log.error("External service Exception: ", ex);
+	    var status = HttpStatus.SERVICE_UNAVAILABLE;
 	    var apiException = buildApiException(status, ex);
 	    return new ResponseEntity<>(apiException, status);
     }

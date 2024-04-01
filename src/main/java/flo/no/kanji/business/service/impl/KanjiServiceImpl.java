@@ -5,6 +5,7 @@ import com.deepl.api.Translator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
+import flo.no.kanji.business.exception.ExternalServiceError;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -75,9 +76,11 @@ public class KanjiServiceImpl implements KanjiService {
 	public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings) {
 
 		checkKanjiAlreadyPresent(kanji);
-		checkDefaultTranslation(kanji);
 		if (autoDetectReadings) {
 			autoFillKanjiReadigs(kanji);
+		}
+		if (enableAutoDefaultTranslation) {
+			checkDefaultTranslation(kanji);
 		}
 
 		return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
@@ -104,27 +107,18 @@ public class KanjiServiceImpl implements KanjiService {
 				kanji.setTranslations(Map.of(Language.EN, kanjiVo.getMeanings()));
 			}
 		} catch (Exception ex) {
-			log.error("Error occurred while retrieving kanji information from API", ex);
+			throw new ExternalServiceError("Error occurred while retrieving kanji information from API", ex);
 		}
 	}
 
 	private void checkDefaultTranslation(Kanji kanji) {
 		if (!kanji.getTranslations().containsKey(Language.EN)) {
-			boolean error = false;
-			if (enableAutoDefaultTranslation) {
-				try {
-					var translation = translator.translateText(
-							kanji.getValue(), LanguageCode.Japanese, LanguageCode.EnglishAmerican);
-					kanji.getTranslations().put(Language.EN, List.of(translation.getText()));
-				} catch (Exception ex) {
-					log.error("Error occurred while retrieving information from deepL", ex);
-					error = true;
-				}
-			} else {
-				error = true;
-			}
-			if (error) {
-				throw new InvalidInputException("Please add at least one 'en' translation");
+			try {
+				var translation = translator.translateText(
+						kanji.getValue(), LanguageCode.Japanese, LanguageCode.EnglishAmerican);
+				kanji.getTranslations().put(Language.EN, List.of(translation.getText()));
+			} catch (Exception ex) {
+				log.error("Error occurred while retrieving information from deepL", ex);
 			}
 		}
 	}

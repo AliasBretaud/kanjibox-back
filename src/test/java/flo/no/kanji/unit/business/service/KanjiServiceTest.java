@@ -14,7 +14,7 @@ import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.util.PatchHelper;
 import flo.no.kanji.web.api.KanjiApiClient;
-import flo.no.kanji.web.api.model.KanjiVO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,16 +25,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(properties = { "kanji.translation.auto.enable=true" })
 public class KanjiServiceTest {
 
 	@Spy
@@ -55,7 +58,13 @@ public class KanjiServiceTest {
 	@InjectMocks
 	@Spy
 	private KanjiServiceImpl kanjiServiceImpl;
-	
+
+
+	@BeforeEach
+	public void setup() {
+		ReflectionTestUtils.setField(kanjiServiceImpl, "enableAutoDefaultTranslation", true);
+	}
+
 	@Test
 	public void addKanjiTestOk1() {
 		// PREPARE
@@ -121,40 +130,21 @@ public class KanjiServiceTest {
 		// ASSERT
 		assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L));
 	}
-
-	@Test
-	public void autoFillKanjiReadigsTestOk1() {
-		// PREPARE
-		var kanVO = new KanjiVO();
-		var kunYomi = List.of("kunYomi");
-		var onYomi = List.of("onYomi");
-		var translations = Map.of(Language.EN, List.of("transation"));
-		kanVO.setKunReadings(kunYomi);
-		kanVO.setOnReadings(onYomi);
-		kanVO.setMeanings(translations.get(Language.EN));
-		when(kanjiApiClient.searchKanjiReadings(anyString())).thenReturn(kanVO);
-		var kanji = new Kanji();
-		kanji.setValue("T");
-		// EXECUTE
-		kanjiServiceImpl.autoFillKanjiReadigs(kanji);
-		// ASSERT
-		assertEquals(kunYomi, kanji.getKunYomi());
-		assertEquals(onYomi, kanji.getOnYomi());
-		assertEquals(translations, kanji.getTranslations());
-	}
 	
 	@Test
-	public void autoFillKanjiReadingsTestOk2() {
+	public void autoFillKanjiReadingsTestOk() {
 		// PREPARE
-		when(kanjiApiClient.searchKanjiReadings(anyString())).thenThrow(new RuntimeException("Exception"));
+		when(kanjiApiClient.searchKanjiReadings(anyString()))
+				.thenReturn(BusinessObjectGenerator.getKanjiVO());
 		var kanji = new Kanji();
 		kanji.setValue("T");
 		// EXECUTE
 		kanjiServiceImpl.autoFillKanjiReadigs(kanji);
 		// ASSERT
-		assertNull(kanji.getKunYomi());
-		assertNull(kanji.getOnYomi());
-		assertNull(kanji.getTranslations());
+		assertEquals(kanji.getValue(), "T");
+		assertEquals(kanji.getKunYomi(), List.of("ひと"));
+		assertEquals(kanji.getOnYomi(), List.of("ジン"));
+		assertEquals(kanji.getTranslations().get(Language.EN), List.of("People"));
 		
 	}
 

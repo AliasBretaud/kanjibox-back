@@ -3,6 +3,7 @@ package flo.no.kanji.unit.business.mock;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
+import flo.no.kanji.web.api.model.KanjiVO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,14 @@ public class BusinessObjectGenerator {
 		}
 		
 		return (Word) objectMap.get("word");
+	}
+
+	public static KanjiVO getKanjiVO() {
+		return KanjiVO.builder()
+				.kunReadings(List.of("ひと"))
+				.onReadings(List.of("ジン"))
+				.meanings(List.of("People"))
+				.build();
 	}
 	
 	public static void resetKanji() {

@@ -1,14 +1,15 @@
 package flo.no.kanji.web.api.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
+@Builder
 /**
  * Object returned by external Kanji readings/meanings API
  * @author Florian

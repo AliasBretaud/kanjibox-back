@@ -57,7 +57,7 @@ public class KanjiEntity {
 	/**
 	 * Kanji japanese value
 	 */
-	@Column(name = "`value`")
+	@Column(name = "`value`", nullable = false)
 	private String value;
 
 	/**
