@@ -4,6 +4,7 @@ import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class Word {
 	private String value;
 
 	/** Word translations */
+	@NotEmpty
 	private Map<Language, List<String>> translations;
 
 	/** Word transcription in hiragana **/

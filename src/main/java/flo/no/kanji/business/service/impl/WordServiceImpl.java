@@ -8,6 +8,7 @@ import flo.no.kanji.business.mapper.WordMapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.KanjiService;
+import flo.no.kanji.business.service.TranslationService;
 import flo.no.kanji.business.service.WordService;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.WordRepository;
@@ -15,6 +16,7 @@ import flo.no.kanji.integration.specification.WordSpecification;
 import flo.no.kanji.util.CharacterUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,6 +57,13 @@ public class WordServiceImpl implements WordService {
 	/** Japanese alphabets converting service **/
 	@Autowired
 	private MojiConverter converter;
+
+	@Value("${kanji.translation.auto.enable}")
+	private Boolean enableAutoDefaultTranslation;
+
+	/** Translation service **/
+	@Autowired
+	private TranslationService translationService;
 	
 	/**
 	 * {@inheritDoc}
@@ -63,6 +73,12 @@ public class WordServiceImpl implements WordService {
 
 		// The word can't be already present in DB in order to be added
 		checkWordAlreadyPresent(word);
+
+		// Check if the word contains at least one default translation
+		if (enableAutoDefaultTranslation && !hasDefaultTranslation(word)) {
+			handleDefaultTranslation(word);
+		}
+
 		// Initializing kanjis composing the word
 		if (CollectionUtils.isEmpty(word.getKanjis())) {
 			word.setKanjis(this.buildWordKanjisList(word.getValue()));
@@ -87,6 +103,20 @@ public class WordServiceImpl implements WordService {
 		// Saving and return created word
 		return wordMapper.toBusinessObject(wordRepository.save(wordEntity));
 	}
+
+	private void handleDefaultTranslation(Word word) {
+		var translations = new HashMap<>(word.getTranslations());
+		var defaultTranslation = translationService.translateValue(word.getValue(), Language.EN);
+		if (defaultTranslation != null) {
+			translations.put(Language.EN, List.of(defaultTranslation));
+		}
+		word.setTranslations(translations);
+	}
+
+	private boolean hasDefaultTranslation(Word word) {
+		var translations = word.getTranslations();
+		return translations != null && translations.containsKey(Language.EN);
+	};
 	
 	private void checkWordAlreadyPresent(final Word word) {
 		Optional.ofNullable(wordRepository.findByValue(word.getValue())).ifPresent(k -> {

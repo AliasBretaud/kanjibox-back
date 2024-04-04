@@ -7,6 +7,7 @@ import flo.no.kanji.business.mapper.WordMapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.KanjiService;
+import flo.no.kanji.business.service.TranslationService;
 import flo.no.kanji.business.service.impl.WordServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
@@ -15,6 +16,7 @@ import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.WordRepository;
 import jakarta.persistence.criteria.*;
 import jakarta.persistence.metamodel.ListAttribute;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -22,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -48,10 +51,18 @@ public class WordServiceTest {
 	
 	@Spy
 	private MojiConverter converter;
+
+	@Mock
+	private TranslationService translationService;
 	
 	@InjectMocks
 	private WordServiceImpl wordServiceImpl;
-	
+
+	@BeforeEach
+	public void setup() {
+		ReflectionTestUtils.setField(wordServiceImpl, "enableAutoDefaultTranslation", true);
+	}
+
 	@Test
 	public void addWordTestOk1() {
 		// PREPARE
@@ -189,6 +200,24 @@ public class WordServiceTest {
 		executeSpecification(specCaptor.getValue(), true);
 		// ASSERT
 		assertEquals(wordMapper.toBusinessObject(EntityGenerator.getWordEntity()), word);
+	}
+
+	@Test
+	public void testDefaultTranslation() {
+		// PREPARE
+		when(translationService.translateValue(anyString(), any(Language.class)))
+				.thenReturn("Translated value");
+		when(kanjiService.findByValue(anyString())).thenReturn(EntityGenerator.getKanjiEntity());
+		when(wordRepository.save(any(WordEntity.class))).thenReturn(EntityGenerator.getWordEntity());
+		var word = Word.builder()
+				.value("火山")
+				.furiganaValue("かざん")
+				.translations(Map.of(Language.FR, List.of("Volcan")))
+				.build();
+		// EXECUTE
+		wordServiceImpl.addWord(word);
+		// ASSERT
+		verify(translationService, times(1)).translateValue(anyString(), any(Language.class));
 	}
 	
 	@SuppressWarnings("unchecked")
