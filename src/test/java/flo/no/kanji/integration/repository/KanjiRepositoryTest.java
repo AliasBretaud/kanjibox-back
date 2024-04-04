@@ -1,6 +1,7 @@
 package flo.no.kanji.integration.repository;
 
 import com.moji4j.MojiConverter;
+import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.specification.KanjiSpecification;
@@ -94,13 +95,15 @@ public class KanjiRepositoryTest {
 	
 	private void assertKanjiEquals(final List<KanjiEntity> kanjis) {
 		assertEquals(1, kanjis.size());
-		var kanji = kanjis.get(0);
+		var kanji = kanjis.getFirst();
 		assertEquals("君", kanji.getValue());
 		assertEquals(List.of("きみ", "-ぎみ"), kanji.getKunYomi());
 		assertEquals(List.of("クン"), kanji.getOnYomi());
 		assertEquals(
 				List.of("mister", "you", "ruler", "male name suffix"),
-				kanji.getTranslations().stream().map(TranslationEntity::getTranslation).toList());
+				kanji.getTranslations().stream()
+						.filter(t -> t.getLanguage().equals((Language.EN)))
+						.map(TranslationEntity::getTranslation).toList());
 		assertEquals(LocalDateTime.of(2020, 4, 14, 1, 21, 52), kanji.getTimeStamp());
 	}
 	

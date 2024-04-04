@@ -16,7 +16,7 @@ CREATE TABLE public.kanji (
 --
 
 CREATE SEQUENCE public.kanji_id_seq
-    START WITH 1
+    START WITH 194
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -86,7 +86,7 @@ CREATE TABLE public.word (
 --
 
 CREATE SEQUENCE public.word_id_seq
-    START WITH 1
+    START WITH 193
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
