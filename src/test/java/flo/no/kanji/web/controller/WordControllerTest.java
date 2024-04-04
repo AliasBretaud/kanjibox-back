@@ -1,14 +1,22 @@
 package flo.no.kanji.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import flo.no.kanji.business.constants.Language;
+import flo.no.kanji.business.model.Word;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -19,6 +27,8 @@ public class WordControllerTest {
 
 	@Autowired
     private MockMvc mockMvc;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Test
     public void testGetWordOk1() throws Exception {
@@ -65,5 +75,31 @@ public class WordControllerTest {
         mockMvc.perform(get("/words?search=*ryjy78598+('-"))
             .andExpect(status().isBadRequest());
     }
-	
+
+    @Test
+    public void testPostWordOk() throws Exception {
+        var word = Word.builder()
+                .value("食前")
+                .furiganaValue("しょくぜん")
+                .translations(Map.of(Language.EN, List.of("Before meal")))
+                .build();
+
+        mockMvc.perform(post("/words")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(word)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testPostWordKoNoTranslation() throws Exception {
+        var word = Word.builder()
+                .value("太陽")
+                .furiganaValue("たいよう")
+                .build();
+
+        mockMvc.perform(post("/words")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(word)))
+                .andExpect(status().isBadRequest());
+    }
 }

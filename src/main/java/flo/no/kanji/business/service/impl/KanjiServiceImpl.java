@@ -1,7 +1,5 @@
 package flo.no.kanji.business.service.impl;
 
-import com.deepl.api.LanguageCode;
-import com.deepl.api.Translator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
@@ -11,6 +9,7 @@ import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
+import flo.no.kanji.business.service.TranslationService;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
@@ -27,10 +26,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Kanji business service implementation
@@ -65,9 +61,9 @@ public class KanjiServiceImpl implements KanjiService {
 	@Value("${kanji.translation.auto.enable}")
 	private Boolean enableAutoDefaultTranslation;
 
-	/** DeepL translator **/
+	/** Translation Service **/
 	@Autowired
-	private Translator translator;
+	private TranslationService translationService;
 
 	/**
 	 * {@inheritDoc}
@@ -75,16 +71,35 @@ public class KanjiServiceImpl implements KanjiService {
 	@Override
 	public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings) {
 
+		// Check duplicate entry
 		checkKanjiAlreadyPresent(kanji);
+
+		// Handle auto-detect readings
 		if (autoDetectReadings) {
 			autoFillKanjiReadigs(kanji);
 		}
-		if (enableAutoDefaultTranslation) {
-			checkDefaultTranslation(kanji);
+
+		// Check if the kanji contains at least one default translation
+		if (enableAutoDefaultTranslation && !hasDefaultTranslation(kanji)) {
+			handleDefaultTranslation(kanji);
 		}
 
 		return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
 	}
+
+	private void handleDefaultTranslation(Kanji kanji) {
+		var translations = new HashMap<>(kanji.getTranslations());
+		var defaultTranslation = translationService.translateValue(kanji.getValue(), Language.EN);
+		if (defaultTranslation != null) {
+			translations.put(Language.EN, List.of(defaultTranslation));
+		}
+		kanji.setTranslations(translations);
+	}
+
+	private boolean hasDefaultTranslation(Kanji kanji) {
+		var translations = kanji.getTranslations();
+		return translations != null && translations.containsKey(Language.EN);
+	};
 	
 	private void checkKanjiAlreadyPresent(final Kanji kanji) {
 		Optional.ofNullable(kanjiRepository.findByValue(kanji.getValue())).ifPresent(k -> {
@@ -108,18 +123,6 @@ public class KanjiServiceImpl implements KanjiService {
 			}
 		} catch (Exception ex) {
 			throw new ExternalServiceError("Error occurred while retrieving kanji information from API", ex);
-		}
-	}
-
-	private void checkDefaultTranslation(Kanji kanji) {
-		if (!kanji.getTranslations().containsKey(Language.EN)) {
-			try {
-				var translation = translator.translateText(
-						kanji.getValue(), LanguageCode.Japanese, LanguageCode.EnglishAmerican);
-				kanji.getTranslations().put(Language.EN, List.of(translation.getText()));
-			} catch (Exception ex) {
-				log.error("Error occurred while retrieving information from deepL", ex);
-			}
 		}
 	}
 
