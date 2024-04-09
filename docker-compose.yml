@@ -33,6 +33,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kanji
       SPRING_DATASOURCE_USERNAME: kanji
       SPRING_DATASOURCE_PASSWORD: kanji
+      GOOGLE_API_KEY: ###
 
 networks:
   kanji_network:

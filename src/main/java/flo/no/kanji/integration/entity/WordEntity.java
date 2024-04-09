@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Word entity persistent database object
+ *
  * @author Florian
  */
 @Entity
@@ -21,45 +22,45 @@ import java.util.List;
 @Builder
 public class WordEntity {
 
-	/** Database technical identifier **/
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    /** Database technical identifier **/
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	/** Transcripted hiragana value of the word **/
-	private String furiganaValue;
+    /** Transcripted hiragana value of the word **/
+    private String furiganaValue;
 
-	/** Associated kanjis composing the word **/
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "word_kanji", joinColumns = { @JoinColumn(name = "word_id") }, inverseJoinColumns = {
-			@JoinColumn(name = "kanji_id") })
-	private List<KanjiEntity> kanjis;
+    /** Associated kanjis composing the word **/
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "word_kanji", joinColumns = {@JoinColumn(name = "word_id")}, inverseJoinColumns = {
+            @JoinColumn(name = "kanji_id")})
+    private List<KanjiEntity> kanjis;
 
-	/**
-	 * Word creation/update timestamp
-	 */
-	private LocalDateTime timeStamp;
+    /**
+     * Word creation/update timestamp
+     */
+    private LocalDateTime timeStamp;
 
-	/**
-	 * Word translations
-	 */
-	@ElementCollection
-	@CollectionTable(name = "word_translation", joinColumns = @JoinColumn(name = "word_id"))
-	private List<TranslationEntity> translations;
+    /**
+     * Word translations
+     */
+    @ElementCollection
+    @CollectionTable(name = "word_translation", joinColumns = @JoinColumn(name = "word_id"))
+    private List<TranslationEntity> translations;
 
-	/**
-	 * Word japanese value (literal kanjis and okuriganas)
-	 */
-	@Column(name = "`value`")
-	private String value;
+    /**
+     * Word japanese value (literal kanjis and okuriganas)
+     */
+    @Column(name = "`value`")
+    private String value;
 
-	/**
-	 * Default method called before each persist or update operation
-	 */
-	@PrePersist
-	@PreUpdate
-	private void setUp() {
-		// Before each creation or upadte, setting current timestamp
-		this.timeStamp = LocalDateTime.now();
-	}
+    /**
+     * Default method called before each persist or update operation
+     */
+    @PrePersist
+    @PreUpdate
+    private void setUp() {
+        // Before each creation or upadte, setting current timestamp
+        this.timeStamp = LocalDateTime.now();
+    }
 }
