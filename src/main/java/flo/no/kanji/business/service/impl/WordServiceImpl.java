@@ -16,7 +16,6 @@ import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.integration.specification.WordSpecification;
 import flo.no.kanji.util.CharacterUtils;
 import jakarta.validation.Valid;
-import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -87,34 +86,19 @@ public class WordServiceImpl implements WordService {
         }
 
         // Word kanjis entities
-        List<KanjiEntity> wordKanjiEntities = Collections.synchronizedList(
-                new ArrayList<>(kanjiRepository.findByValueIn(word.getKanjis()
-                        .stream()
-                        .map(Kanji::getValue)
-                        .toList())));
+        var wordKanjiEntities = getWordKanjiEntities(word);
 
         // Async tasks
-        var watch = new StopWatch();
         var wordTranslationFuture = CompletableFuture.supplyAsync(() -> buildInitializedTranslations(word));
-        var kanjiFutures = word.getKanjis()
-                .stream()
-                .filter(k -> wordKanjiEntities.stream()
-                        .map(KanjiEntity::getValue)
-                        .noneMatch(ke -> ke.equals(k.getValue())))
-                .map(k -> CompletableFuture.supplyAsync(() -> {
-                    kanjiService.autoFillKanjiReadigs(k);
-                    return k;
-                }))
-                .toList();
+        var kanjisToFetch = getKanjisToFetch(word.getKanjis(), wordKanjiEntities);
+        var kanjiFutures = buildKanjiFutures(kanjisToFetch);
 
-        watch.start();
+        // Register all kanjis to save or merge with the word
         wordKanjiEntities.addAll(kanjiFutures.stream()
                 .map(CompletableFuture::join)
                 .map(kanjiMapper::toEntity)
                 .toList());
         word.setTranslations(wordTranslationFuture.join());
-
-        watch.stop();
 
         // Build entity
         var wordEntity = wordMapper.toEntity(word);
@@ -123,6 +107,32 @@ public class WordServiceImpl implements WordService {
         // Saving and return created word
         wordEntity = wordRepository.save(wordEntity);
         return wordMapper.toBusinessObject(wordEntity);
+    }
+
+    private List<CompletableFuture<Kanji>> buildKanjiFutures(List<Kanji> kanjis) {
+        return kanjis.stream()
+                .map(k -> CompletableFuture.supplyAsync(() -> {
+                    kanjiService.autoFillKanjiReadigs(k);
+                    return k;
+                }))
+                .toList();
+    }
+
+    private List<Kanji> getKanjisToFetch(List<Kanji> kanjis, List<KanjiEntity> filter) {
+        return kanjis
+                .stream()
+                .filter(k -> filter.stream()
+                        .map(KanjiEntity::getValue)
+                        .noneMatch(ke -> ke.equals(k.getValue())))
+                .toList();
+    }
+
+    private List<KanjiEntity> getWordKanjiEntities(Word word) {
+        return Collections.synchronizedList(
+                new ArrayList<>(kanjiRepository.findByValueIn(word.getKanjis()
+                        .stream()
+                        .map(Kanji::getValue)
+                        .toList())));
     }
 
     private Map<Language, List<String>> buildInitializedTranslations(Word word) {
