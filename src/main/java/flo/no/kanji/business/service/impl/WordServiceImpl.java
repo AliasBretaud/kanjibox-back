@@ -16,6 +16,8 @@ import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.integration.specification.WordSpecification;
 import flo.no.kanji.util.CharacterUtils;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -28,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +41,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Validated
+@Slf4j
 public class WordServiceImpl implements WordService {
 
     /** Kanji operations business service */
@@ -77,21 +81,45 @@ public class WordServiceImpl implements WordService {
     @Transactional
     public Word addWord(@Valid Word word) {
 
+        var gWatch = new StopWatch();
+        gWatch.start();
+        var watch = new StopWatch();
+        watch.start();
         // The word can't be already present in DB in order to be added
         checkWordAlreadyPresent(word);
+        watch.stop();
+        log.info("checkWordAlreadyPresent - {}", watch.getTime(TimeUnit.MILLISECONDS));
+        watch.reset();
 
+        watch.start();
         // Initializing kanjis composing the word
         if (CollectionUtils.isEmpty(word.getKanjis())) {
             word.setKanjis(this.buildWordKanjisList(word.getValue()));
         }
+        watch.stop();
+        log.info("initialize kanjis - {}", watch.getTime(TimeUnit.MILLISECONDS));
+        watch.reset();
 
+        watch.start();
         // Word kanjis entities
         var wordKanjiEntities = getWordKanjiEntities(word);
+        watch.stop();
+        log.info("getWordKanjiEntities - {}", watch.getTime(TimeUnit.MILLISECONDS));
+        watch.reset();
 
+        watch.start();
+        log.info("START ASYNC");
         // Async tasks
         var wordTranslationFuture = CompletableFuture.supplyAsync(() -> buildInitializedTranslations(word));
         var kanjisToFetch = getKanjisToFetch(word.getKanjis(), wordKanjiEntities);
         var kanjiFutures = buildKanjiFutures(kanjisToFetch);
+
+        CompletableFuture.allOf(kanjiFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            log.info("READINGS API TIME - {}", watch.getTime(TimeUnit.MILLISECONDS));
+        });
+        wordTranslationFuture.thenRun(() -> {
+            log.info("TRANSLATION API TIME - {}", watch.getTime(TimeUnit.MILLISECONDS));
+        });
 
         // Register all kanjis to save or merge with the word
         wordKanjiEntities.addAll(kanjiFutures.stream()
@@ -100,12 +128,21 @@ public class WordServiceImpl implements WordService {
                 .toList());
         word.setTranslations(wordTranslationFuture.join());
 
+        watch.stop();
+        log.info("async tasks - {}", watch.getTime(TimeUnit.MILLISECONDS));
+        watch.reset();
+
+        watch.start();
         // Build entity
         var wordEntity = wordMapper.toEntity(word);
         wordEntity.setKanjis(wordKanjiEntities);
 
         // Saving and return created word
         wordEntity = wordRepository.save(wordEntity);
+        watch.stop();
+        gWatch.stop();
+        log.info("build and save - {}", watch.getTime(TimeUnit.MILLISECONDS));
+        log.info("GLOBAL TIME - {}", gWatch.getTime(TimeUnit.MILLISECONDS));
         return wordMapper.toBusinessObject(wordEntity);
     }
 
