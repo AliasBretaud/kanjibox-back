@@ -25,55 +25,54 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class WordControllerTest {
 
-	@Autowired
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-	
-	@Test
+    @Test
     public void testGetWordOk1() throws Exception {
         mockMvc.perform(get("/words?search=大阪"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content[0].value", is("大阪")))
-            .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
-            .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
-            .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].value", is("大阪")))
+                .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
+                .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
+                .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
     }
-	
-	@Test
+
+    @Test
     public void testGetWordOk2() throws Exception {
         mockMvc.perform(get("/words?search=おおさか"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content[0].value", is("大阪")))
-            .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
-            .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
-            .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].value", is("大阪")))
+                .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
+                .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
+                .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
     }
-	
-	@Test
+
+    @Test
     public void testGetWordOk3() throws Exception {
         mockMvc.perform(get("/words?search=osaka"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content[0].value", is("大阪")))
-            .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
-            .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
-            .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].value", is("大阪")))
+                .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
+                .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
+                .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
     }
-	
-	@Test
+
+    @Test
     public void testGetWordOk4() throws Exception {
         mockMvc.perform(get("/words?search=oosaka"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content[0].value", is("大阪")))
-            .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
-            .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
-            .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].value", is("大阪")))
+                .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
+                .andExpect(jsonPath("$.content[0].kanjis[0].value", is("大")))
+                .andExpect(jsonPath("$.content[0].kanjis[1].value", is("阪")));
     }
-	
-	@Test
+
+    @Test
     public void testGetWordKo() throws Exception {
         mockMvc.perform(get("/words?search=*ryjy78598+('-"))
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

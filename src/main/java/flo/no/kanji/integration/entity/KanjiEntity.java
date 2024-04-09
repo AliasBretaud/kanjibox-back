@@ -29,7 +29,7 @@ public class KanjiEntity {
 	/**
 	 * Kanji japanese style readings
 	 */
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "kanji_kun_yomi", joinColumns = @JoinColumn(name = "kanji_id"))
 	@Column(name = "kun_yomi")
 	private List<String> kunYomi;
@@ -37,7 +37,7 @@ public class KanjiEntity {
 	/**
 	 * Kanji chinese style readings
 	 */
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "kanji_on_yomi", joinColumns = @JoinColumn(name = "kanji_id"))
 	@Column(name = "on_yomi")
 	private List<String> onYomi;
@@ -45,7 +45,7 @@ public class KanjiEntity {
 	/**
 	 * Kanji translations
 	 */
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "kanji_translation", joinColumns = @JoinColumn(name = "kanji_id"))
 	private List<TranslationEntity> translations;
 

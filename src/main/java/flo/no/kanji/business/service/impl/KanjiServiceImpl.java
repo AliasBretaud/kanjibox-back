@@ -10,7 +10,6 @@ import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.TranslationService;
-import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.PatchHelper;
@@ -30,167 +29,159 @@ import java.util.*;
 
 /**
  * Kanji business service implementation
- * @see KanjiService
+ *
  * @author Florian
+ * @see KanjiService
  */
 @Service
 @Slf4j
 @Validated
 public class KanjiServiceImpl implements KanjiService {
 
-	/** Kanji JPA repository **/
-	@Autowired
-	private KanjiRepository kanjiRepository;
+    /** Kanji JPA repository **/
+    @Autowired
+    private KanjiRepository kanjiRepository;
 
-	/** Kanji business/entity object mapper */
-	@Autowired
-	private KanjiMapper kanjiMapper;
+    /** Kanji business/entity object mapper */
+    @Autowired
+    private KanjiMapper kanjiMapper;
 
-	/** External kanji readings/translations API client */
-	@Autowired
-	private KanjiApiClient kanjiApiClient;
-	
-	/** Kanji updating fields class helper */
-	@Autowired
-	private PatchHelper patchHelper;
-	
-	/** Japanese alphabets converting service **/
-	@Autowired
-	private MojiConverter converter;
+    /** External kanji readings/translations API client */
+    @Autowired
+    private KanjiApiClient kanjiApiClient;
 
-	@Value("${kanji.translation.auto.enable}")
-	private Boolean enableAutoDefaultTranslation;
+    /** Kanji updating fields class helper */
+    @Autowired
+    private PatchHelper patchHelper;
 
-	/** Translation Service **/
-	@Autowired
-	private TranslationService translationService;
+    /** Japanese alphabets converting service **/
+    @Autowired
+    private MojiConverter converter;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings) {
+    @Value("${kanji.translation.auto.enable}")
+    private Boolean enableAutoDefaultTranslation;
 
-		// Check duplicate entry
-		checkKanjiAlreadyPresent(kanji);
+    /** Translation Service **/
+    @Autowired
+    private TranslationService translationService;
 
-		// Handle auto-detect readings
-		if (autoDetectReadings) {
-			autoFillKanjiReadigs(kanji);
-		}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings) {
 
-		// Check if the kanji contains at least one default translation
-		if (enableAutoDefaultTranslation && !hasDefaultTranslation(kanji)) {
-			handleDefaultTranslation(kanji);
-		}
+        // Check duplicate entry
+        checkKanjiAlreadyPresent(kanji);
 
-		return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
-	}
+        // Handle auto-detect readings
+        if (autoDetectReadings) {
+            autoFillKanjiReadigs(kanji);
+        }
 
-	private void handleDefaultTranslation(Kanji kanji) {
-		var translations = new HashMap<>(kanji.getTranslations());
-		var defaultTranslation = translationService.translateValue(kanji.getValue(), Language.EN);
-		if (defaultTranslation != null) {
-			translations.put(Language.EN, List.of(defaultTranslation));
-		}
-		kanji.setTranslations(translations);
-	}
+        // Check if the kanji contains at least one default translation
+        if (enableAutoDefaultTranslation && !hasDefaultTranslation(kanji)) {
+            handleDefaultTranslation(kanji);
+        }
 
-	private boolean hasDefaultTranslation(Kanji kanji) {
-		var translations = kanji.getTranslations();
-		return translations != null && translations.containsKey(Language.EN);
-	};
-	
-	private void checkKanjiAlreadyPresent(final Kanji kanji) {
-		Optional.ofNullable(kanjiRepository.findByValue(kanji.getValue())).ifPresent(k -> {
-			throw new InvalidInputException(
-					String.format("Kanji with value '%s' already exists in database", k.getValue()));
-		});
-	}
+        return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void autoFillKanjiReadigs(Kanji kanji) {
+    private void handleDefaultTranslation(Kanji kanji) {
+        var translations = new HashMap<>(kanji.getTranslations());
+        var defaultTranslation = translationService.translateValue(kanji.getValue(), Language.EN);
+        if (defaultTranslation != null) {
+            translations.put(Language.EN, List.of(defaultTranslation));
+        }
+        kanji.setTranslations(translations);
+    }
 
-		try {
-			var kanjiVo = kanjiApiClient.searchKanjiReadings(kanji.getValue());
-			if (kanjiVo != null) {
-				kanji.setKunYomi(kanjiVo.getKunReadings());
-				kanji.setOnYomi(kanjiVo.getOnReadings());
-				kanji.setTranslations(Map.of(Language.EN, kanjiVo.getMeanings()));
-			}
-		} catch (Exception ex) {
-			throw new ExternalServiceError("Error occurred while retrieving kanji information from API", ex);
-		}
-	}
+    private boolean hasDefaultTranslation(Kanji kanji) {
+        var translations = kanji.getTranslations();
+        return translations != null && translations.containsKey(Language.EN);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Page<Kanji> getKanjis(String search, Language language, Pageable pageable) {
+    ;
 
-		return ObjectUtils.isEmpty(search)
-				? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
-						.map(kanjiMapper::toBusinessObject)
-				: this.searchKanji(search, language, pageable);
-	}
+    private void checkKanjiAlreadyPresent(final Kanji kanji) {
+        Optional.ofNullable(kanjiRepository.findByValue(kanji.getValue())).ifPresent(k -> {
+            throw new InvalidInputException(
+                    String.format("Kanji with value '%s' already exists in database", k.getValue()));
+        });
+    }
 
-	/**
-	 * Execute a search query on different readings, translations or kanji value
-	 * 
-	 * @param search
-	 * 			The input search value
-	 * @param pageable
-	 * 			Pagination parameter
-	 * @return
-	 * 		The result of search
-	 */
-	private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void autoFillKanjiReadigs(Kanji kanji) {
 
-		var spec = KanjiSpecification.searchKanji(search, language, this.converter);
-		// Execute query, mapping and return results
-		return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
-	}
+        try {
+            var kanjiVo = kanjiApiClient.searchKanjiReadings(kanji.getValue());
+            if (kanjiVo != null) {
+                kanji.setKunYomi(kanjiVo.getKunReadings());
+                kanji.setOnYomi(kanjiVo.getOnReadings());
+                kanji.setTranslations(Map.of(Language.EN, kanjiVo.getMeanings()));
+            }
+        } catch (Exception ex) {
+            throw new ExternalServiceError("Error occurred while retrieving kanji information from API", ex);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Kanji patchKanji(Long kanjiId, JsonNode patch) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<Kanji> getKanjis(String search, Language language, Pageable pageable) {
 
-		var initialKanji = this.findById(kanjiId);
-		var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
-		
-		// Prevent ID update
-		if (!Objects.equals(patchedKanji.getId(), kanjiId)) {
-			throw new InvalidInputException("ID update is forbidden");
-		}
-		
-		var patchedKanjiEntity = kanjiMapper.toEntity(patchedKanji);
-		patchedKanjiEntity.setTimeStamp(LocalDateTime.now());
-		patchedKanjiEntity = kanjiRepository.save(patchedKanjiEntity);
-		
-		return kanjiMapper.toBusinessObject(patchedKanjiEntity);
-	}
+        return ObjectUtils.isEmpty(search)
+                ? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
+                .map(kanjiMapper::toBusinessObject)
+                : this.searchKanji(search, language, pageable);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Kanji findById(Long kanjiId) {
-		return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
-				.orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
-	}
+    /**
+     * Execute a search query on different readings, translations or kanji value
+     *
+     * @param search   The input search value
+     * @param pageable Pagination parameter
+     * @return The result of search
+     */
+    private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public KanjiEntity findByValue(String value) {
-		return kanjiRepository.findByValue(value);
-	}
+        var spec = KanjiSpecification.searchKanji(search, language, this.converter);
+        // Execute query, mapping and return results
+        return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Kanji patchKanji(Long kanjiId, JsonNode patch) {
+
+        var initialKanji = this.findById(kanjiId);
+        var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
+
+        // Prevent ID update
+        if (!Objects.equals(patchedKanji.getId(), kanjiId)) {
+            throw new InvalidInputException("ID update is forbidden");
+        }
+
+        var patchedKanjiEntity = kanjiMapper.toEntity(patchedKanji);
+        patchedKanjiEntity.setTimeStamp(LocalDateTime.now());
+        patchedKanjiEntity = kanjiRepository.save(patchedKanjiEntity);
+
+        return kanjiMapper.toBusinessObject(patchedKanjiEntity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Kanji findById(Long kanjiId) {
+        return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
+                .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
+    }
 
 }
