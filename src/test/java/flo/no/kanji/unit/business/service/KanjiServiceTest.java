@@ -14,7 +14,6 @@ import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.util.PatchHelper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +25,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,11 +57,6 @@ public class KanjiServiceTest {
     @Spy
     private KanjiServiceImpl kanjiServiceImpl;
 
-
-    @BeforeEach
-    public void setup() {
-        ReflectionTestUtils.setField(kanjiServiceImpl, "enableAutoDefaultTranslation", true);
-    }
 
     @Test
     public void addKanjiTestOk1() {
