@@ -1,23 +1,21 @@
 package flo.no.kanji.business.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.aliasbretaud.mojibox.KanjiDictionary;
+import com.github.aliasbretaud.mojibox.ReadingType;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
-import flo.no.kanji.business.exception.ExternalServiceError;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
-import flo.no.kanji.business.service.TranslationService;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.PatchHelper;
-import flo.no.kanji.web.api.KanjiApiClient;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,9 +44,9 @@ public class KanjiServiceImpl implements KanjiService {
     @Autowired
     private KanjiMapper kanjiMapper;
 
-    /** External kanji readings/translations API client */
+    /** External kanji dictionary */
     @Autowired
-    private KanjiApiClient kanjiApiClient;
+    private KanjiDictionary kanjiDictionary;
 
     /** Kanji updating fields class helper */
     @Autowired
@@ -57,13 +55,6 @@ public class KanjiServiceImpl implements KanjiService {
     /** Japanese alphabets converting service **/
     @Autowired
     private MojiConverter converter;
-
-    @Value("${kanji.translation.auto.enable}")
-    private Boolean enableAutoDefaultTranslation;
-
-    /** Translation Service **/
-    @Autowired
-    private TranslationService translationService;
 
     /**
      * {@inheritDoc}
@@ -80,7 +71,7 @@ public class KanjiServiceImpl implements KanjiService {
         }
 
         // Check if the kanji contains at least one default translation
-        if (enableAutoDefaultTranslation && !hasDefaultTranslation(kanji)) {
+        if (!hasDefaultTranslation(kanji)) {
             handleDefaultTranslation(kanji);
         }
 
@@ -89,9 +80,11 @@ public class KanjiServiceImpl implements KanjiService {
 
     private void handleDefaultTranslation(Kanji kanji) {
         var translations = new HashMap<>(kanji.getTranslations());
-        var defaultTranslation = translationService.translateValue(kanji.getValue(), Language.EN);
-        if (defaultTranslation != null) {
-            translations.put(Language.EN, List.of(defaultTranslation));
+        var kanjiVo = kanjiDictionary.searchKanji(kanji.getValue());
+        var defaultTranslation = kanjiVo.getMeanings()
+                .get(com.github.aliasbretaud.mojibox.Language.EN);
+        if (defaultTranslation != null && !defaultTranslation.isEmpty()) {
+            translations.put(Language.EN, defaultTranslation);
         }
         kanji.setTranslations(translations);
     }
@@ -100,8 +93,6 @@ public class KanjiServiceImpl implements KanjiService {
         var translations = kanji.getTranslations();
         return translations != null && translations.containsKey(Language.EN);
     }
-
-    ;
 
     private void checkKanjiAlreadyPresent(final Kanji kanji) {
         Optional.ofNullable(kanjiRepository.findByValue(kanji.getValue())).ifPresent(k -> {
@@ -115,17 +106,24 @@ public class KanjiServiceImpl implements KanjiService {
      */
     @Override
     public void autoFillKanjiReadigs(Kanji kanji) {
-
-        try {
-            var kanjiVo = kanjiApiClient.searchKanjiReadings(kanji.getValue());
-            if (kanjiVo != null) {
-                kanji.setKunYomi(kanjiVo.getKunReadings());
-                kanji.setOnYomi(kanjiVo.getOnReadings());
-                kanji.setTranslations(Map.of(Language.EN, kanjiVo.getMeanings()));
-            }
-        } catch (Exception ex) {
-            throw new ExternalServiceError("Error occurred while retrieving kanji information from API", ex);
+        var kanjiVo = kanjiDictionary.searchKanji(kanji.getValue());
+        if (kanjiVo != null) {
+            kanji.setKunYomi(kanjiVo.getReadings().get(ReadingType.JA_KUN));
+            kanji.setOnYomi(kanjiVo.getReadings().get(ReadingType.JA_ON));
+            kanji.setTranslations(buildTranslationsFromVo(kanjiVo));
         }
+
+    }
+
+    private Map<Language, List<String>> buildTranslationsFromVo(com.github.aliasbretaud.mojibox.Kanji kanjiVo) {
+        var translations = new HashMap<>(Map.of(
+                Language.EN, kanjiVo.getMeanings().get(com.github.aliasbretaud.mojibox.Language.EN)
+                        .stream().limit(3).toList()));
+        var frTranslations = kanjiVo.getMeanings().get(com.github.aliasbretaud.mojibox.Language.EN);
+        if (frTranslations != null && !frTranslations.isEmpty()) {
+            translations.put(Language.FR, frTranslations.stream().limit(3).toList());
+        }
+        return translations;
     }
 
     /**

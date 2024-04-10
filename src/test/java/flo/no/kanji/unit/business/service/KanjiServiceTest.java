@@ -1,6 +1,7 @@
 package flo.no.kanji.unit.business.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.aliasbretaud.mojibox.KanjiDictionary;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
@@ -13,7 +14,6 @@ import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.util.PatchHelper;
-import flo.no.kanji.web.api.KanjiApiClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +47,7 @@ public class KanjiServiceTest {
     private KanjiRepository kanjiRepository;
 
     @Mock
-    private KanjiApiClient kanjiApiClient;
+    private KanjiDictionary kanjiDictionary;
 
     @Mock
     private PatchHelper patchHelper;
@@ -123,7 +123,7 @@ public class KanjiServiceTest {
     @Test
     public void autoFillKanjiReadingsTestOk() {
         // PREPARE
-        when(kanjiApiClient.searchKanjiReadings(anyString()))
+        when(kanjiDictionary.searchKanji(anyString()))
                 .thenReturn(BusinessObjectGenerator.getKanjiVO());
         var kanji = new Kanji();
         kanji.setValue("T");
