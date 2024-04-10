@@ -119,7 +119,7 @@ public class KanjiServiceImpl implements KanjiService {
         var translations = new HashMap<>(Map.of(
                 Language.EN, kanjiVo.getMeanings().get(com.github.aliasbretaud.mojibox.Language.EN)
                         .stream().limit(3).toList()));
-        var frTranslations = kanjiVo.getMeanings().get(com.github.aliasbretaud.mojibox.Language.EN);
+        var frTranslations = kanjiVo.getMeanings().get(com.github.aliasbretaud.mojibox.Language.FR);
         if (frTranslations != null && !frTranslations.isEmpty()) {
             translations.put(Language.FR, frTranslations.stream().limit(3).toList());
         }
