@@ -1,4 +1,4 @@
-version: '3.8'
+name: kanjibox
 
 services:
   db:
@@ -16,7 +16,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d
 
-  app:
+  api:
     build:
       context: .
       target: development
@@ -28,12 +28,26 @@ services:
     networks:
       - kanji_network
     volumes:
-      - app_data:/app/data
+      - api_data:/app/data
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kanji
       SPRING_DATASOURCE_USERNAME: kanji
       SPRING_DATASOURCE_PASSWORD: kanji
       GOOGLE_API_KEY: ###
+
+  front:
+    image: fbrtd/kanjibox-front:latest
+    container_name: kanjibox-front
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    networks:
+      - kanji_network
+    volumes:
+      - front_data:/app/data
+    environment:
+      BACKEND_API_URL: http://api:8080/kanjibox
 
 networks:
   kanji_network:
@@ -41,4 +55,5 @@ networks:
 
 volumes:
   postgres_data:
-  app_data:
+  api_data:
+  front_data:
