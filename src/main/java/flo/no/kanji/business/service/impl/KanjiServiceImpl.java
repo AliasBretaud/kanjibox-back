@@ -1,8 +1,6 @@
 package flo.no.kanji.business.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.aliasbretaud.mojibox.KanjiDictionary;
-import com.github.aliasbretaud.mojibox.ReadingType;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
@@ -13,6 +11,10 @@ import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.PatchHelper;
+import io.github.aliasbretaud.mojibox.data.KanjiEntry;
+import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
+import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
+import io.github.aliasbretaud.mojibox.enums.ReadingType;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +84,7 @@ public class KanjiServiceImpl implements KanjiService {
         var translations = new HashMap<>(kanji.getTranslations());
         var kanjiVo = kanjiDictionary.searchKanji(kanji.getValue());
         var defaultTranslation = kanjiVo.getMeanings()
-                .get(com.github.aliasbretaud.mojibox.Language.EN);
+                .get(MeaningLanguage.EN);
         if (defaultTranslation != null && !defaultTranslation.isEmpty()) {
             translations.put(Language.EN, defaultTranslation);
         }
@@ -115,11 +117,11 @@ public class KanjiServiceImpl implements KanjiService {
 
     }
 
-    private Map<Language, List<String>> buildTranslationsFromVo(com.github.aliasbretaud.mojibox.Kanji kanjiVo) {
+    private Map<Language, List<String>> buildTranslationsFromVo(KanjiEntry kanjiVo) {
         var translations = new HashMap<>(Map.of(
-                Language.EN, kanjiVo.getMeanings().get(com.github.aliasbretaud.mojibox.Language.EN)
+                Language.EN, kanjiVo.getMeanings().get(MeaningLanguage.EN)
                         .stream().limit(3).toList()));
-        var frTranslations = kanjiVo.getMeanings().get(com.github.aliasbretaud.mojibox.Language.FR);
+        var frTranslations = kanjiVo.getMeanings().get(MeaningLanguage.FR);
         if (frTranslations != null && !frTranslations.isEmpty()) {
             translations.put(Language.FR, frTranslations.stream().limit(3).toList());
         }

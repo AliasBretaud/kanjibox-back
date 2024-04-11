@@ -1,7 +1,7 @@
 package flo.no.kanji.conf;
 
-import com.github.aliasbretaud.mojibox.KanjiDictionary;
 import com.moji4j.MojiConverter;
+import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

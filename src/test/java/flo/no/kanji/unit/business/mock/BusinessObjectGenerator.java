@@ -1,9 +1,11 @@
 package flo.no.kanji.unit.business.mock;
 
-import com.github.aliasbretaud.mojibox.ReadingType;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
+import io.github.aliasbretaud.mojibox.data.KanjiEntry;
+import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
+import io.github.aliasbretaud.mojibox.enums.ReadingType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,12 +47,12 @@ public class BusinessObjectGenerator {
         return (Word) objectMap.get("word");
     }
 
-    public static com.github.aliasbretaud.mojibox.Kanji getKanjiVO() {
-        var kanjiVo = new com.github.aliasbretaud.mojibox.Kanji();
+    public static KanjiEntry getKanjiVO() {
+        var kanjiVo = new KanjiEntry();
         kanjiVo.setLiteral("人");
         kanjiVo.setReadings(Map.of(ReadingType.JA_KUN, List.of("ひと"),
                 ReadingType.JA_ON, List.of("ジン")));
-        kanjiVo.setMeanings(Map.of(com.github.aliasbretaud.mojibox.Language.EN, List.of("People")));
+        kanjiVo.setMeanings(Map.of(MeaningLanguage.EN, List.of("People")));
 
         return kanjiVo;
     }

@@ -1,7 +1,6 @@
 package flo.no.kanji.unit.business.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.aliasbretaud.mojibox.KanjiDictionary;
 import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
@@ -14,6 +13,7 @@ import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.util.PatchHelper;
+import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
