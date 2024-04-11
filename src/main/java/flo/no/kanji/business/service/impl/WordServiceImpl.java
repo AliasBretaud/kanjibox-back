@@ -169,7 +169,7 @@ public class WordServiceImpl implements WordService {
      */
     private List<Kanji> buildWordKanjisList(String wordValue) {
         return wordValue.chars().mapToObj(i -> String.valueOf((char) i)).filter(CharacterUtils::isKanji)
-                .map(Kanji::new).collect(Collectors.toList());
+                .map(Kanji::new).distinct().collect(Collectors.toList());
     }
 
     /**
