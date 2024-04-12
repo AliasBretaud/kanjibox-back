@@ -83,8 +83,7 @@ public class KanjiServiceImpl implements KanjiService {
     private void handleDefaultTranslation(Kanji kanji) {
         var translations = new HashMap<>(kanji.getTranslations());
         var kanjiVo = kanjiDictionary.searchKanji(kanji.getValue());
-        var defaultTranslation = kanjiVo.getMeanings()
-                .get(MeaningLanguage.EN);
+        var defaultTranslation = kanjiVo.getMeaning(MeaningLanguage.EN);
         if (defaultTranslation != null && !defaultTranslation.isEmpty()) {
             translations.put(Language.EN, defaultTranslation);
         }
@@ -110,8 +109,8 @@ public class KanjiServiceImpl implements KanjiService {
     public void autoFillKanjiReadigs(Kanji kanji) {
         var kanjiVo = kanjiDictionary.searchKanji(kanji.getValue());
         if (kanjiVo != null) {
-            kanji.setKunYomi(kanjiVo.getReadings().get(ReadingType.JA_KUN));
-            kanji.setOnYomi(kanjiVo.getReadings().get(ReadingType.JA_ON));
+            kanji.setKunYomi(kanjiVo.getReading(ReadingType.JA_KUN));
+            kanji.setOnYomi(kanjiVo.getReading(ReadingType.JA_ON));
             kanji.setTranslations(buildTranslationsFromVo(kanjiVo));
         }
 
@@ -119,9 +118,9 @@ public class KanjiServiceImpl implements KanjiService {
 
     private Map<Language, List<String>> buildTranslationsFromVo(KanjiEntry kanjiVo) {
         var translations = new HashMap<>(Map.of(
-                Language.EN, kanjiVo.getMeanings().get(MeaningLanguage.EN)
+                Language.EN, kanjiVo.getMeaning(MeaningLanguage.EN)
                         .stream().limit(3).toList()));
-        var frTranslations = kanjiVo.getMeanings().get(MeaningLanguage.FR);
+        var frTranslations = kanjiVo.getMeaning(MeaningLanguage.FR);
         if (frTranslations != null && !frTranslations.isEmpty()) {
             translations.put(Language.FR, frTranslations.stream().limit(3).toList());
         }
