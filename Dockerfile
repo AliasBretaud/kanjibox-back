@@ -8,7 +8,11 @@ RUN ./mvnw dependency:resolve
 COPY src ./src
 
 FROM base as development
-CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'"]
+CMD ["./mvnw", "spring-boot:run", "-Dspring.profiles.active=dev", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'"]
+
+FROM base as test
+COPY db ./db
+CMD ["./mvnw", "spring-boot:run", "-Dspring.profiles.active=test", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'"]
 
 FROM base as build
 RUN ./mvnw package

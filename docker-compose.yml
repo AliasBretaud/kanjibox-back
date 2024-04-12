@@ -14,7 +14,6 @@ services:
       - kanji_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db:/docker-entrypoint-initdb.d
 
   api:
     build:
@@ -33,7 +32,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kanji
       SPRING_DATASOURCE_USERNAME: kanji
       SPRING_DATASOURCE_PASSWORD: kanji
-      GOOGLE_API_KEY: ###
+      GOOGLE_API_KEY:
+      AUTO_TRANSLATION_ENABLED: false
 
   front:
     image: fbrtd/kanjibox-front:latest
