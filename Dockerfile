@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:22_36-jdk-jammy as base
+FROM eclipse-temurin:22_36-jdk-alpine as base
 WORKDIR /app
+RUN apk --no-cache add curl
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
 RUN ./mvnw dependency:resolve
@@ -17,7 +18,7 @@ CMD ["./mvnw", "spring-boot:run", "-Dspring.profiles.active=test", "-Dspring-boo
 FROM base as build
 RUN ./mvnw package
 
-FROM eclipse-temurin:22_36-jdk-jammy as production
+FROM eclipse-temurin:22_36-jre-alpine as production
 EXPOSE 8080
 COPY --from=build /app/target/flo-no-kanji-*.jar /flo-no-kanji.jar
 CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/flo-no-kanji.jar"]
