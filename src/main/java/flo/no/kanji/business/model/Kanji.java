@@ -1,5 +1,6 @@
 package flo.no.kanji.business.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
@@ -15,35 +16,37 @@ import java.util.Map;
 
 /**
  * Kanji model object representation
+ *
  * @author Florian
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Kanji {
 
-	/** Kanji technical identifier **/
-	private Long id;
+    /** Kanji technical identifier **/
+    private Long id;
 
-	/** Kanji japanese value **/
-	@NotBlank
-	@Size(min = 1, max = 1)
-	@JapaneseCharacterFormat(format = CharacterType.KANJI)
-	private String value;
+    /** Kanji japanese value **/
+    @NotBlank
+    @Size(min = 1, max = 1)
+    @JapaneseCharacterFormat(format = CharacterType.KANJI)
+    private String value;
 
-	/** Kanji translations **/
-	private Map<Language, List<String>> translations;
+    /** Kanji translations **/
+    private Map<Language, List<String>> translations;
 
-	/** Kanji japanese style reading styles (in hiragana) **/
-	@JapaneseCharacterFormat(format = CharacterType.HIRAGANA)
-	private List<String> kunYomi;
+    /** Kanji japanese style reading styles (in hiragana) **/
+    @JapaneseCharacterFormat(format = CharacterType.HIRAGANA)
+    private List<String> kunYomi;
 
-	/** Kanji chinese style reading styles (in hiragana) **/
-	@JapaneseCharacterFormat(format = CharacterType.KATAKANA)
-	private List<String> onYomi;
+    /** Kanji chinese style reading styles (in hiragana) **/
+    @JapaneseCharacterFormat(format = CharacterType.KATAKANA)
+    private List<String> onYomi;
 
-	public Kanji(final String value) {
-		this.value = value;
-	}
+    public Kanji(final String value) {
+        this.value = value;
+    }
 }

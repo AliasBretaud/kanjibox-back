@@ -15,80 +15,68 @@ import java.sql.Timestamp;
 
 /**
  * Global controller for exceptions handling
+ *
  * @author Florian
  */
 @ControllerAdvice
 @Slf4j
 public class ExceptionHelper {
-	
-	/**
-	 * Handling User inputs relating exception
-	 * @param ex
-	 * 			Generated exception during the process of entity creation/update
-	 * @return
-	 * 			400 BAD_REQUEST status with returned error
-	 */
-	@ExceptionHandler(value = {
-			InvalidInputException.class,
-			ConstraintViolationException.class,
-			HttpMessageNotReadableException.class,
-	})
-	public ResponseEntity<Object> handleInvalidInputException(Exception ex) {
-	    log.error("Invalid Input Exception: ", ex);
-	    var status = HttpStatus.BAD_REQUEST;
-	    var apiException = buildApiException(status, ex);
-	    return new ResponseEntity<>(apiException, status);
-    }
-	
-	/**
-	 * Handling not found object exceptions
-	 * @param ex
-	 * 			Generated exception while retrieving object
-	 * @return
-	 * 			404 NOT_FOUND status with returned error
-	 */
-	@ExceptionHandler(value = ItemNotFoundException.class)
-	public ResponseEntity<Object> handleItemNotFoundException(ItemNotFoundException ex) {
-		var status = HttpStatus.NOT_FOUND;
-	    var apiException = buildApiException(status, ex);
-	    return new ResponseEntity<>(apiException, status);
-	}
 
-	/**
-	 * Handling external services exceptions
-	 * @param ex
-	 * 			Generated exception while retrieving object
-	 * @return
-	 * 			503 NOT_FOUND status with returned error
-	 */
-	
-	/**
-	 * Handling general Exceptions
-	 * @param ex
-	 * 			Exception
-	 * @return
-	 * 			500 SERVICE_UNAVAILABLE status with returned error
-	 */
-	@ExceptionHandler(value = ExternalServiceError.class)
-	public ResponseEntity<Object> handleExternalServiceException(Exception ex) {
-	    log.error("External service Exception: ", ex);
-	    var status = HttpStatus.SERVICE_UNAVAILABLE;
-	    var apiException = buildApiException(status, ex);
-	    return new ResponseEntity<>(apiException, status);
+    /**
+     * Handling User inputs relating exception
+     *
+     * @param ex Generated exception during the process of entity creation/update
+     * @return 400 BAD_REQUEST status with returned error
+     */
+    @ExceptionHandler(value = {
+            InvalidInputException.class,
+            ConstraintViolationException.class,
+            HttpMessageNotReadableException.class,
+    })
+    public ResponseEntity<Object> handleInvalidInputException(Exception ex) {
+        log.error("Invalid Input Exception: ", ex);
+        var status = HttpStatus.BAD_REQUEST;
+        var apiException = buildApiException(status, ex);
+        return new ResponseEntity<>(apiException, status);
     }
-	
-	/**
-	 * Builds Exception to return via the API
-	 * @param status
-	 * 			Error HTTP status
-	 * @param ex
-	 * 			Returned exception
-	 * @return
-	 * 			Builded/converted API exception
-	 */
-	private ApiExceptionWrapper buildApiException(final HttpStatus status, final Exception ex) {
-		return new ApiExceptionWrapper(new Timestamp(System.currentTimeMillis()).toString(),
-	    		status.value(),	ex.getClass().getName(), ex.getMessage());
-	}
+
+    /**
+     * Handling not found object exceptions
+     *
+     * @param ex Generated exception while retrieving object
+     * @return 404 NOT_FOUND status with returned error
+     */
+    @ExceptionHandler(value = ItemNotFoundException.class)
+    public ResponseEntity<Object> handleItemNotFoundException(ItemNotFoundException ex) {
+        var status = HttpStatus.NOT_FOUND;
+        var apiException = buildApiException(status, ex);
+        return new ResponseEntity<>(apiException, status);
+    }
+
+    /**
+     * Handling general Exceptions
+     *
+     * @param ex Exception
+     * @return 500 SERVICE_UNAVAILABLE status with returned error
+     */
+    @ExceptionHandler(value = ExternalServiceError.class)
+    public ResponseEntity<Object> handleExternalServiceException(Exception ex) {
+        log.error("External service Exception: ", ex);
+        var status = HttpStatus.SERVICE_UNAVAILABLE;
+        var apiException = buildApiException(status, ex);
+        return new ResponseEntity<>(apiException, status);
+    }
+
+    /**
+     * Builds Exception to return via the API
+     *
+     * @param status Error HTTP status
+     * @param ex     Returned exception
+     * @return Builded/converted API exception
+     */
+    private ApiExceptionWrapper buildApiException(final HttpStatus status, final Exception ex) {
+        return new ApiExceptionWrapper(new Timestamp(System.currentTimeMillis()).toString(),
+                status.value(), ex.getClass().getName(), ex.getMessage());
+    }
 
 }

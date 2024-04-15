@@ -10,7 +10,6 @@ import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.TranslationService;
 import flo.no.kanji.business.service.impl.WordServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
-import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
@@ -71,6 +70,8 @@ public class WordServiceTest {
     @Test
     public void addWordTestOk1() {
         // PREPARE
+        when(translationService.translateValue(anyString(), eq(Language.FR)))
+                .thenReturn("fr translation");
         var kan1 = KanjiEntity.builder().value("火").build();
         var kan2 = KanjiEntity.builder().value("山").build();
         when(kanjiRepository.findByValueIn(anyList())).thenReturn(List.of(kan1, kan2));
@@ -87,9 +88,9 @@ public class WordServiceTest {
         // ASSERT
         assertEquals(word.getValue(), savedWord.getValue());
         assertEquals(word.getFuriganaValue(), savedWord.getFuriganaValue());
-        assertEquals(
-                word.getTranslations().get(Language.EN),
-                savedWord.getTranslations().stream().map(TranslationEntity::getTranslation).toList());
+        assertEquals(Map.of(
+                Language.EN, List.of("beautiful volcano"),
+                Language.FR, List.of("fr translation")), word.getTranslations());
         var kanjiList = savedWord.getKanjis();
         assertEquals(2, kanjiList.size());
         assertTrue(kanjiList.contains(kan1));
@@ -116,11 +117,11 @@ public class WordServiceTest {
     @Test
     public void getWordsWithoutSearchTest() {
         // PREPARE
-        var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
+        var page = new PageImpl<>(List.of(EntityGenerator.getWordEntity()));
         when(wordRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
                 .thenReturn(page);
         // EXECUTE
-        var word = wordServiceImpl.getWords(null, null, mock(Pageable.class)).getContent().get(0);
+        var word = wordServiceImpl.getWords(null, null, mock(Pageable.class)).getContent().getFirst();
         // ASSERT
         assertEquals(wordMapper.toBusinessObject(EntityGenerator.getWordEntity()), word);
     }
@@ -129,11 +130,11 @@ public class WordServiceTest {
     @SuppressWarnings("unchecked")
     public void getWordsWithKunSearchTest() {
         // PREPARE
-        var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
+        var page = new PageImpl<>(List.of(EntityGenerator.getWordEntity()));
         when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(page);
         // EXECUTE
-        var word = wordServiceImpl.getWords("あ", null, mock(Pageable.class)).getContent().get(0);
+        var word = wordServiceImpl.getWords("あ", null, mock(Pageable.class)).getContent().getFirst();
         var specCaptor = ArgumentCaptor.forClass(Specification.class);
         verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
         executeSpecification(specCaptor.getValue(), false);
@@ -145,11 +146,11 @@ public class WordServiceTest {
     @SuppressWarnings("unchecked")
     public void getWordsWithOnSearchTest() {
         // PREPARE
-        var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
+        var page = new PageImpl<>(List.of(EntityGenerator.getWordEntity()));
         when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(page);
         // EXECUTE
-        var word = wordServiceImpl.getWords("ア", null, mock(Pageable.class)).getContent().get(0);
+        var word = wordServiceImpl.getWords("ア", null, mock(Pageable.class)).getContent().getFirst();
         var specCaptor = ArgumentCaptor.forClass(Specification.class);
         verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
         executeSpecification(specCaptor.getValue(), false);
@@ -161,11 +162,11 @@ public class WordServiceTest {
     @SuppressWarnings("unchecked")
     public void getWordsWithKanjiSearchTest() {
         // PREPARE
-        var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
+        var page = new PageImpl<>(List.of(EntityGenerator.getWordEntity()));
         when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(page);
         // EXECUTE
-        var word = wordServiceImpl.getWords("亜", null, mock(Pageable.class)).getContent().get(0);
+        var word = wordServiceImpl.getWords("亜", null, mock(Pageable.class)).getContent().getFirst();
         var specCaptor = ArgumentCaptor.forClass(Specification.class);
         verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
         executeSpecification(specCaptor.getValue(), false);
@@ -177,11 +178,11 @@ public class WordServiceTest {
     @SuppressWarnings("unchecked")
     public void getWordsWithKanjiOkuriganaSearchTest() {
         // PREPARE
-        var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
+        var page = new PageImpl<>(List.of(EntityGenerator.getWordEntity()));
         when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(page);
         // EXECUTE
-        var word = wordServiceImpl.getWords("会う", null, mock(Pageable.class)).getContent().get(0);
+        var word = wordServiceImpl.getWords("会う", null, mock(Pageable.class)).getContent().getFirst();
         var specCaptor = ArgumentCaptor.forClass(Specification.class);
         verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
         executeSpecification(specCaptor.getValue(), false);
@@ -193,11 +194,11 @@ public class WordServiceTest {
     @SuppressWarnings("unchecked")
     public void getWordsWithRomajiSearchTest() {
         // PREPARE
-        var page = new PageImpl<WordEntity>(List.of(EntityGenerator.getWordEntity()));
+        var page = new PageImpl<>(List.of(EntityGenerator.getWordEntity()));
         when(wordRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(page);
         // EXECUTE
-        var word = wordServiceImpl.getWords("a", null, mock(Pageable.class)).getContent().get(0);
+        var word = wordServiceImpl.getWords("a", null, mock(Pageable.class)).getContent().getFirst();
         var specCaptor = ArgumentCaptor.forClass(Specification.class);
         verify(wordRepository).findAll(specCaptor.capture(), any(Pageable.class));
         executeSpecification(specCaptor.getValue(), true);
