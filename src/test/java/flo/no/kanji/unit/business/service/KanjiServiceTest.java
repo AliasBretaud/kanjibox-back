@@ -39,7 +39,7 @@ import static org.mockito.Mockito.*;
 public class KanjiServiceTest {
 
     @Spy
-    private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
+    private final KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
 
     @Mock
     private KanjiRepository kanjiRepository;

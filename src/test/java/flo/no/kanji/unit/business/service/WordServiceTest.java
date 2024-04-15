@@ -37,13 +37,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class WordServiceTest {
 
-    @Spy
-    private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
-
     @InjectMocks
     @Spy
-    private WordMapper wordMapper = Mockito.spy(WordMapper.class);
-
+    private final WordMapper wordMapper = Mockito.spy(WordMapper.class);
+    @Spy
+    private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
     @Mock
     private KanjiService kanjiService;
 

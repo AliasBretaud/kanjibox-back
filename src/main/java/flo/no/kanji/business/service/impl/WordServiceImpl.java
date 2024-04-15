@@ -115,6 +115,18 @@ public class WordServiceImpl implements WordService {
         return wordMapper.toBusinessObject(wordEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<Word> getWords(String search, Language language, Pageable pageable) {
+
+        return ObjectUtils.isEmpty(search)
+                ? wordRepository.findAllByOrderByTimeStampDesc(pageable)
+                .map(wordMapper::toBusinessObject)
+                : this.searchWord(search, pageable);
+    }
+
     private List<CompletableFuture<Kanji>> buildKanjiFutures(List<Kanji> kanjis) {
         return kanjis.stream()
                 .map(k -> CompletableFuture.supplyAsync(() -> {
@@ -146,17 +158,26 @@ public class WordServiceImpl implements WordService {
                 .filter(l -> l != Language.JA)
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        l -> {
-                            var existingTranslation = word.getTranslations() != null ? word.getTranslations()
-                                    .get(l) : null;
+                        lang -> {
+                            var existingTranslation = getExistingTranslation(word, lang);
                             if (enableAutoDefaultTranslation && CollectionUtils.isEmpty(existingTranslation)) {
-                                return CompletableFuture.supplyAsync(() -> {
-                                    var autoTranslation = translationService.translateValue(word.getValue(), l);
-                                    return autoTranslation != null ? List.of(autoTranslation) : Collections.emptyList();
-                                });
+                                return fetchAutoTranslationAsync(word, lang);
                             }
                             return CompletableFuture.completedFuture(existingTranslation);
                         }));
+    }
+
+    private List<String> getExistingTranslation(Word word, Language lang) {
+        return Optional.ofNullable(word.getTranslations())
+                .map(translations -> translations.get(lang))
+                .orElse(null);
+    }
+
+    private CompletableFuture<List<String>> fetchAutoTranslationAsync(Word word, Language lang) {
+        return CompletableFuture.supplyAsync(() -> {
+            var autoTranslation = translationService.translateValue(word.getValue(), lang);
+            return autoTranslation != null ? List.of(autoTranslation) : Collections.emptyList();
+        });
     }
 
     private void checkWordAlreadyPresent(final Word word) {
@@ -175,18 +196,6 @@ public class WordServiceImpl implements WordService {
     private List<Kanji> buildWordKanjisList(String wordValue) {
         return wordValue.chars().mapToObj(i -> String.valueOf((char) i)).filter(CharacterUtils::isKanji)
                 .map(Kanji::new).distinct().collect(Collectors.toList());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Page<Word> getWords(String search, Language language, Pageable pageable) {
-
-        return ObjectUtils.isEmpty(search)
-                ? wordRepository.findAllByOrderByTimeStampDesc(pageable)
-                .map(wordMapper::toBusinessObject)
-                : this.searchWord(search, pageable);
     }
 
     /**
