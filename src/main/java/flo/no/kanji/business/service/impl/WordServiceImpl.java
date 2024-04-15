@@ -31,6 +31,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
+
 /**
  * Word business service implementation
  *
@@ -129,9 +131,11 @@ public class WordServiceImpl implements WordService {
 
     private List<CompletableFuture<Kanji>> buildKanjiFutures(List<Kanji> kanjis) {
         return kanjis.stream()
-                .map(k -> CompletableFuture.supplyAsync(() -> {
-                    kanjiService.autoFillKanjiReadigs(k);
-                    return k;
+                .map(kanji -> CompletableFuture.supplyAsync(() -> {
+                    kanjiService.autoFillKanjiReadigs(kanji);
+                    var translations = kanjiService.buildTranslations(kanji);
+                    kanji.setTranslations(translations);
+                    return kanji;
                 }))
                 .toList();
     }
@@ -155,28 +159,21 @@ public class WordServiceImpl implements WordService {
 
     private Map<Language, CompletableFuture<List<String>>> buildTranslationFutures(Word word) {
         return Arrays.stream(Language.values())
-                .filter(l -> l != Language.JA)
+                .filter(lang -> lang != Language.JA)
                 .collect(Collectors.toMap(
                         Function.identity(),
                         lang -> {
-                            var existingTranslation = getExistingTranslation(word, lang);
-                            if (enableAutoDefaultTranslation && CollectionUtils.isEmpty(existingTranslation)) {
-                                return fetchAutoTranslationAsync(word, lang);
-                            }
-                            return CompletableFuture.completedFuture(existingTranslation);
+                            var existingTranslation = getExistingTranslation(word.getTranslations(), lang);
+                            return enableAutoDefaultTranslation && CollectionUtils.isEmpty(existingTranslation) ?
+                                    fetchAutoTranslationAsync(word, lang) :
+                                    CompletableFuture.completedFuture(existingTranslation);
                         }));
-    }
-
-    private List<String> getExistingTranslation(Word word, Language lang) {
-        return Optional.ofNullable(word.getTranslations())
-                .map(translations -> translations.get(lang))
-                .orElse(null);
     }
 
     private CompletableFuture<List<String>> fetchAutoTranslationAsync(Word word, Language lang) {
         return CompletableFuture.supplyAsync(() -> {
             var autoTranslation = translationService.translateValue(word.getValue(), lang);
-            return autoTranslation != null ? List.of(autoTranslation) : Collections.emptyList();
+            return Optional.ofNullable(autoTranslation).map(List::of).orElse(Collections.emptyList());
         });
     }
 

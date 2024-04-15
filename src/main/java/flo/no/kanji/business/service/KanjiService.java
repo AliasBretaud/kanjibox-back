@@ -7,6 +7,9 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Kanji operations business service
  *
@@ -22,6 +25,14 @@ public interface KanjiService {
      * @return Created kanji
      */
     Kanji addKanji(@Valid Kanji kanji, boolean autodetectReadings);
+
+    /**
+     * Merges the existing kanji translations and fills the ones not provided
+     *
+     * @param kanji Kanji
+     * @return The built list of all translations
+     */
+    Map<Language, List<String>> buildTranslations(Kanji kanji);
 
     /**
      * Affecting auto-determined readings and translations to an existing kanji

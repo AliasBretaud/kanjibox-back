@@ -13,7 +13,9 @@ import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.util.PatchHelper;
+import io.github.aliasbretaud.mojibox.data.KanjiEntry;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
+import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -126,8 +129,6 @@ public class KanjiServiceTest {
         assertEquals(kanji.getValue(), "T");
         assertEquals(kanji.getKunYomi(), List.of("ひと"));
         assertEquals(kanji.getOnYomi(), List.of("ジン"));
-        assertEquals(kanji.getTranslations().get(Language.EN), List.of("People"));
-
     }
 
     @Test
@@ -194,6 +195,25 @@ public class KanjiServiceTest {
         // EXECUTE
         // ASSERT
         assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest));
+    }
+
+    @Test
+    public void buldTranslationsTest() {
+        // PREPARE
+        var entry = new KanjiEntry();
+        entry.setMeanings(Map.of(MeaningLanguage.EN, List.of("white dict"),
+                MeaningLanguage.FR, List.of("blanc dict")));
+        when(kanjiDictionary.searchKanji(eq("白"))).thenReturn(entry);
+        var kanji = Kanji.builder()
+                .value("白")
+                .translations(Map.of(Language.FR, List.of("blanc test")))
+                .build();
+        // EXECUTE
+        var translations = kanjiServiceImpl.buildTranslations(kanji);
+        // ASSERT
+        assertEquals(
+                Map.of(Language.FR, List.of("blanc test"),
+                        Language.EN, List.of("white dict")), translations);
     }
 
 }

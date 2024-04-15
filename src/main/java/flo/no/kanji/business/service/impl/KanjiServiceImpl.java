@@ -11,7 +11,6 @@ import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.PatchHelper;
-import io.github.aliasbretaud.mojibox.data.KanjiEntry;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
 import io.github.aliasbretaud.mojibox.enums.ReadingType;
@@ -26,6 +25,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
 
 /**
  * Kanji business service implementation
@@ -72,34 +74,24 @@ public class KanjiServiceImpl implements KanjiService {
             autoFillKanjiReadigs(kanji);
         }
 
-        // Check if the kanji contains at least one default translation
-        if (!hasDefaultTranslation(kanji)) {
-            handleDefaultTranslation(kanji);
-        }
+        // Get all translations
+        var translations = buildTranslations(kanji);
+        kanji.setTranslations(translations);
 
         return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
     }
 
-    private void handleDefaultTranslation(Kanji kanji) {
-        var translations = new HashMap<>(kanji.getTranslations());
-        var kanjiVo = kanjiDictionary.searchKanji(kanji.getValue());
-        var defaultTranslation = kanjiVo.getMeaning(MeaningLanguage.EN);
-        if (defaultTranslation != null && !defaultTranslation.isEmpty()) {
-            translations.put(Language.EN, defaultTranslation);
-        }
-        kanji.setTranslations(translations);
-    }
-
-    private boolean hasDefaultTranslation(Kanji kanji) {
-        var translations = kanji.getTranslations();
-        return translations != null && translations.containsKey(Language.EN);
-    }
-
-    private void checkKanjiAlreadyPresent(final Kanji kanji) {
-        Optional.ofNullable(kanjiRepository.findByValue(kanji.getValue())).ifPresent(k -> {
-            throw new InvalidInputException(
-                    String.format("Kanji with value '%s' already exists in database", k.getValue()));
-        });
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Language, List<String>> buildTranslations(Kanji kanji) {
+        return Arrays.stream(Language.values())
+                .filter(lang -> lang != Language.JA)
+                .map(lang -> Map.entry(lang, Optional.ofNullable(getExistingTranslation(kanji.getTranslations(), lang))
+                        .orElseGet(() -> findDictionaryTranslations(kanji.getValue(), lang))))
+                .filter(entry -> !entry.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
@@ -107,24 +99,11 @@ public class KanjiServiceImpl implements KanjiService {
      */
     @Override
     public void autoFillKanjiReadigs(Kanji kanji) {
-        var kanjiVo = kanjiDictionary.searchKanji(kanji.getValue());
-        if (kanjiVo != null) {
-            kanji.setKunYomi(kanjiVo.getReading(ReadingType.JA_KUN));
-            kanji.setOnYomi(kanjiVo.getReading(ReadingType.JA_ON));
-            kanji.setTranslations(buildTranslationsFromVo(kanjiVo));
-        }
-
-    }
-
-    private Map<Language, List<String>> buildTranslationsFromVo(KanjiEntry kanjiVo) {
-        var translations = new HashMap<>(Map.of(
-                Language.EN, kanjiVo.getMeaning(MeaningLanguage.EN)
-                        .stream().limit(3).toList()));
-        var frTranslations = kanjiVo.getMeaning(MeaningLanguage.FR);
-        if (frTranslations != null && !frTranslations.isEmpty()) {
-            translations.put(Language.FR, frTranslations.stream().limit(3).toList());
-        }
-        return translations;
+        Optional.ofNullable(kanjiDictionary.searchKanji(kanji.getValue()))
+                .ifPresent(kanjiVo -> {
+                    kanji.setKunYomi(kanjiVo.getReading(ReadingType.JA_KUN));
+                    kanji.setOnYomi(kanjiVo.getReading(ReadingType.JA_ON));
+                });
     }
 
     /**
@@ -137,20 +116,6 @@ public class KanjiServiceImpl implements KanjiService {
                 ? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
                 .map(kanjiMapper::toBusinessObject)
                 : this.searchKanji(search, language, pageable);
-    }
-
-    /**
-     * Execute a search query on different readings, translations or kanji value
-     *
-     * @param search   The input search value
-     * @param pageable Pagination parameter
-     * @return The result of search
-     */
-    private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
-
-        var spec = KanjiSpecification.searchKanji(search, language, this.converter);
-        // Execute query, mapping and return results
-        return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
     }
 
     /**
@@ -181,6 +146,38 @@ public class KanjiServiceImpl implements KanjiService {
     public Kanji findById(Long kanjiId) {
         return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
+    }
+
+    /**
+     * Execute a search query on different readings, translations or kanji value
+     *
+     * @param search   The input search value
+     * @param pageable Pagination parameter
+     * @return The result of search
+     */
+    private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
+
+        var spec = KanjiSpecification.searchKanji(search, language, this.converter);
+        // Execute query, mapping and return results
+        return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
+    }
+
+    private List<String> findDictionaryTranslations(String kanjiValue, Language language) {
+        var entry = kanjiDictionary.searchKanji(kanjiValue);
+        return Optional.ofNullable(entry)
+                .map(e -> Arrays.stream(MeaningLanguage.values())
+                        .filter(ml -> ml.name().equalsIgnoreCase(language.getValue()))
+                        .findFirst()
+                        .map(e::getMeaning)
+                        .orElse(Collections.emptyList()))
+                .orElse(Collections.emptyList());
+    }
+
+    private void checkKanjiAlreadyPresent(final Kanji kanji) {
+        Optional.ofNullable(kanjiRepository.findByValue(kanji.getValue())).ifPresent(k -> {
+            throw new InvalidInputException(
+                    String.format("Kanji with value '%s' already exists in database", k.getValue()));
+        });
     }
 
 }
