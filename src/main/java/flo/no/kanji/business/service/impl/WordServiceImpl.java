@@ -28,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -87,20 +88,23 @@ public class WordServiceImpl implements WordService {
 
         // Word kanjis entities
         var wordKanjiEntities = getWordKanjiEntities(word);
+        var kanjisToFetch = getKanjisToFetch(word.getKanjis(), wordKanjiEntities);
 
         // Async tasks
-        var wordTranslationFuture = CompletableFuture.supplyAsync(() -> buildInitializedTranslations(word));
-        var kanjisToFetch = getKanjisToFetch(word.getKanjis(), wordKanjiEntities);
+        var wordTranslationFutures = buildTranslationFutures(word);
         var kanjiFutures = buildKanjiFutures(kanjisToFetch);
-
-        CompletableFuture.allOf(kanjiFutures.toArray(new CompletableFuture[0]));
 
         // Register all kanjis to save or merge with the word
         wordKanjiEntities.addAll(kanjiFutures.stream()
                 .map(CompletableFuture::join)
                 .map(kanjiMapper::toEntity)
                 .toList());
-        word.setTranslations(wordTranslationFuture.join());
+        // Getting all the translations
+        var translationsMap = wordTranslationFutures.entrySet()
+                .stream()
+                .filter(e -> e.getValue().join() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().join()));
+        word.setTranslations(translationsMap);
 
         // Build entity
         var wordEntity = wordMapper.toEntity(word);
@@ -137,21 +141,22 @@ public class WordServiceImpl implements WordService {
                         .toList())));
     }
 
-    private Map<Language, List<String>> buildInitializedTranslations(Word word) {
-        var translations = new HashMap<>(word.getTranslations());
-        // Check if the word contains at least one default translation
-        if (enableAutoDefaultTranslation && !hasDefaultTranslation(word)) {
-            var defaultTranslation = translationService.translateValue(word.getValue(), Language.EN);
-            if (defaultTranslation != null) {
-                translations.put(Language.EN, List.of(defaultTranslation));
-            }
-        }
-        return translations;
-    }
-
-    private boolean hasDefaultTranslation(Word word) {
-        var translations = word.getTranslations();
-        return translations != null && translations.containsKey(Language.EN);
+    private Map<Language, CompletableFuture<List<String>>> buildTranslationFutures(Word word) {
+        return Arrays.stream(Language.values())
+                .filter(l -> l != Language.JA)
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        l -> {
+                            var existingTranslation = word.getTranslations() != null ? word.getTranslations()
+                                    .get(l) : null;
+                            if (enableAutoDefaultTranslation && CollectionUtils.isEmpty(existingTranslation)) {
+                                return CompletableFuture.supplyAsync(() -> {
+                                    var autoTranslation = translationService.translateValue(word.getValue(), l);
+                                    return autoTranslation != null ? List.of(autoTranslation) : Collections.emptyList();
+                                });
+                            }
+                            return CompletableFuture.completedFuture(existingTranslation);
+                        }));
     }
 
     private void checkWordAlreadyPresent(final Word word) {

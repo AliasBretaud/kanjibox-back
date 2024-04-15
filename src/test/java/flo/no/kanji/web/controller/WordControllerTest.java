@@ -3,10 +3,15 @@ package flo.no.kanji.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Word;
+import flo.no.kanji.business.service.TranslationService;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -14,6 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,11 +32,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Slf4j
 public class WordControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    @MockBean
+    private TranslationService translationService;
     @Autowired
     private MockMvc mockMvc;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        try (var mocks = MockitoAnnotations.openMocks(this)) {
+            log.debug("init mocks : {}", mocks.toString());
+        }
+    }
 
     @Test
     public void testGetWordOk1() throws Exception {
@@ -75,6 +96,7 @@ public class WordControllerTest {
 
     @Test
     public void testPostWordOk() throws Exception {
+        when(translationService.translateValue(anyString(), any(Language.class))).thenReturn("auto translation");
         var word = Word.builder()
                 .value("食前")
                 .furiganaValue("しょくぜん")
@@ -84,19 +106,26 @@ public class WordControllerTest {
         mockMvc.perform(post("/words")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(word)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.value", is("食前")))
+                .andExpect(jsonPath("$.furiganaValue", is("しょくぜん")))
+                .andExpect(jsonPath("$.translations", hasEntry(is("en"), contains("Before meal"))))
+                .andExpect(jsonPath("$.translations", hasEntry(is("fr"), contains("auto translation"))));
+
     }
 
     @Test
-    public void testPostWordKoNoTranslation() throws Exception {
+    public void testPostWordOkNoTranslation() throws Exception {
+        when(translationService.translateValue(anyString(), any(Language.class))).thenReturn("auto translation");
         var word = Word.builder()
-                .value("太陽")
+                .value("植物")
                 .furiganaValue("たいよう")
                 .build();
 
         mockMvc.perform(post("/words")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(word)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk());
     }
 }

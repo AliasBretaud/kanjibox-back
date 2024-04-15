@@ -31,9 +31,6 @@ public class JapaneseCharacterFormatValidator implements ConstraintValidator<Jap
 
     @SuppressWarnings("unchecked")
     @Override
-    /**
-     * @{inheritDoc}
-     */
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) {
             return true;

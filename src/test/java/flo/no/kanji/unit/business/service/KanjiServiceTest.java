@@ -134,7 +134,7 @@ public class KanjiServiceTest {
     public void getKanjisTestOk1() {
         // PREPARE
         when(kanjiRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
-                .thenReturn(new PageImpl<KanjiEntity>(List.of(EntityGenerator.getKanjiEntity())));
+                .thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
         var pageable = Pageable.ofSize(1);
         // EXECUTE
         var kanjis = kanjiServiceImpl.getKanjis(null, null, pageable).getContent();
@@ -151,12 +151,11 @@ public class KanjiServiceTest {
         when(kanjiRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
         var pageable = Pageable.ofSize(1);
-        Kanji kanji = null;
         // EXECUTE
         var kanjisSearch = kanjiServiceImpl.getKanjis("T", null, pageable).getContent();
         // ASSERT
         assertEquals(1, kanjisSearch.size());
-        kanji = kanjisSearch.get(0);
+        var kanji = kanjisSearch.getFirst();
         assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
     }
 
@@ -177,7 +176,7 @@ public class KanjiServiceTest {
     @Test
     public void patchKanjiTestKo1() {
         // PREPARE
-        when(kanjiRepository.findById(anyLong())).thenReturn(Optional.ofNullable(null));
+        when(kanjiRepository.findById(anyLong())).thenReturn(Optional.empty());
         var patchRequest = mock(JsonNode.class);
         // EXECUTE
         // ASSERT
