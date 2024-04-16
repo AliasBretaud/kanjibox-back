@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.validator.JapaneseCharacterFormat;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,16 +34,18 @@ public class Word implements Serializable {
     /** Word japanese value */
     @NotBlank
     @JapaneseCharacterFormat(format = {CharacterType.KANJI, CharacterType.KANJI_WITH_OKURIGANA})
+    @Size(min = 1, max = 5)
     private String value;
 
     /** Word translations */
-    private Map<Language, List<String>> translations;
+    private Map<Language, List<@Size(max = 50) String>> translations;
 
     /** Word transcription in hiragana **/
     @NotBlank
     @JapaneseCharacterFormat(format = CharacterType.HIRAGANA)
+    @Size(min = 1, max = 20)
     private String furiganaValue;
 
     /** Kanjis composing the word */
-    private List<Kanji> kanjis;
+    private List<@Valid Kanji> kanjis;
 }
