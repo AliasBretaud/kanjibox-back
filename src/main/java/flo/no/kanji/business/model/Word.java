@@ -33,7 +33,10 @@ public class Word implements Serializable {
 
     /** Word japanese value */
     @NotBlank
-    @JapaneseCharacterFormat(format = {CharacterType.KANJI, CharacterType.KANJI_WITH_OKURIGANA})
+    @JapaneseCharacterFormat(format = {
+            CharacterType.KANJI, CharacterType.KANJI_WITH_OKURIGANA,
+            CharacterType.HIRAGANA, CharacterType.KATAKANA
+    })
     @Size(min = 1, max = 5)
     private String value;
 
@@ -41,9 +44,8 @@ public class Word implements Serializable {
     private Map<Language, List<@Size(max = 50) String>> translations;
 
     /** Word transcription in hiragana **/
-    @NotBlank
     @JapaneseCharacterFormat(format = CharacterType.HIRAGANA)
-    @Size(min = 1, max = 20)
+    @Size(max = 20)
     private String furiganaValue;
 
     /** Kanjis composing the word */
