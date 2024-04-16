@@ -37,15 +37,15 @@ public class Kanji implements Serializable {
     private String value;
 
     /** Kanji translations **/
-    private Map<Language, List<String>> translations;
+    private Map<Language, List<@Size(max = 50) String>> translations;
 
     /** Kanji japanese style reading styles (in hiragana) **/
     @JapaneseCharacterFormat(format = CharacterType.HIRAGANA)
-    private List<String> kunYomi;
+    private List<@Size(max = 15) String> kunYomi;
 
     /** Kanji chinese style reading styles (in hiragana) **/
     @JapaneseCharacterFormat(format = CharacterType.KATAKANA)
-    private List<String> onYomi;
+    private List<@Size(max = 5) String> onYomi;
 
     public Kanji(final String value) {
         this.value = value;
