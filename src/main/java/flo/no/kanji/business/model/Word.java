@@ -50,4 +50,8 @@ public class Word implements Serializable {
 
     /** Kanjis composing the word */
     private List<@Valid Kanji> kanjis;
+
+    public Word(final String value) {
+        this.value = value;
+    }
 }

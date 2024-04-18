@@ -8,29 +8,27 @@ import org.springframework.data.domain.Pageable;
 
 /**
  * Word operations business service
+ *
  * @author Florian
  */
 public interface WordService {
 
-	/**
-	 * Search words by its japanese value
-	 * @param search
-	 * 			Word japansese writing value
-	 * @param language
-	 * 			Translations language filter
-	 * @param pageable
-	 * 			Returned page parameters (limit, number of items per page...)
-	 * @return
-	 * 			Spring page of retrieved corresponding words
-	 */
-	Page<Word> getWords(String search, Language language, Pageable pageable);
+    /**
+     * Search words by its japanese value
+     *
+     * @param search   Word japansese writing value
+     * @param language Translations language filter
+     * @param pageable Returned page parameters (limit, number of items per page...)
+     * @return Spring page of retrieved corresponding words
+     */
+    Page<Word> getWords(String search, Language language, Pageable pageable);
 
-	/**
-	 * Saving new word
-	 * @param word
-	 * 			Word business object
-	 * @return
-	 * 			Created word
-	 */
-	Word addWord(@Valid Word word);
+    /**
+     * Saving new word
+     *
+     * @param word    Word business object
+     * @param preview Return unsaved value
+     * @return Created word
+     */
+    Word addWord(@Valid Word word, boolean preview);
 }

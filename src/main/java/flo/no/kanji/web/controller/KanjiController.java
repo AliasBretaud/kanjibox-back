@@ -55,12 +55,14 @@ public class KanjiController {
      *
      * @param kanji      Kanji business object
      * @param autoDetect Calling external API for auto readings/translations setting (optional)
+     * @param preview    Return unsaved object
      * @return Created kanji
      */
     @PostMapping
     public Kanji addKanji(@RequestBody Kanji kanji,
-                          @RequestParam(defaultValue = "false", value = "autoDetectReadings") boolean autoDetect) {
-        return kanjiService.addKanji(kanji, autoDetect);
+                          @RequestParam(defaultValue = "false", value = "autoDetectReadings") boolean autoDetect,
+                          @RequestParam(defaultValue = "false", value = "preview") boolean preview) {
+        return kanjiService.addKanji(kanji, autoDetect, preview);
     }
 
     /**

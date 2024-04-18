@@ -64,7 +64,7 @@ public class KanjiServiceImpl implements KanjiService {
      * {@inheritDoc}
      */
     @Override
-    public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings) {
+    public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings, boolean preview) {
 
         // Check duplicate entry
         checkKanjiAlreadyPresent(kanji);
@@ -78,7 +78,13 @@ public class KanjiServiceImpl implements KanjiService {
         var translations = buildTranslations(kanji);
         kanji.setTranslations(translations);
 
-        return kanjiMapper.toBusinessObject(kanjiRepository.save(kanjiMapper.toEntity(kanji)));
+        // Built object
+        return preview ? kanji : saveKanji(kanji);
+    }
+
+    private Kanji saveKanji(final Kanji kanji) {
+        var entity = kanjiMapper.toEntity(kanji);
+        return kanjiMapper.toBusinessObject(kanjiRepository.save(entity));
     }
 
     /**

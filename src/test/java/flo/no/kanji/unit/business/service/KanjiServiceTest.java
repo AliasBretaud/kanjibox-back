@@ -16,6 +16,7 @@ import flo.no.kanji.util.PatchHelper;
 import io.github.aliasbretaud.mojibox.data.KanjiEntry;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
+import io.github.aliasbretaud.mojibox.enums.ReadingType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,7 +36,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(properties = {"kanji.translation.auto.enable=true"})
@@ -61,39 +63,48 @@ public class KanjiServiceTest {
     private KanjiServiceImpl kanjiServiceImpl;
 
 
+    /**
+     * Nominal scenario, add kanji with all values filled
+     */
     @Test
-    public void addKanjiTestOk1() {
+    public void addKanjiTestOk() {
         // PREPARE
-        when(kanjiRepository.save(any(KanjiEntity.class)))
-                .thenReturn(EntityGenerator.getKanjiEntity());
         var kanji = BusinessObjectGenerator.getKanji();
         //EXECUTE
-        var created = kanjiServiceImpl.addKanji(kanji, false);
+        var created = kanjiServiceImpl.addKanji(kanji, false, true);
         // ASSERT
         assertEquals(kanji, created);
     }
 
+    /**
+     * Test adding a kanji with auto-detection of readings/translations enabled
+     */
     @Test
-    public void addKanjiTestOk2() {
+    public void addKanjiWithAutoDetectTestOk() {
         // PREPARE
-        when(kanjiRepository.save(any(KanjiEntity.class)))
-                .thenReturn(EntityGenerator.getKanjiEntity());
-        var kanji = BusinessObjectGenerator.getKanji();
+        var entry = new KanjiEntry();
+        entry.setMeanings(Map.of(MeaningLanguage.EN, List.of("en translation")));
+        entry.setReadings(Map.of(ReadingType.JA_KUN, List.of("くんよみ")));
+        when(kanjiDictionary.searchKanji(anyString())).thenReturn(entry);
+        var kanji = new Kanji("白");
         //EXECUTE
-        var created = kanjiServiceImpl.addKanji(kanji, true);
-        BusinessObjectGenerator.resetKanji();
+        var created = kanjiServiceImpl.addKanji(kanji, true, true);
         // ASSERT
-        assertEquals(kanji, created);
-        verify(kanjiServiceImpl, times(1)).autoFillKanjiReadigs(any(Kanji.class));
+        assertEquals("白", created.getValue());
+        assertEquals(List.of("くんよみ"), created.getKunYomi());
+        assertEquals(Map.of(Language.EN, List.of("en translation")), created.getTranslations());
     }
 
+    /**
+     * Can't add a kanji if its value is already present in DB
+     */
     @Test
     public void addKanjiTestKo() {
         // PREPARE
         when(kanjiRepository.findByValue(anyString())).thenReturn(EntityGenerator.getKanjiEntity());
         var kanji = BusinessObjectGenerator.getKanji();
         // ASSERT
-        assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.addKanji(kanji, false));
+        assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.addKanji(kanji, false, true));
     }
 
     @Test
