@@ -1,6 +1,7 @@
 package flo.no.kanji.conf;
 
 import com.moji4j.MojiConverter;
+import com.moji4j.MojiDetector;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,11 @@ public class CharactersConvertersConfig {
     @Bean
     public MojiConverter getMojiConverter() {
         return new MojiConverter();
+    }
+
+    @Bean
+    public MojiDetector getMojiDetector() {
+        return new MojiDetector();
     }
 
     @Bean

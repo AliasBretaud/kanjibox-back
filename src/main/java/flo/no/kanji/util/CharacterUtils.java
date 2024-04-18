@@ -1,10 +1,14 @@
 package flo.no.kanji.util;
 
+import com.atilika.kuromoji.ipadic.Token;
+import com.atilika.kuromoji.ipadic.Tokenizer;
+import com.moji4j.MojiConverter;
 import com.moji4j.MojiDetector;
 import flo.no.kanji.business.constants.CharacterType;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.Character.UnicodeBlock;
+import java.util.stream.Collectors;
 
 import static java.lang.Character.UnicodeBlock.*;
 
@@ -17,6 +21,12 @@ public final class CharacterUtils {
 
     /** Japanese alphabet (hiragana/katakana/kanji) detetor **/
     private static final MojiDetector mojiDetector = new MojiDetector();
+
+    /** Japanese characters converter **/
+    private static final MojiConverter mojiConverter = new MojiConverter();
+
+    /** Japanese characters tokenizer **/
+    private static final Tokenizer tokenizer = new Tokenizer();
 
     /** Private constructor : The class provides only static methods so no instantiation needed **/
     private CharacterUtils() {
@@ -102,6 +112,27 @@ public final class CharacterUtils {
         }
 
         return type;
+    }
+
+    /**
+     * Converts a Kana value (hiragana or katakana) to a standard plain hiragana value
+     *
+     * @param value Kana string input
+     * @return Hiragana converted value
+     */
+    public static String convertKanaToFurigana(final String value) {
+        // Since MojiConverter library doesn't provide a katakana to hiragana converting method we first convert
+        // to romaji
+        return CharacterUtils.isHiragana(value) ? value :
+                mojiConverter.convertRomajiToHiragana(mojiConverter.convertKanaToRomaji(value));
+    }
+
+    public static String getWordFurigana(final String value) {
+        var tokens = tokenizer.tokenize(value);
+        var katakanaValue = tokens.stream()
+                .map(Token::getReading)
+                .collect(Collectors.joining());
+        return convertKanaToFurigana(katakanaValue);
     }
 
     /**

@@ -116,16 +116,20 @@ public class WordControllerTest {
     }
 
     @Test
-    public void testPostWordOkNoTranslation() throws Exception {
+    public void testPostWordOkAutoDetect() throws Exception {
         when(translationService.translateValue(anyString(), any(Language.class))).thenReturn("auto translation");
         var word = Word.builder()
                 .value("植物")
-                .furiganaValue("たいよう")
                 .build();
 
         mockMvc.perform(post("/words")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(word)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.value", is("植物")))
+                .andExpect(jsonPath("$.furiganaValue", is("しょくぶつ")))
+                .andExpect(jsonPath("$.translations", hasEntry(is("en"), contains("auto translation"))))
+                .andExpect(jsonPath("$.translations", hasEntry(is("fr"), contains("auto translation"))));
     }
 }

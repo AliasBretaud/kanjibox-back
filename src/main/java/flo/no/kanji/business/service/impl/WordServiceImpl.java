@@ -1,6 +1,6 @@
 package flo.no.kanji.business.service.impl;
 
-import com.moji4j.MojiConverter;
+import com.moji4j.MojiDetector;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.mapper.KanjiMapper;
@@ -62,9 +62,8 @@ public class WordServiceImpl implements WordService {
     @Autowired
     private KanjiMapper kanjiMapper;
 
-    /** Japanese alphabets converting service **/
     @Autowired
-    private MojiConverter converter;
+    private MojiDetector mojiDetector;
 
     @Value("${kanji.translation.auto.enable}")
     private Boolean enableAutoDefaultTranslation;
@@ -88,8 +87,13 @@ public class WordServiceImpl implements WordService {
             word.setKanjis(this.buildWordKanjisList(word.getValue()));
         }
 
+        // Add default furigana value
+        if (word.getFuriganaValue() == null && mojiDetector.hasKanji(word.getValue())) {
+            word.setFuriganaValue(CharacterUtils.getWordFurigana(word.getValue()));
+        }
+
         // Word kanjis entities
-        var wordKanjiEntities = getWordKanjiEntities(word);
+        var wordKanjiEntities = getExistingKanjisFromWord(word);
         var kanjisToFetch = getKanjisToFetch(word.getKanjis(), wordKanjiEntities);
 
         // Async tasks
@@ -149,7 +153,7 @@ public class WordServiceImpl implements WordService {
                 .toList();
     }
 
-    private List<KanjiEntity> getWordKanjiEntities(Word word) {
+    private List<KanjiEntity> getExistingKanjisFromWord(Word word) {
         return Collections.synchronizedList(
                 new ArrayList<>(kanjiRepository.findByValueIn(word.getKanjis()
                         .stream()
@@ -204,7 +208,7 @@ public class WordServiceImpl implements WordService {
      */
     private Page<Word> searchWord(String search, Pageable pageable) {
 
-        var spec = WordSpecification.searchWord(search, this.converter);
+        var spec = WordSpecification.searchWord(search);
         return wordRepository.findAll(spec, pageable).map(wordMapper::toBusinessObject);
     }
 

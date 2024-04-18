@@ -72,5 +72,10 @@ public class CharacterUtilsTest {
         assertFalse(CharacterUtils.isRomaji(value));
     }
 
+    @Test
+    public void convertToFuriganaTest() {
+        var value = "言葉";
+        assertEquals("ことば", CharacterUtils.getWordFurigana(value));
+    }
 }
 

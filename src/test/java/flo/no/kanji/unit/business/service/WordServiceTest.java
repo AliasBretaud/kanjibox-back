@@ -1,6 +1,7 @@
 package flo.no.kanji.unit.business.service;
 
 import com.moji4j.MojiConverter;
+import com.moji4j.MojiDetector;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.WordMapper;
@@ -53,6 +54,9 @@ public class WordServiceTest {
 
     @Spy
     private MojiConverter converter;
+
+    @Spy
+    private MojiDetector detector;
 
     @Mock
     private TranslationService translationService;
