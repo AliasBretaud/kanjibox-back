@@ -77,7 +77,7 @@ public class WordServiceImpl implements WordService {
      */
     @Override
     @Transactional
-    public Word addWord(@Valid Word word) {
+    public Word addWord(@Valid Word word, boolean preview) {
 
         // The word can't be already present in DB in order to be added
         checkWordAlreadyPresent(word);
@@ -112,13 +112,18 @@ public class WordServiceImpl implements WordService {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().join()));
         word.setTranslations(translationsMap);
 
-        // Build entity
-        var wordEntity = wordMapper.toEntity(word);
-        wordEntity.setKanjis(wordKanjiEntities);
+        // Return created word
+        if (preview) {
+            word.setKanjis(wordKanjiEntities.stream().map(kanjiMapper::toBusinessObject).toList());
+            return word;
+        }
+        return saveWord(word, wordKanjiEntities);
+    }
 
-        // Saving and return created word
-        wordEntity = wordRepository.save(wordEntity);
-        return wordMapper.toBusinessObject(wordEntity);
+    private Word saveWord(final Word word, List<KanjiEntity> wordKanjis) {
+        var entity = wordMapper.toEntity(word);
+        entity.setKanjis(wordKanjis);
+        return wordMapper.toBusinessObject(wordRepository.save(entity));
     }
 
     /**

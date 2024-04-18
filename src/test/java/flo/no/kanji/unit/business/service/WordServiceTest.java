@@ -3,9 +3,9 @@ package flo.no.kanji.unit.business.service;
 import com.moji4j.MojiConverter;
 import com.moji4j.MojiDetector;
 import flo.no.kanji.business.constants.Language;
+import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.WordMapper;
-import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.TranslationService;
@@ -15,6 +15,7 @@ import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.repository.WordRepository;
+import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import jakarta.persistence.criteria.*;
 import jakarta.persistence.metamodel.ListAttribute;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,8 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -69,6 +69,9 @@ public class WordServiceTest {
         ReflectionTestUtils.setField(wordServiceImpl, "enableAutoDefaultTranslation", true);
     }
 
+    /**
+     * Nominal scenario : add a word with all the vales fulfilled
+     */
     @Test
     public void addWordTestOk1() {
         // PREPARE
@@ -77,16 +80,11 @@ public class WordServiceTest {
         var kan1 = KanjiEntity.builder().value("火").build();
         var kan2 = KanjiEntity.builder().value("山").build();
         when(kanjiRepository.findByValueIn(anyList())).thenReturn(List.of(kan1, kan2));
-        when(wordRepository.save(any(WordEntity.class))).thenReturn(new WordEntity());
-        doReturn(new Word()).when(wordMapper).toBusinessObject(any(WordEntity.class));
-        var word = new Word();
-        word.setValue("きれいな火山");
-        word.setTranslations(Map.of(Language.EN, List.of("beautiful volcano")));
+        var word = Word.builder().value("きれいな火山")
+                .translations(Map.of(Language.EN, List.of("beautiful volcano")))
+                .build();
         // EXECUTE
-        wordServiceImpl.addWord(word);
-        var wordCaptor = ArgumentCaptor.forClass(WordEntity.class);
-        verify(wordRepository).save(wordCaptor.capture());
-        var savedWord = wordCaptor.getValue();
+        var savedWord = wordServiceImpl.addWord(word, true);
         // ASSERT
         assertEquals(word.getValue(), savedWord.getValue());
         assertEquals(word.getFuriganaValue(), savedWord.getFuriganaValue());
@@ -95,25 +93,40 @@ public class WordServiceTest {
                 Language.FR, List.of("fr translation")), word.getTranslations());
         var kanjiList = savedWord.getKanjis();
         assertEquals(2, kanjiList.size());
-        assertTrue(kanjiList.contains(kan1));
-        assertTrue(kanjiList.contains(kan2));
+        assertTrue(kanjiList.contains(kanjiMapper.toBusinessObject(kan1)));
+        assertTrue(kanjiList.contains(kanjiMapper.toBusinessObject(kan2)));
     }
 
+    /**
+     * Test adding a word with auto-detection enabled
+     */
     @Test
     public void addWordTestOk2() {
         // PREPARE
-        var wordEntity = EntityGenerator.getWordEntity();
-        when(wordRepository.save(any(WordEntity.class))).thenReturn(wordEntity);
-        var word = new Word();
-        word.setValue("きれいな火山");
-        word.setKanjis(List.of(
-                Kanji.builder().value("火").translations(Map.of(Language.EN, List.of("fire"))).build(),
-                Kanji.builder().value("山").translations(Map.of(Language.EN, List.of("mountain"))).build()));
-        word.setTranslations(Map.of(Language.EN, List.of("Volcano")));
+        var word = new Word("きれいな火山");
+        when(translationService.translateValue(anyString(), eq(Language.EN)))
+                .thenReturn("en translation");
+        when(translationService.translateValue(anyString(), eq(Language.FR)))
+                .thenReturn("fr translation");
         // EXECUTE
-        var res = wordServiceImpl.addWord(word);
+        var res = wordServiceImpl.addWord(word, true);
         // ASSERT
-        assertEquals(wordMapper.toBusinessObject(wordEntity), res);
+        assertEquals("きれいな火山", res.getValue());
+        assertEquals("きれいなかざん", res.getFuriganaValue());
+        assertEquals(List.of("en translation"), res.getTranslations().get(Language.EN));
+        assertEquals(List.of("fr translation"), res.getTranslations().get(Language.FR));
+    }
+
+    /**
+     * Can't add a word if it's value is already present in database
+     */
+    @Test
+    public void addWordKo() {
+        // PREPARE
+        var word = BusinessObjectGenerator.getWord();
+        when(wordRepository.findByValue(eq(word.getValue()))).thenReturn(EntityGenerator.getWordEntity());
+        // EXECUTE/ASSERT
+        assertThrows(InvalidInputException.class, () -> wordServiceImpl.addWord(word, true));
     }
 
     @Test
@@ -221,7 +234,7 @@ public class WordServiceTest {
                 .translations(Map.of(Language.FR, List.of("Volcan")))
                 .build();
         // EXECUTE
-        wordServiceImpl.addWord(word);
+        wordServiceImpl.addWord(word, false);
         // ASSERT
         verify(translationService, times(1)).translateValue(anyString(), any(Language.class));
     }

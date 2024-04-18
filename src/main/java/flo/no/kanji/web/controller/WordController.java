@@ -44,7 +44,8 @@ public class WordController {
      * @return Created word
      */
     @PostMapping
-    public Word addWord(@RequestBody Word word) {
-        return wordService.addWord(word);
+    public Word addWord(@RequestBody Word word,
+                        @RequestParam(defaultValue = "false", value = "preview") boolean preview) {
+        return wordService.addWord(word, preview);
     }
 }

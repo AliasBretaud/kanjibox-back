@@ -22,9 +22,10 @@ public interface KanjiService {
      *
      * @param kanji              Kanji business object
      * @param autodetectReadings Calling external API for auto readings/translations setting (optional)
+     * @param preview            Return the unsaved object
      * @return Created kanji
      */
-    Kanji addKanji(@Valid Kanji kanji, boolean autodetectReadings);
+    Kanji addKanji(@Valid Kanji kanji, boolean autodetectReadings, boolean preview);
 
     /**
      * Merges the existing kanji translations and fills the ones not provided
