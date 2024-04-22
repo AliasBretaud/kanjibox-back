@@ -7,12 +7,12 @@ COPY .mvn .mvn
 COPY mvnw pom.xml ./
 RUN ./mvnw dependency:resolve
 COPY src ./src
+COPY db ./db
 
 FROM base as development
 CMD ["./mvnw", "spring-boot:run", "-Dspring.profiles.active=dev", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'"]
 
 FROM base as test
-COPY db ./db
 CMD ["./mvnw", "spring-boot:run", "-Dspring.profiles.active=test", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'"]
 
 FROM base as build
