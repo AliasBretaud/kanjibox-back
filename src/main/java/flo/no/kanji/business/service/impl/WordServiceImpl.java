@@ -130,11 +130,11 @@ public class WordServiceImpl implements WordService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Word> getWords(String search, Language language, Pageable pageable) {
+    public Page<Word> getWords(String search, Language language, Integer listLimit, Pageable pageable) {
 
         return ObjectUtils.isEmpty(search)
                 ? wordRepository.findAllByOrderByTimeStampDesc(pageable)
-                .map(wordMapper::toBusinessObject)
+                .map(w -> wordMapper.toBusinessObject(w, listLimit))
                 : this.searchWord(search, pageable);
     }
 

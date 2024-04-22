@@ -26,6 +26,17 @@ public class WordMapper {
      * @return Transformed business word object
      */
     public Word toBusinessObject(WordEntity wordEntity) {
+        return toBusinessObject(wordEntity, null);
+    }
+
+    /**
+     * Transforms a Word entity to business object
+     *
+     * @param wordEntity Input entity
+     * @param listLimit  Max lists sizes
+     * @return Transformed business word object
+     */
+    public Word toBusinessObject(WordEntity wordEntity, Integer listLimit) {
         if (wordEntity == null) {
             return null;
         }
@@ -33,7 +44,10 @@ public class WordMapper {
                 .collect(Collectors.toList()) : null;
         var translations = wordEntity.getTranslations() != null ? wordEntity.getTranslations().stream()
                 .collect(Collectors.groupingBy(TranslationEntity::getLanguage,
-                        Collectors.mapping(TranslationEntity::getTranslation, Collectors.toList())
+                        Collectors.mapping(TranslationEntity::getTranslation, Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> listLimit != null ? list.stream().limit(listLimit).toList() : list
+                        ))
                 )) : null;
         return Word.builder()
                 .id(wordEntity.getId())

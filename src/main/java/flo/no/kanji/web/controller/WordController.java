@@ -26,15 +26,17 @@ public class WordController {
     /**
      * Search words by its japanese value
      *
-     * @param search   Word japansese writing value
-     * @param pageable Returned page parameters (limit, number of items per page...)
+     * @param search    Word japansese writing value
+     * @param listLimit Max size of the lists contained in the returned object
+     * @param pageable  Returned page parameters (limit, number of items per page...)
      * @return Spring page of retrieved corresponding words
      */
     @GetMapping
     public Page<Word> getWords(@RequestParam(required = false, value = "search") final String search,
                                @RequestParam(required = false, value = "lang") final Language lang,
+                               @RequestParam(required = false, value = "listLimit") final Integer listLimit,
                                @ParameterObject @PageableDefault final Pageable pageable) {
-        return wordService.getWords(search, lang, pageable);
+        return wordService.getWords(search, lang, listLimit, pageable);
     }
 
     /**

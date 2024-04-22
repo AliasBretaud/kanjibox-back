@@ -156,7 +156,6 @@
                     <argLine>
                         --illegal-access=permit
                     </argLine>
-                    <testFailureIgnore>true</testFailureIgnore>
                     <forkCount>2</forkCount>
                     <reuseForks>true</reuseForks>
                     <argLine>${surefireArgLine} -Dfile.encoding=UTF-8</argLine>

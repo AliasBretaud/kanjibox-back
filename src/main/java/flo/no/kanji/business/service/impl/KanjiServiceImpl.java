@@ -116,12 +116,12 @@ public class KanjiServiceImpl implements KanjiService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Kanji> getKanjis(String search, Language language, Pageable pageable) {
+    public Page<Kanji> getKanjis(String search, Language language, Integer listLimit, Pageable pageable) {
 
         return ObjectUtils.isEmpty(search)
                 ? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
-                .map(kanjiMapper::toBusinessObject)
-                : this.searchKanji(search, language, pageable);
+                .map(k -> kanjiMapper.toBusinessObject(k, listLimit))
+                : this.searchKanji(search, language, listLimit, pageable);
     }
 
     /**
@@ -161,11 +161,11 @@ public class KanjiServiceImpl implements KanjiService {
      * @param pageable Pagination parameter
      * @return The result of search
      */
-    private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
+    private Page<Kanji> searchKanji(String search, Language language, Integer listLimit, Pageable pageable) {
 
         var spec = KanjiSpecification.searchKanji(search, language, this.converter);
         // Execute query, mapping and return results
-        return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
+        return kanjiRepository.findAll(spec, pageable).map(k -> kanjiMapper.toBusinessObject(k, listLimit));
     }
 
     private List<String> findDictionaryTranslations(String kanjiValue, Language language) {

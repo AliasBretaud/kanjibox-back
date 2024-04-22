@@ -9,6 +9,7 @@ import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.impl.KanjiServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
+import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
@@ -32,6 +33,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -149,7 +151,7 @@ public class KanjiServiceTest {
                 .thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
         var pageable = Pageable.ofSize(1);
         // EXECUTE
-        var kanjis = kanjiServiceImpl.getKanjis(null, null, pageable).getContent();
+        var kanjis = kanjiServiceImpl.getKanjis(null, null, null, pageable).getContent();
         var kanji = kanjis.getFirst();
         // ASSERT
         assertEquals(1, kanjis.size());
@@ -164,7 +166,7 @@ public class KanjiServiceTest {
                 .thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
         var pageable = Pageable.ofSize(1);
         // EXECUTE
-        var kanjisSearch = kanjiServiceImpl.getKanjis("T", null, pageable).getContent();
+        var kanjisSearch = kanjiServiceImpl.getKanjis("T", null, null, pageable).getContent();
         // ASSERT
         assertEquals(1, kanjisSearch.size());
         var kanji = kanjisSearch.getFirst();
@@ -225,6 +227,56 @@ public class KanjiServiceTest {
         assertEquals(
                 Map.of(Language.FR, List.of("blanc test"),
                         Language.EN, List.of("white dict")), translations);
+    }
+
+    @Test
+    public void getKanjisListLimitTest1() {
+        // PREPARE
+        var kanjiEntity = KanjiEntity.builder()
+                .value("白")
+                .onYomi(List.of("On 1", "On 2", "On 3", "On 4", "On 5"))
+                .kunYomi(List.of("Kun 1", "Kun 2", "Kun 3", "Kun 4", "Kun 5"))
+                .translations(Stream.of("Tr 1", "Tr 2", "Tr 3", "Tr 4").map(t -> {
+                    var translation = new TranslationEntity();
+                    translation.setLanguage(Language.EN);
+                    translation.setTranslation(t);
+                    return translation;
+                }).toList())
+                .build();
+        when(kanjiRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(kanjiEntity)));
+        var pageable = Pageable.ofSize(1);
+        // EXECUTE
+        var kanjis = kanjiServiceImpl.getKanjis(null, null, 3, pageable).getContent();
+        var kanji = kanjis.getFirst();
+        // ASSERT
+        assertEquals(List.of("On 1", "On 2", "On 3"), kanji.getOnYomi());
+        assertEquals(List.of("Kun 1", "Kun 2", "Kun 3"), kanji.getKunYomi());
+        assertEquals(List.of("Tr 1", "Tr 2", "Tr 3"), kanji.getTranslations().get(Language.EN));
+    }
+
+    @Test
+    public void getKanjisListLimitTest2() {
+        // PREPARE
+        var kanjiEntity = KanjiEntity.builder()
+                .value("白")
+                .onYomi(List.of("On 1", "On 2", "On 3", "On 4", "On 5"))
+                .translations(Stream.of("Tr 1", "Tr 2").map(t -> {
+                    var translation = new TranslationEntity();
+                    translation.setLanguage(Language.EN);
+                    translation.setTranslation(t);
+                    return translation;
+                }).toList())
+                .build();
+        when(kanjiRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(kanjiEntity)));
+        var pageable = Pageable.ofSize(1);
+        // EXECUTE
+        var kanjis = kanjiServiceImpl.getKanjis(null, null, 3, pageable).getContent();
+        var kanji = kanjis.getFirst();
+        // ASSERT
+        assertEquals(List.of("On 1", "On 2", "On 3"), kanji.getOnYomi());
+        assertEquals(List.of("Tr 1", "Tr 2"), kanji.getTranslations().get(Language.EN));
     }
 
 }

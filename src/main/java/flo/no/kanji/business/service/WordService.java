@@ -16,12 +16,13 @@ public interface WordService {
     /**
      * Search words by its japanese value
      *
-     * @param search   Word japansese writing value
-     * @param language Translations language filter
-     * @param pageable Returned page parameters (limit, number of items per page...)
+     * @param search    Word japansese writing value
+     * @param language  Translations language filter
+     * @param listLimit Max size of the lists contained in the returned object
+     * @param pageable  Returned page parameters (limit, number of items per page...)
      * @return Spring page of retrieved corresponding words
      */
-    Page<Word> getWords(String search, Language language, Pageable pageable);
+    Page<Word> getWords(String search, Language language, Integer listLimit, Pageable pageable);
 
     /**
      * Saving new word
