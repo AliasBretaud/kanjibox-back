@@ -64,13 +64,13 @@ public class KanjiServiceImpl implements KanjiService {
      * {@inheritDoc}
      */
     @Override
-    public Kanji addKanji(@Valid Kanji kanji, boolean autoDetectReadings, boolean preview) {
+    public Kanji addKanji(@Valid Kanji kanji, boolean autoDetect, boolean preview) {
 
         // Check duplicate entry
         checkKanjiAlreadyPresent(kanji);
 
         // Handle auto-detect readings
-        if (autoDetectReadings) {
+        if (autoDetect) {
             autoFillKanjiReadigs(kanji);
         }
 
