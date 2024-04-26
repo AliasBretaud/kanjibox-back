@@ -128,6 +128,9 @@ public class WordServiceImpl implements WordService {
     private Word saveWord(final Word word, List<KanjiEntity> wordKanjis) {
         var user = userService.getCurrentUser();
         var entity = wordMapper.toEntity(word);
+        if (!ObjectUtils.isEmpty(wordKanjis)) {
+            wordKanjis.forEach(k -> k.setUser(user));
+        }
         entity.setKanjis(wordKanjis);
         entity.setUser(user);
         return wordMapper.toBusinessObject(wordRepository.save(entity));
