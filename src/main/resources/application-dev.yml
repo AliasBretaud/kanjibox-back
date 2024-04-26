@@ -1,0 +1,22 @@
+# ===============================
+#=LOCAL
+# ===============================
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/kanjidb
+    username: postgres
+    password: root
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+kanji:
+  translation:
+    auto:
+      enable: true
+okta:
+  oauth2:
+    audience: https://kanjibox/api
+    issuer: https://dev-62s0gk167wgszh7o.jp.auth0.com/

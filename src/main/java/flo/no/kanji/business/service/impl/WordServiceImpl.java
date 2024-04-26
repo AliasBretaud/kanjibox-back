@@ -9,11 +9,13 @@ import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.TranslationService;
+import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.business.service.WordService;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.integration.specification.WordSpecification;
+import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,9 @@ import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
 @Service
 @Validated
 public class WordServiceImpl implements WordService {
+
+    @Autowired
+    private UserService userService;
 
     /** Kanji operations business service */
     @Autowired
@@ -121,8 +126,10 @@ public class WordServiceImpl implements WordService {
     }
 
     private Word saveWord(final Word word, List<KanjiEntity> wordKanjis) {
+        var user = userService.getCurrentUser();
         var entity = wordMapper.toEntity(word);
         entity.setKanjis(wordKanjis);
+        entity.setUser(user);
         return wordMapper.toBusinessObject(wordRepository.save(entity));
     }
 
@@ -131,9 +138,9 @@ public class WordServiceImpl implements WordService {
      */
     @Override
     public Page<Word> getWords(String search, Language language, Integer listLimit, Pageable pageable) {
-
+        var sub = AuthUtils.getUserSub();
         return ObjectUtils.isEmpty(search)
-                ? wordRepository.findAllByOrderByTimeStampDesc(pageable)
+                ? wordRepository.findAllByUserSubOrderByTimeStampDesc(sub, pageable)
                 .map(w -> wordMapper.toBusinessObject(w, listLimit))
                 : this.searchWord(search, pageable);
     }
@@ -187,7 +194,8 @@ public class WordServiceImpl implements WordService {
     }
 
     private void checkWordAlreadyPresent(final Word word) {
-        Optional.ofNullable(wordRepository.findByValue(word.getValue())).ifPresent(k -> {
+        var sub = AuthUtils.getUserSub();
+        Optional.ofNullable(wordRepository.findByValueAndUserSub(word.getValue(), sub)).ifPresent(k -> {
             throw new InvalidInputException(
                     String.format("Word with value '%s' already exists in database", k.getValue()));
         });

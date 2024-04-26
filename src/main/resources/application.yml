@@ -1,0 +1,31 @@
+# Spring params
+spring:
+  datasource:
+    hikari:
+      data-source-properties:
+        useUnicode: true
+        characterEncoding: UTF-8
+    tomcat:
+      connection-properties: useUnicode=true;characterEncoding=utf-8;
+  profiles:
+    active: '@spring.profiles.active@'
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+server:
+  error:
+    include-stacktrace: never
+  servlet:
+    context-path: /kanjibox
+
+# Business params
+kanji:
+  translation:
+    auto:
+      enable: ${AUTO_TRANSLATION_ENABLED:#{false}}
+okta:
+  oauth2:
+    audience: ${OKTA_OAUTH2_AUDIENCE}
+    issuer: ${OKTA_OAUTH2_ISSUER}
+

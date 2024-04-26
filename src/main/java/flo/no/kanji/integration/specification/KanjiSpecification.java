@@ -6,6 +6,8 @@ import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.KanjiEntity_;
 import flo.no.kanji.integration.entity.TranslationEntity_;
+import flo.no.kanji.integration.entity.UserEntity_;
+import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.JoinType;
@@ -39,6 +41,9 @@ public class KanjiSpecification {
                                                          final MojiConverter converter) {
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
+            var userJoin = root.join(KanjiEntity_.user, JoinType.INNER);
+            var userPredicate = builder.equal(userJoin.get(UserEntity_.sub), AuthUtils.getUserSub());
+            predicates.add(userPredicate);
             var characterTypeSearch = CharacterUtils.getCharacterType(search);
             if (characterTypeSearch == null) {
                 throw new InvalidInputException("Invalid search value format");
