@@ -4,7 +4,7 @@
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO users (id, sub, last_connected) VALUES (1, 'sub', '2023-12-02 13:50:57');
+INSERT INTO users (id, sub, last_connected) VALUES (1, 'auth0|662dc5e995203229af749169', '2023-12-02 13:50:57');
 
 --
 -- TOC entry 3334 (class 0 OID 16556)
