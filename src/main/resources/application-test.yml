@@ -14,7 +14,3 @@ kanji:
   translation:
     auto:
       enable: false
-okta:
-  oauth2:
-    audience: https://kanjibox/api
-    issuer: https://dev-62s0gk167wgszh7o.jp.auth0.com/

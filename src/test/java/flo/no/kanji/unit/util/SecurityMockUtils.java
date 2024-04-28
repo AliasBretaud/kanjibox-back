@@ -14,7 +14,7 @@ public class SecurityMockUtils {
 
     public static void mockAuthentication() {
         var jwt = mock(Jwt.class);
-        lenient().when(jwt.getClaimAsString(eq("sub"))).thenReturn("sub");
+        lenient().when(jwt.getClaimAsString(eq("sub"))).thenReturn("auth0|662dc5e995203229af749169");
         var authentication = mock(Authentication.class);
         lenient().when(authentication.getPrincipal()).thenReturn(jwt);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);

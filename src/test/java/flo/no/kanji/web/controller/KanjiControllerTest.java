@@ -35,7 +35,7 @@ public class KanjiControllerTest {
     private MockMvc mockMvc;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor mockUser() {
-        return jwt().jwt(jwt -> jwt.claim("sub", "sub"));
+        return jwt().jwt(jwt -> jwt.claim("sub", "auth0|662dc5e995203229af749169"));
     }
 
     @Test
