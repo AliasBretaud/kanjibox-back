@@ -13,11 +13,13 @@ import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
+import flo.no.kanji.unit.util.SecurityMockUtils;
 import flo.no.kanji.util.PatchHelper;
 import io.github.aliasbretaud.mojibox.data.KanjiEntry;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
 import io.github.aliasbretaud.mojibox.enums.ReadingType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,6 +66,10 @@ public class KanjiServiceTest {
     @Spy
     private KanjiServiceImpl kanjiServiceImpl;
 
+    @BeforeEach
+    public void setUp() {
+        SecurityMockUtils.mockAuthentication();
+    }
 
     /**
      * Nominal scenario, add kanji with all values filled
@@ -147,7 +153,7 @@ public class KanjiServiceTest {
     @Test
     public void getKanjisTestOk1() {
         // PREPARE
-        when(kanjiRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
+        when(kanjiRepository.findAllByUserSubOrderByTimeStampDesc(anyString(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
         var pageable = Pageable.ofSize(1);
         // EXECUTE
@@ -243,7 +249,7 @@ public class KanjiServiceTest {
                     return translation;
                 }).toList())
                 .build();
-        when(kanjiRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
+        when(kanjiRepository.findAllByUserSubOrderByTimeStampDesc(anyString(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(kanjiEntity)));
         var pageable = Pageable.ofSize(1);
         // EXECUTE
@@ -268,7 +274,7 @@ public class KanjiServiceTest {
                     return translation;
                 }).toList())
                 .build();
-        when(kanjiRepository.findAllByOrderByTimeStampDesc(any(Pageable.class)))
+        when(kanjiRepository.findAllByUserSubOrderByTimeStampDesc(anyString(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(kanjiEntity)));
         var pageable = Pageable.ofSize(1);
         // EXECUTE

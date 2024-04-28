@@ -37,8 +37,9 @@ public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSp
      * Find all kanjis, ordered by creation/modification date
      *
      * @param pageable Spring pageable settings
+     * @param sub      User sub identifier
      * @return Kanjis page
      */
-    Page<KanjiEntity> findAllByOrderByTimeStampDesc(Pageable pageable);
+    Page<KanjiEntity> findAllByUserSubOrderByTimeStampDesc(String sub, Pageable pageable);
 
 }

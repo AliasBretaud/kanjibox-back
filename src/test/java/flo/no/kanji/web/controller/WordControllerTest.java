@@ -13,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -25,6 +27,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,9 +40,15 @@ public class WordControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @MockBean
+    JwtDecoder jwtDecoder;
+    @MockBean
     private TranslationService translationService;
     @Autowired
     private MockMvc mockMvc;
+
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor mockUser() {
+        return jwt().jwt(jwt -> jwt.claim("sub", "auth0|662dc5e995203229af749169"));
+    }
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -50,7 +59,7 @@ public class WordControllerTest {
 
     @Test
     public void testGetWordOk1() throws Exception {
-        mockMvc.perform(get("/words?search=大阪"))
+        mockMvc.perform(get("/words?search=大阪").with(mockUser()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].value", is("大阪")))
                 .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
@@ -60,7 +69,7 @@ public class WordControllerTest {
 
     @Test
     public void testGetWordOk2() throws Exception {
-        mockMvc.perform(get("/words?search=おおさか"))
+        mockMvc.perform(get("/words?search=おおさか").with(mockUser()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].value", is("大阪")))
                 .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
@@ -70,7 +79,7 @@ public class WordControllerTest {
 
     @Test
     public void testGetWordOk3() throws Exception {
-        mockMvc.perform(get("/words?search=osaka"))
+        mockMvc.perform(get("/words?search=osaka").with(mockUser()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].value", is("大阪")))
                 .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
@@ -80,7 +89,7 @@ public class WordControllerTest {
 
     @Test
     public void testGetWordOk4() throws Exception {
-        mockMvc.perform(get("/words?search=oosaka"))
+        mockMvc.perform(get("/words?search=oosaka").with(mockUser()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].value", is("大阪")))
                 .andExpect(jsonPath("$.content[0].furiganaValue", is("おおさか")))
@@ -90,7 +99,7 @@ public class WordControllerTest {
 
     @Test
     public void testGetWordKo() throws Exception {
-        mockMvc.perform(get("/words?search=*ryjy78598+('-"))
+        mockMvc.perform(get("/words?search=*ryjy78598+('-").with(mockUser()))
                 .andExpect(status().isBadRequest());
     }
 
@@ -104,6 +113,7 @@ public class WordControllerTest {
                 .build();
 
         mockMvc.perform(post("/words")
+                        .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(word)))
                 .andExpect(status().isOk())
@@ -123,6 +133,7 @@ public class WordControllerTest {
                 .build();
 
         mockMvc.perform(post("/words")
+                        .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(word)))
                 .andExpect(status().isOk())

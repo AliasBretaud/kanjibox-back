@@ -1,0 +1,21 @@
+# Using H2 Driver
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    continue-on-error: true
+  jpa:
+    generate-ddl: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: file:./db/insert_data.sql
+
+# Auto translation
+kanji:
+  translation:
+    auto:
+      enable: true

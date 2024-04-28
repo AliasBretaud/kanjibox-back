@@ -8,8 +8,10 @@ import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
+import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
+import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.PatchHelper;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
@@ -39,6 +41,9 @@ import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
 @Slf4j
 @Validated
 public class KanjiServiceImpl implements KanjiService {
+
+    @Autowired
+    UserService userService;
 
     /** Kanji JPA repository **/
     @Autowired
@@ -84,6 +89,8 @@ public class KanjiServiceImpl implements KanjiService {
 
     private Kanji saveKanji(final Kanji kanji) {
         var entity = kanjiMapper.toEntity(kanji);
+        var user = userService.getCurrentUser();
+        entity.setUser(user);
         return kanjiMapper.toBusinessObject(kanjiRepository.save(entity));
     }
 
@@ -117,9 +124,9 @@ public class KanjiServiceImpl implements KanjiService {
      */
     @Override
     public Page<Kanji> getKanjis(String search, Language language, Integer listLimit, Pageable pageable) {
-
+        var sub = AuthUtils.getUserSub();
         return ObjectUtils.isEmpty(search)
-                ? kanjiRepository.findAllByOrderByTimeStampDesc(pageable)
+                ? kanjiRepository.findAllByUserSubOrderByTimeStampDesc(sub, pageable)
                 .map(k -> kanjiMapper.toBusinessObject(k, listLimit))
                 : this.searchKanji(search, language, listLimit, pageable);
     }

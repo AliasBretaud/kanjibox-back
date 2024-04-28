@@ -22,13 +22,18 @@ import java.sql.Timestamp;
 @Slf4j
 public class ExceptionHelper {
 
+    public static ApiExceptionWrapper buildApiException(final HttpStatus status, final Exception ex) {
+        return new ApiExceptionWrapper(new Timestamp(System.currentTimeMillis()).toString(),
+                status.value(), ex.getClass().getName(), ex.getMessage());
+    }
+
     /**
      * Handling User inputs relating exception
      *
      * @param ex Generated exception during the process of entity creation/update
      * @return 400 BAD_REQUEST status with returned error
      */
-    @ExceptionHandler(value = {
+    @ExceptionHandler({
             InvalidInputException.class,
             ConstraintViolationException.class,
             HttpMessageNotReadableException.class,
@@ -46,7 +51,7 @@ public class ExceptionHelper {
      * @param ex Generated exception while retrieving object
      * @return 404 NOT_FOUND status with returned error
      */
-    @ExceptionHandler(value = ItemNotFoundException.class)
+    @ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<Object> handleItemNotFoundException(ItemNotFoundException ex) {
         var status = HttpStatus.NOT_FOUND;
         var apiException = buildApiException(status, ex);
@@ -59,24 +64,12 @@ public class ExceptionHelper {
      * @param ex Exception
      * @return 500 SERVICE_UNAVAILABLE status with returned error
      */
-    @ExceptionHandler(value = ExternalServiceError.class)
+    @ExceptionHandler(ExternalServiceError.class)
     public ResponseEntity<Object> handleExternalServiceException(Exception ex) {
         log.error("External service Exception: ", ex);
         var status = HttpStatus.SERVICE_UNAVAILABLE;
         var apiException = buildApiException(status, ex);
         return new ResponseEntity<>(apiException, status);
-    }
-
-    /**
-     * Builds Exception to return via the API
-     *
-     * @param status Error HTTP status
-     * @param ex     Returned exception
-     * @return Builded/converted API exception
-     */
-    private ApiExceptionWrapper buildApiException(final HttpStatus status, final Exception ex) {
-        return new ApiExceptionWrapper(new Timestamp(System.currentTimeMillis()).toString(),
-                status.value(), ex.getClass().getName(), ex.getMessage());
     }
 
 }

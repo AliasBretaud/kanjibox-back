@@ -54,6 +54,10 @@ public class WordEntity {
     @Column(name = "`value`")
     private String value;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
     /**
      * Default method called before each persist or update operation
      */

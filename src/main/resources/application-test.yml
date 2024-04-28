@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    continue-on-error: true
+  jpa:
+    generate-ddl: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: file:./db/insert_data.sql
+
+# Disable translation
+kanji:
+  translation:
+    auto:
+      enable: false
