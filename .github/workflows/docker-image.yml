@@ -36,6 +36,3 @@ jobs:
           push: true
           target: test
           tags: fbrtd/kanjibox-api:test
-          secrets: |
-            "OKTA_OAUTH2_AUDIENCE=${{ secrets.OKTA_OAUTH2_AUDIENCE }}"
-            "OKTA_OAUTH2_ISSUER=${{ secrets.OKTA_OAUTH2_ISSUER }}"
