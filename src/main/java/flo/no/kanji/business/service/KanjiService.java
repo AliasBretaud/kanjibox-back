@@ -69,4 +69,11 @@ public interface KanjiService {
      * @return Kanji entity returned from database
      */
     Kanji findById(Long kanjiId);
+
+    /**
+     * Delete a kanji
+     *
+     * @param kanjiId Kanji ID
+     */
+    void deleteKanji(Long kanjiId);
 }

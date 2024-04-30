@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * JPA repository for WORD table
  *
@@ -33,4 +35,5 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
      */
     WordEntity findByValueAndUserSub(String value, String sub);
 
+    List<WordEntity> findByKanjisId(Long kanjiId);
 }

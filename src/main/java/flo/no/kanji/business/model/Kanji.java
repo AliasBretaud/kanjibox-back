@@ -47,6 +47,8 @@ public class Kanji implements Serializable {
     @JapaneseCharacterFormat(format = CharacterType.KATAKANA)
     private List<@Size(max = 5) String> onYomi;
 
+    private List<String> usages;
+
     public Kanji(final String value) {
         this.value = value;
     }

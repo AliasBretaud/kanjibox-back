@@ -27,7 +27,7 @@ public class WordEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Transcripted hiragana value of the word **/
+    /** Transcript hiragana value of the word **/
     private String furiganaValue;
 
     /** Associated kanjis composing the word **/
@@ -64,7 +64,7 @@ public class WordEntity {
     @PrePersist
     @PreUpdate
     private void setUp() {
-        // Before each creation or upadte, setting current timestamp
+        // Before each creation or update, setting current timestamp
         this.timeStamp = LocalDateTime.now();
     }
 }

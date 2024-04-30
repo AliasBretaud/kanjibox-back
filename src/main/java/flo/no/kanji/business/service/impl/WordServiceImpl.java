@@ -3,6 +3,7 @@ package flo.no.kanji.business.service.impl;
 import com.moji4j.MojiDetector;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
+import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.WordMapper;
 import flo.no.kanji.business.model.Kanji;
@@ -123,6 +124,16 @@ public class WordServiceImpl implements WordService {
             return word;
         }
         return saveWord(word, wordKanjiEntities);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteWord(Long wordId) {
+        var word = wordRepository.findById(wordId)
+                .orElseThrow(() -> new ItemNotFoundException("Word with ID " + wordId + " not found"));
+        wordRepository.delete(word);
     }
 
     private Word saveWord(final Word word, List<KanjiEntity> wordKanjis) {

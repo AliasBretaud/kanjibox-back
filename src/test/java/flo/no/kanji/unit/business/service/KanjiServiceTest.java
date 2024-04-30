@@ -10,8 +10,10 @@ import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.impl.KanjiServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
+import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
+import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
 import flo.no.kanji.unit.util.SecurityMockUtils;
 import flo.no.kanji.util.PatchHelper;
@@ -52,6 +54,9 @@ public class KanjiServiceTest {
 
     @Mock
     private KanjiRepository kanjiRepository;
+
+    @Mock
+    private WordRepository wordRepository;
 
     @Mock
     private KanjiDictionary kanjiDictionary;
@@ -118,12 +123,21 @@ public class KanjiServiceTest {
     @Test
     public void findByIdTestOk() {
         // PREPARE
+        var kanjiMock = EntityGenerator.getKanjiEntity();
         when(kanjiRepository.findById(anyLong()))
-                .thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
+                .thenReturn(Optional.of(kanjiMock));
+        when(wordRepository.findByKanjisId(anyLong()))
+                .thenReturn(List.of(WordEntity.builder().value("漢字").build()));
         // EXECUTE
         var kanji = kanjiServiceImpl.findById(1L);
         // ASSERT
-        assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
+        assertEquals(kanjiMock.getValue(), kanji.getValue());
+        assertEquals(kanjiMock.getOnYomi(), kanji.getOnYomi());
+        assertEquals(kanjiMock.getKunYomi(), kanji.getKunYomi());
+        assertEquals(kanjiMock.getTranslations()
+                        .stream().map(TranslationEntity::getTranslation).toList(),
+                kanji.getTranslations().get(Language.EN));
+        assertEquals(List.of("漢字"), kanji.getUsages());
     }
 
     @Test

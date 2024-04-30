@@ -71,7 +71,7 @@ public class KanjiEntity {
     @PrePersist
     @PreUpdate
     private void setUp() {
-        // Before each creation or upadte, setting current timestamp
+        // Before each creation or update, setting current timestamp
         this.timeStamp = LocalDateTime.now();
     }
 }

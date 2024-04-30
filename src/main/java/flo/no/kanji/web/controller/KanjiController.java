@@ -79,4 +79,14 @@ public class KanjiController {
                              @RequestBody JsonNode patch) {
         return kanjiService.patchKanji(kanjiId, patch);
     }
+
+    /**
+     * Delete a kanji
+     *
+     * @param kanjiId Kanji ID
+     */
+    @DeleteMapping(path = "/{kanjiId}")
+    public void deleteKanji(@PathVariable("kanjiId") final Long kanjiId) {
+        kanjiService.deleteKanji(kanjiId);
+    }
 }

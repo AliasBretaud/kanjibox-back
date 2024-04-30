@@ -47,9 +47,10 @@ public class KanjiControllerTest {
 
     @Test
     public void testGetKanjiByIdOk() throws Exception {
-        mockMvc.perform(get("/kanjis/188").with(mockUser()))
+        mockMvc.perform(get("/kanjis/84").with(mockUser()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("value", is("口")));
+                .andExpect(jsonPath("$.value", is("学")))
+                .andExpect(jsonPath("$.usages[0]", is("大学")));
     }
 
     @Test
@@ -191,6 +192,27 @@ public class KanjiControllerTest {
                         .with(mockUser())
                         .contentType("application/json-patch+json")
                         .content(translationsPatch))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteKanjiOk() throws Exception {
+        mockMvc.perform(delete("/kanjis/14")
+                        .with(mockUser()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteWordKoUsages() throws Exception {
+        mockMvc.perform(delete("/kanjis/84")
+                        .with(mockUser()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void deleteWordKoNotFound() throws Exception {
+        mockMvc.perform(delete("/kanjis/1111")
+                        .with(mockUser()))
                 .andExpect(status().isNotFound());
     }
 }

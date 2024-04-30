@@ -28,8 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -142,5 +141,19 @@ public class WordControllerTest {
                 .andExpect(jsonPath("$.furiganaValue", is("しょっき")))
                 .andExpect(jsonPath("$.translations", hasEntry(is("en"), contains("auto translation"))))
                 .andExpect(jsonPath("$.translations", hasEntry(is("fr"), contains("auto translation"))));
+    }
+
+    @Test
+    public void deleteWordOk() throws Exception {
+        mockMvc.perform(delete("/words/80")
+                        .with(mockUser()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteWordKo() throws Exception {
+        mockMvc.perform(delete("/words/1111")
+                        .with(mockUser()))
+                .andExpect(status().isNotFound());
     }
 }

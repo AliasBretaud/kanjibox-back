@@ -32,4 +32,11 @@ public interface WordService {
      * @return Created word
      */
     Word addWord(@Valid Word word, boolean preview);
+
+    /**
+     * Delete word
+     *
+     * @param wordId Word ID
+     */
+    void deleteWord(Long wordId);
 }

@@ -50,4 +50,14 @@ public class WordController {
                         @RequestParam(defaultValue = "false", value = "preview") boolean preview) {
         return wordService.addWord(word, preview);
     }
+
+    /**
+     * Delete a word
+     *
+     * @param wordId Word ID
+     */
+    @DeleteMapping(path = "/{wordId}")
+    public void deleteWord(@PathVariable("wordId") final Long wordId) {
+        wordService.deleteWord(wordId);
+    }
 }
