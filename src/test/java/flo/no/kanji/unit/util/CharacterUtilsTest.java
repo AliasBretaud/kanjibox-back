@@ -3,57 +3,31 @@ package flo.no.kanji.unit.util;
 import flo.no.kanji.business.constants.CharacterType;
 import flo.no.kanji.util.CharacterUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
 public class CharacterUtilsTest {
 
     @Test
-    public void getCharacterTypeTest() {
-        var value = "あ";
-        assertEquals(CharacterType.HIRAGANA, CharacterUtils.getCharacterType(value));
+    public void getCharacterTypeTestOk() {
+        assertEquals(CharacterType.HIRAGANA, CharacterUtils.getCharacterType("あ"));
+        assertEquals(CharacterType.KATAKANA, CharacterUtils.getCharacterType("ア"));
+        assertEquals(CharacterType.KANJI, CharacterUtils.getCharacterType("亜"));
+        assertEquals(CharacterType.KANJI_WITH_OKURIGANA, CharacterUtils.getCharacterType("会う"));
+        assertEquals(CharacterType.ROMAJI, CharacterUtils.getCharacterType("abz"));
     }
 
     @Test
-    public void getCharacterTypeTest2() {
-        var value = "ア";
-        assertEquals(CharacterType.KATAKANA, CharacterUtils.getCharacterType(value));
+    public void getCharacterTypeTestKo() {
+        assertNull(CharacterUtils.getCharacterType(""));
+        assertNull(CharacterUtils.getCharacterType("+"));
     }
 
     @Test
-    public void getCharacterTypeTest3() {
-        var value = "亜";
-        assertEquals(CharacterType.KANJI, CharacterUtils.getCharacterType(value));
-    }
-
-    @Test
-    public void getCharacterTypeTest4() {
-        var value = "会う";
-        assertEquals(CharacterType.KANJI_WITH_OKURIGANA, CharacterUtils.getCharacterType(value));
-    }
-
-    @Test
-    public void getCharacterTypeTest5() {
-        var value = "abz";
-        assertEquals(CharacterType.ROMAJI, CharacterUtils.getCharacterType(value));
-        value = "ABZ";
-        assertEquals(CharacterType.ROMAJI, CharacterUtils.getCharacterType(value));
-    }
-
-    @Test
-    public void getCharacterTypeTest6() {
-        var value = "+";
-        assertNull(CharacterUtils.getCharacterType(value));
-    }
-
-    @Test
-    public void getCharacterTypeTest7() {
-        var value = "";
-        assertNull(CharacterUtils.getCharacterType(value));
-    }
-
-    @Test
-    public void isOkuriganaTestKo() {
+    public void isOkuriganaTest() {
         var value = "あう";
         assertFalse(CharacterUtils.isKanjiWithOkurigana(value));
         value = "アウト";
@@ -68,14 +42,17 @@ public class CharacterUtilsTest {
 
     @Test
     public void isRomajiTestKo() {
-        var value = "aあ";
-        assertFalse(CharacterUtils.isRomaji(value));
+        assertTrue(CharacterUtils.isRomaji("abcd"));
+        assertFalse(CharacterUtils.isRomaji("aあ"));
     }
 
     @Test
     public void convertToFuriganaTest() {
-        var value = "言葉";
-        assertEquals("ことば", CharacterUtils.getWordFurigana(value));
+        assertEquals("ことば", CharacterUtils.getWordFurigana("言葉"));
+        assertEquals("まるのうち", CharacterUtils.getWordFurigana("丸の内"));
+        assertEquals("さまざま", CharacterUtils.getWordFurigana("様々"));
+        assertNull(CharacterUtils.getWordFurigana("油淋鶏"));
+        assertNull(CharacterUtils.getWordFurigana("ad*df"));
     }
 }
 

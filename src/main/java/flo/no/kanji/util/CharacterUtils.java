@@ -132,7 +132,8 @@ public final class CharacterUtils {
         var katakanaValue = tokens.stream()
                 .map(Token::getReading)
                 .collect(Collectors.joining());
-        return convertKanaToFurigana(katakanaValue);
+        var furigana = convertKanaToFurigana(katakanaValue);
+        return isHiragana(furigana) ? furigana : null;
     }
 
     /**
