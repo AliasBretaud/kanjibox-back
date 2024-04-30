@@ -35,5 +35,5 @@ public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpec
      */
     WordEntity findByValueAndUserSub(String value, String sub);
 
-    List<WordEntity> findByKanjisId(Long kanjiId);
+    List<WordEntity> findByKanjisIdAndUserSub(Long kanjiId, String sub);
 }

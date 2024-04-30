@@ -164,7 +164,8 @@ public class KanjiServiceImpl implements KanjiService {
     public Kanji findById(Long kanjiId) {
         var kanji = kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
-        var usages = wordRepository.findByKanjisId(kanji.getId())
+        var usages = wordRepository
+                .findByKanjisIdAndUserSub(kanji.getId(), AuthUtils.getUserSub())
                 .stream().map(WordEntity::getValue).toList();
         kanji.setUsages(usages);
         return kanji;
@@ -174,7 +175,7 @@ public class KanjiServiceImpl implements KanjiService {
     public void deleteKanji(Long kanjiId) {
         var kanji = kanjiRepository.findById(kanjiId)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found"));
-        var usages = wordRepository.findByKanjisId(kanji.getId());
+        var usages = wordRepository.findByKanjisIdAndUserSub(kanji.getId(), AuthUtils.getUserSub());
         if (!usages.isEmpty()) {
             throw new InvalidInputException("Kanji used in words: "
                     + usages.stream().map(WordEntity::getValue).collect(Collectors.joining(",")));

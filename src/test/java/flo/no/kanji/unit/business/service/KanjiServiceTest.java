@@ -126,7 +126,7 @@ public class KanjiServiceTest {
         var kanjiMock = EntityGenerator.getKanjiEntity();
         when(kanjiRepository.findById(anyLong()))
                 .thenReturn(Optional.of(kanjiMock));
-        when(wordRepository.findByKanjisId(anyLong()))
+        when(wordRepository.findByKanjisIdAndUserSub(anyLong(), anyString()))
                 .thenReturn(List.of(WordEntity.builder().value("漢字").build()));
         // EXECUTE
         var kanji = kanjiServiceImpl.findById(1L);
