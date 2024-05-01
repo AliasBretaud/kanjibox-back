@@ -7,9 +7,11 @@ import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.exception.ItemNotFoundException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.business.service.impl.KanjiServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
+import flo.no.kanji.integration.entity.UserEntity;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
@@ -66,6 +68,9 @@ public class KanjiServiceTest {
 
     @Spy
     private MojiConverter mojiConverter;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     @Spy
@@ -199,6 +204,7 @@ public class KanjiServiceTest {
         var patchRequest = mock(JsonNode.class);
         when(patchHelper.mergePatch(any(Kanji.class), any(JsonNode.class), eq(Kanji.class)))
                 .thenReturn(BusinessObjectGenerator.getKanji());
+        when(userService.getCurrentUser()).thenReturn(new UserEntity("sub"));
         when(kanjiRepository.save(any(KanjiEntity.class))).thenReturn(EntityGenerator.getKanjiEntity());
         // EXECUTE
         var kanji = kanjiServiceImpl.patchKanji(1L, patchRequest);

@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -147,7 +146,7 @@ public class KanjiServiceImpl implements KanjiService {
         }
 
         var patchedKanjiEntity = kanjiMapper.toEntity(patchedKanji);
-        patchedKanjiEntity.setTimeStamp(LocalDateTime.now());
+        patchedKanjiEntity.setUser(userService.getCurrentUser());
         patchedKanjiEntity = kanjiRepository.save(patchedKanjiEntity);
 
         return kanjiMapper.toBusinessObject(patchedKanjiEntity);

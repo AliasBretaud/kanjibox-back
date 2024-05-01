@@ -55,7 +55,7 @@ public class WordEntity {
     private String value;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     /**

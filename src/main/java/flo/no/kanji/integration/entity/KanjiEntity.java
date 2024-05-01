@@ -62,7 +62,7 @@ public class KanjiEntity {
     private String value;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     /** Associated words **/
