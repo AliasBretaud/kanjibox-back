@@ -31,7 +31,7 @@ public class WordEntity {
     private String furiganaValue;
 
     /** Associated kanjis composing the word **/
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "word_kanji", joinColumns = {@JoinColumn(name = "word_id")}, inverseJoinColumns = {
             @JoinColumn(name = "kanji_id")})
     private List<KanjiEntity> kanjis;
@@ -44,7 +44,7 @@ public class WordEntity {
     /**
      * Word translations
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "word_translation", joinColumns = @JoinColumn(name = "word_id"))
     private List<TranslationEntity> translations;
 

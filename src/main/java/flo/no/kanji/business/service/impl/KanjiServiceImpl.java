@@ -11,7 +11,6 @@ import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
-import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.PatchHelper;
@@ -50,9 +49,6 @@ public class KanjiServiceImpl implements KanjiService {
     /** Kanji JPA repository **/
     @Autowired
     private KanjiRepository kanjiRepository;
-
-    @Autowired
-    private WordRepository wordRepository;
 
     /** Kanji business/entity object mapper */
     @Autowired
@@ -162,23 +158,17 @@ public class KanjiServiceImpl implements KanjiService {
      */
     @Override
     public Kanji findById(Long kanjiId) {
-        var kanji = kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
+        return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
-        var usages = wordRepository
-                .findByKanjisIdAndUserSub(kanji.getId(), AuthUtils.getUserSub())
-                .stream().map(WordEntity::getValue).toList();
-        kanji.setUsages(usages);
-        return kanji;
     }
 
     @Override
     public void deleteKanji(Long kanjiId) {
         var kanji = kanjiRepository.findById(kanjiId)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found"));
-        var usages = wordRepository.findByKanjisIdAndUserSub(kanji.getId(), AuthUtils.getUserSub());
-        if (!usages.isEmpty()) {
+        if (!kanji.getWords().isEmpty()) {
             throw new InvalidInputException("Kanji used in words: "
-                    + usages.stream().map(WordEntity::getValue).collect(Collectors.joining(",")));
+                    + kanji.getWords().stream().map(WordEntity::getValue).collect(Collectors.joining(",")));
         }
         kanjiRepository.delete(kanji);
     }

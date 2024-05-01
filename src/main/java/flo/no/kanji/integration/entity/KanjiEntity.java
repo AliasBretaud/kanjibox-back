@@ -65,6 +65,10 @@ public class KanjiEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    /** Associated words **/
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "kanjis")
+    private List<WordEntity> words;
+
     /**
      * Default method called before each persist or update operation
      */

@@ -3,6 +3,7 @@ package flo.no.kanji.business.mapper;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
+import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.util.ListUtils;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,8 @@ public class KanjiMapper {
                                         )
                                 )
                         )) : null;
+        var usages = kanjiEntity.getWords() != null ? kanjiEntity.getWords()
+                .stream().map(WordEntity::getValue).toList() : null;
 
         return Kanji.builder()
                 .id(kanjiEntity.getId())
@@ -58,6 +61,7 @@ public class KanjiMapper {
                 .onYomi(listLimit != null ? ListUtils.truncateList(onYomi, listLimit) : onYomi)
                 .kunYomi(listLimit != null ? ListUtils.truncateList(kunYomi, listLimit) : kunYomi)
                 .translations(translations)
+                .usages(usages)
                 .build();
     }
 
