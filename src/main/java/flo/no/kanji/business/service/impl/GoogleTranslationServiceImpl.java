@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.web.util.HtmlUtils.htmlUnescape;
+
 /**
  * Translation service implementation based on Google
  *
@@ -26,7 +28,8 @@ public class GoogleTranslationServiceImpl implements TranslationService {
         try {
             var translation = googleTranslate.translate(value, TranslateOption.sourceLanguage("ja"),
                     TranslateOption.targetLanguage(target.getValue()));
-            return translation.getTranslatedText();
+            var res = translation.getTranslatedText();
+            return res != null ? htmlUnescape(res) : null;
         } catch (Exception ex) {
             log.error("Error occurred while retrieving information from Google", ex);
         }
