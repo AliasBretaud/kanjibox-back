@@ -4,7 +4,6 @@ import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.entity.WordEntity;
-import flo.no.kanji.util.ListUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -17,8 +16,6 @@ import java.util.stream.Collectors;
 @Service
 public class KanjiMapper {
 
-    private final int LISTS_MAX_SIZE = 3;
-
     /**
      * Transforms a Kanji entity to business object
      *
@@ -29,18 +26,13 @@ public class KanjiMapper {
         if (kanjiEntity == null) {
             return null;
         }
-        var onYomi = ListUtils.truncateList(kanjiEntity.getOnYomi(), LISTS_MAX_SIZE);
-        var kunYomi = ListUtils.truncateList(kanjiEntity.getKunYomi(), LISTS_MAX_SIZE);
+        var onYomi = kanjiEntity.getOnYomi();
+        var kunYomi = kanjiEntity.getKunYomi();
         var translations = kanjiEntity.getTranslations() != null ?
                 kanjiEntity.getTranslations().stream()
                         .collect(Collectors.groupingBy(TranslationEntity::getLanguage,
                                 Collectors.mapping(TranslationEntity::getTranslation,
-                                        Collectors.collectingAndThen(
-                                                Collectors.toList(),
-                                                list -> list.stream()
-                                                        .limit(LISTS_MAX_SIZE)
-                                                        .toList()
-                                        )
+                                        Collectors.toList()
                                 )
                         )) : null;
         var usages = kanjiEntity.getWords() != null ? kanjiEntity.getWords()

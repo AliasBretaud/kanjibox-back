@@ -13,6 +13,7 @@ import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
 import flo.no.kanji.util.AuthUtils;
+import flo.no.kanji.util.ListUtils;
 import flo.no.kanji.util.PatchHelper;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
@@ -41,6 +42,8 @@ import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
 @Slf4j
 @Validated
 public class KanjiServiceImpl implements KanjiService {
+
+    private final int LISTS_MAX_SIZE = 3;
 
     @Autowired
     UserService userService;
@@ -114,8 +117,10 @@ public class KanjiServiceImpl implements KanjiService {
     public void autoFillKanjiReadigs(Kanji kanji) {
         Optional.ofNullable(kanjiDictionary.searchKanji(kanji.getValue()))
                 .ifPresent(kanjiVo -> {
-                    kanji.setKunYomi(kanjiVo.getReading(ReadingType.JA_KUN));
-                    kanji.setOnYomi(kanjiVo.getReading(ReadingType.JA_ON));
+                    kanji.setKunYomi(
+                            ListUtils.truncateList(kanjiVo.getReading(ReadingType.JA_KUN), LISTS_MAX_SIZE));
+                    kanji.setOnYomi(
+                            ListUtils.truncateList(kanjiVo.getReading(ReadingType.JA_ON), LISTS_MAX_SIZE));
                 });
     }
 
@@ -192,7 +197,7 @@ public class KanjiServiceImpl implements KanjiService {
                 .map(e -> Arrays.stream(MeaningLanguage.values())
                         .filter(ml -> ml.name().equalsIgnoreCase(language.getValue()))
                         .findFirst()
-                        .map(e::getMeaning)
+                        .map(l -> ListUtils.truncateList(e.getMeaning(l), LISTS_MAX_SIZE))
                         .orElse(Collections.emptyList()))
                 .orElse(Collections.emptyList());
     }
