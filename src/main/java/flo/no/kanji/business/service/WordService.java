@@ -1,5 +1,6 @@
 package flo.no.kanji.business.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Word;
 import jakarta.validation.Valid;
@@ -39,4 +40,13 @@ public interface WordService {
      * @param wordId Word ID
      */
     void deleteWord(Long wordId);
+
+    /**
+     * Modify an existing word attributes
+     *
+     * @param wordId Technical ID of the word present in database
+     * @param patch  Data which have to be modified
+     * @return Updated Word
+     */
+    Word patchWord(Long wordId, JsonNode patch);
 }

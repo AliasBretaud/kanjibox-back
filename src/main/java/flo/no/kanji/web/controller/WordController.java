@@ -1,5 +1,6 @@
 package flo.no.kanji.web.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.WordService;
@@ -49,6 +50,19 @@ public class WordController {
     public Word addWord(@RequestBody Word word,
                         @RequestParam(defaultValue = "false", value = "preview") boolean preview) {
         return wordService.addWord(word, preview);
+    }
+
+    /**
+     * Modify an existing word attributes
+     *
+     * @param wordId Technical ID of the word present in database
+     * @param patch  Data which have to be modified
+     * @return Updated Word
+     */
+    @PatchMapping(path = "/{wordId}")
+    public Word updateWord(@PathVariable Long wordId,
+                           @RequestBody JsonNode patch) {
+        return wordService.patchWord(wordId, patch);
     }
 
     /**

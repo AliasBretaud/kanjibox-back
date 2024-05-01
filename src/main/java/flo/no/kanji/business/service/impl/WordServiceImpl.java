@@ -1,5 +1,6 @@
 package flo.no.kanji.business.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.moji4j.MojiDetector;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
@@ -18,6 +19,7 @@ import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.integration.specification.WordSpecification;
 import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
+import flo.no.kanji.util.PatchHelper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,6 +80,10 @@ public class WordServiceImpl implements WordService {
     @Autowired
     private TranslationService translationService;
 
+    /** Word updating fields class helper */
+    @Autowired
+    private PatchHelper patchHelper;
+
     /**
      * {@inheritDoc}
      */
@@ -134,6 +140,26 @@ public class WordServiceImpl implements WordService {
         var word = wordRepository.findById(wordId)
                 .orElseThrow(() -> new ItemNotFoundException("Word with ID " + wordId + " not found"));
         wordRepository.delete(word);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Word patchWord(Long wordId, JsonNode patch) {
+        var initialWord = this.findById(wordId);
+        var patchedWord = patchHelper.mergePatch(initialWord, patch, Word.class);
+
+        // Prevent ID update
+        if (!Objects.equals(patchedWord.getId(), wordId)) {
+            throw new InvalidInputException("ID update is forbidden");
+        }
+
+        var patchedWordEntity = wordMapper.toEntity(patchedWord);
+        patchedWordEntity.setUser(userService.getCurrentUser());
+        patchedWordEntity = wordRepository.save(patchedWordEntity);
+
+        return wordMapper.toBusinessObject(patchedWordEntity);
     }
 
     private Word saveWord(final Word word, List<KanjiEntity> wordKanjis) {
@@ -239,4 +265,9 @@ public class WordServiceImpl implements WordService {
         return wordRepository.findAll(spec, pageable).map(wordMapper::toBusinessObject);
     }
 
+    private Word findById(final Long wordId) {
+        var wordEntity = wordRepository.findById(wordId)
+                .orElseThrow(() -> new ItemNotFoundException("Word with ID " + wordId + " not found"));
+        return wordMapper.toBusinessObject(wordEntity);
+    }
 }

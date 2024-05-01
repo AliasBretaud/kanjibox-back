@@ -176,7 +176,7 @@ public class KanjiControllerTest {
     }
 
     @Test
-    public void testPatchKanjiKo() throws Exception {
+    public void testPatchKanjiKoIdUpdate() throws Exception {
         var translationsPatch = "{\"id\": 85, \"\"translations\": [\"test patch\"]}";
         mockMvc.perform(patch("/kanjis/84")
                         .with(mockUser())
@@ -186,7 +186,7 @@ public class KanjiControllerTest {
     }
 
     @Test
-    public void testPatchKanjiKo2() throws Exception {
+    public void testPatchKanjiKoNotFound() throws Exception {
         var translationsPatch = "{\"translations\": [\"test patch\"]}";
         mockMvc.perform(patch("/kanjis/-1")
                         .with(mockUser())

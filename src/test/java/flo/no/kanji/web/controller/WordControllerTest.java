@@ -156,4 +156,38 @@ public class WordControllerTest {
                         .with(mockUser()))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void testPatchWordOk() throws Exception {
+        var translationsPatch = "{\"translations\": {\"en\": [\"test patch\"]}}";
+        mockMvc.perform(patch("/words/119")
+                        .with(mockUser())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(translationsPatch))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(119)))
+                .andExpect(jsonPath("$.value", is("掃除")))
+                .andExpect(jsonPath("$.furiganaValue", is("そうじ")))
+                .andExpect(jsonPath("$.translations.en[0]", is("test patch")));
+    }
+
+    @Test
+    public void testPatchWordKoIdUpdate() throws Exception {
+        var translationsPatch = "{\"id\": 55, \"\"translations\": [\"test patch\"]}";
+        mockMvc.perform(patch("/words/119")
+                        .with(mockUser())
+                        .contentType("application/json-patch+json")
+                        .content(translationsPatch))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchWordKoNotFound() throws Exception {
+        var translationsPatch = "{\"translations\": [\"test patch\"]}";
+        mockMvc.perform(patch("/words/-1")
+                        .with(mockUser())
+                        .contentType("application/json-patch+json")
+                        .content(translationsPatch))
+                .andExpect(status().isNotFound());
+    }
 }

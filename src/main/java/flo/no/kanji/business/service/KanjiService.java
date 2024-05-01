@@ -56,7 +56,7 @@ public interface KanjiService {
     /**
      * Modify an existing kanji attributes
      *
-     * @param kanjiId Technical ID of the kanji persent in database
+     * @param kanjiId Technical ID of the kanji present in database
      * @param patch   Data which have to be modified
      * @return Updated Kanji
      */
