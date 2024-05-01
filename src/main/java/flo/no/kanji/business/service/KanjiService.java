@@ -45,13 +45,12 @@ public interface KanjiService {
     /**
      * Search kanjis
      *
-     * @param search    Japanese kanji value
-     * @param language  Filter for translations language
-     * @param listLimit Max size of the lists contained in the returned object
-     * @param pageable  Returned page parameters (limit, number of items per page...)
+     * @param search   Japanese kanji value
+     * @param language Filter for translations language
+     * @param pageable Returned page parameters (limit, number of items per page...)
      * @return Spring page of retrieved corresponding kanjis
      */
-    Page<Kanji> getKanjis(String search, Language language, Integer listLimit, Pageable pageable);
+    Page<Kanji> getKanjis(String search, Language language, Pageable pageable);
 
     /**
      * Modify an existing kanji attributes

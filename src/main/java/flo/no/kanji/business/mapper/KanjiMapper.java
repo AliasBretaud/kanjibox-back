@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @Service
 public class KanjiMapper {
 
+    private final int LISTS_MAX_SIZE = 3;
+
     /**
      * Transforms a Kanji entity to business object
      *
@@ -24,31 +26,20 @@ public class KanjiMapper {
      * @return Transformed business kanji object
      */
     public Kanji toBusinessObject(KanjiEntity kanjiEntity) {
-        return toBusinessObject(kanjiEntity, null);
-    }
-
-    /**
-     * Transforms a Kanji entity to business object
-     *
-     * @param kanjiEntity Input entity
-     * @param listLimit   Max size of lists contained in the object to convert
-     * @return Transformed business kanji object
-     */
-    public Kanji toBusinessObject(KanjiEntity kanjiEntity, Integer listLimit) {
         if (kanjiEntity == null) {
             return null;
         }
-        var onYomi = kanjiEntity.getOnYomi();
-        var kunYomi = kanjiEntity.getKunYomi();
+        var onYomi = ListUtils.truncateList(kanjiEntity.getOnYomi(), LISTS_MAX_SIZE);
+        var kunYomi = ListUtils.truncateList(kanjiEntity.getKunYomi(), LISTS_MAX_SIZE);
         var translations = kanjiEntity.getTranslations() != null ?
                 kanjiEntity.getTranslations().stream()
                         .collect(Collectors.groupingBy(TranslationEntity::getLanguage,
                                 Collectors.mapping(TranslationEntity::getTranslation,
                                         Collectors.collectingAndThen(
                                                 Collectors.toList(),
-                                                list -> listLimit != null ? list.stream()
-                                                        .limit(listLimit)
-                                                        .toList() : list
+                                                list -> list.stream()
+                                                        .limit(LISTS_MAX_SIZE)
+                                                        .toList()
                                         )
                                 )
                         )) : null;
@@ -58,8 +49,8 @@ public class KanjiMapper {
         return Kanji.builder()
                 .id(kanjiEntity.getId())
                 .value(kanjiEntity.getValue())
-                .onYomi(listLimit != null ? ListUtils.truncateList(onYomi, listLimit) : onYomi)
-                .kunYomi(listLimit != null ? ListUtils.truncateList(kunYomi, listLimit) : kunYomi)
+                .onYomi(onYomi)
+                .kunYomi(kunYomi)
                 .translations(translations)
                 .usages(usages)
                 .build();
