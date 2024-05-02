@@ -118,7 +118,7 @@ public class KanjiServiceTest {
     @Test
     public void addKanjiTestKo() {
         // PREPARE
-        when(kanjiRepository.findByValue(anyString())).thenReturn(EntityGenerator.getKanjiEntity());
+        when(kanjiRepository.findByValueAndUserSub(anyString(), anyString())).thenReturn(EntityGenerator.getKanjiEntity());
         var kanji = BusinessObjectGenerator.getKanji();
         // ASSERT
         assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.addKanji(kanji, false, true));

@@ -21,17 +21,19 @@ public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSp
      * Find a kanji by its japanese writing value
      *
      * @param kanjiValue japanese writing value
+     * @param sub        User sub identifier
      * @return Found kanji
      */
-    KanjiEntity findByValue(String kanjiValue);
+    KanjiEntity findByValueAndUserSub(String kanjiValue, String sub);
 
     /**
      * Find a list of kanji by japanese writing values
      *
      * @param kanjiValues japanese writing values
+     * @param sub         User sub identifier
      * @return Found kanjis
      */
-    List<KanjiEntity> findByValueIn(List<String> kanjiValues);
+    List<KanjiEntity> findByValueInAndUserSub(List<String> kanjiValues, String sub);
 
     /**
      * Find all kanjis, ordered by creation/modification date

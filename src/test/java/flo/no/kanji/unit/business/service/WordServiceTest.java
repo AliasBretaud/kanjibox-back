@@ -89,7 +89,7 @@ public class WordServiceTest {
                 .thenReturn("fr translation");
         var kan1 = KanjiEntity.builder().value("火").build();
         var kan2 = KanjiEntity.builder().value("山").build();
-        when(kanjiRepository.findByValueIn(anyList())).thenReturn(List.of(kan1, kan2));
+        when(kanjiRepository.findByValueInAndUserSub(anyList(), anyString())).thenReturn(List.of(kan1, kan2));
         var word = Word.builder().value("きれいな火山")
                 .translations(Map.of(Language.EN, List.of("beautiful volcano")))
                 .build();
@@ -237,7 +237,7 @@ public class WordServiceTest {
         when(userService.getCurrentUser()).thenReturn(new UserEntity("sub"));
         when(translationService.translateValue(anyString(), any(Language.class)))
                 .thenReturn("Translated value");
-        when(kanjiRepository.findByValueIn(anyList())).thenReturn(List.of(EntityGenerator.getKanjiEntity()));
+        when(kanjiRepository.findByValueInAndUserSub(anyList(), anyString())).thenReturn(List.of(EntityGenerator.getKanjiEntity()));
         when(wordRepository.save(any(WordEntity.class))).thenReturn(EntityGenerator.getWordEntity());
         var word = Word.builder()
                 .value("火山")

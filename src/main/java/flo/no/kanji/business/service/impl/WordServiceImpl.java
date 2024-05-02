@@ -207,10 +207,10 @@ public class WordServiceImpl implements WordService {
 
     private List<KanjiEntity> getExistingKanjisFromWord(Word word) {
         return Collections.synchronizedList(
-                new ArrayList<>(kanjiRepository.findByValueIn(word.getKanjis()
+                new ArrayList<>(kanjiRepository.findByValueInAndUserSub(word.getKanjis()
                         .stream()
                         .map(Kanji::getValue)
-                        .toList())));
+                        .toList(), AuthUtils.getUserSub())));
     }
 
     private Map<Language, CompletableFuture<List<String>>> buildTranslationFutures(Word word) {
