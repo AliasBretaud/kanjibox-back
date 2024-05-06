@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:22_36-jdk-alpine as base
+FROM --platform=$BUILDPLATFORM  eclipse-temurin:22_36-jdk-alpine as base
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 WORKDIR /app
 RUN apk --no-cache add curl
 COPY .mvn .mvn
