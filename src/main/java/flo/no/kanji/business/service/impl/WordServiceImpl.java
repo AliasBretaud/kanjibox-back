@@ -155,11 +155,8 @@ public class WordServiceImpl implements WordService {
             throw new InvalidInputException("ID update is forbidden");
         }
 
-        var patchedWordEntity = wordMapper.toEntity(patchedWord);
-        patchedWordEntity.setUser(userService.getCurrentUser());
-        patchedWordEntity = wordRepository.save(patchedWordEntity);
-
-        return wordMapper.toBusinessObject(patchedWordEntity);
+        return saveWord(patchedWord, initialWord.getKanjis()
+                .stream().map(kanjiMapper::toEntity).toList());
     }
 
     private Word saveWord(final Word word, List<KanjiEntity> wordKanjis) {
