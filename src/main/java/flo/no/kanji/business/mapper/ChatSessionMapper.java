@@ -1,0 +1,53 @@
+package flo.no.kanji.business.mapper;
+
+
+import flo.no.kanji.business.model.conversation.ChatSession;
+import flo.no.kanji.business.service.UserService;
+import flo.no.kanji.integration.entity.conversation.ChatSessionEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ * Chat session object bidirectional mapper between Model objects and Entities
+ *
+ * @author Florian
+ */
+@Component
+public class ChatSessionMapper {
+
+    @Autowired
+    private UserService userService;
+
+    /**
+     * Transforms a Chat session entity to business object
+     *
+     * @param sessionEntity ChatSessionEntity Input entity
+     * @return Transformed business chat session object
+     */
+    public ChatSession toBusinessObject(ChatSessionEntity sessionEntity) {
+        if (sessionEntity == null) {
+            return null;
+        }
+        return ChatSession.builder()
+                .id(sessionEntity.getId())
+                .agent(sessionEntity.getAgent())
+                .lastUpdate(sessionEntity.getLastAccess())
+                .build();
+    }
+
+    /**
+     * Transforms a ChatSession business object to entity (before performing save in database)
+     *
+     * @param chatSession session Chat session business object
+     * @return ChatSessionEntity converted object
+     */
+    public ChatSessionEntity toEntity(ChatSession chatSession) {
+        if (chatSession == null) {
+            return null;
+        }
+        return ChatSessionEntity.builder()
+                .agent(chatSession.getAgent())
+                .user(userService.getCurrentUser())
+                .build();
+    }
+}

@@ -20,3 +20,10 @@ okta:
   oauth2:
     audience: https://kanjibox/api
     issuer: https://dev-62s0gk167wgszh7o.jp.auth0.com/
+
+gcloud:
+  auth:
+    clientId: 764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com
+    clientSecret: d-FL95Q19q7MQmFpd7hHD0Ty
+    refreshToken: 1//0ekcACXXAQNRTCgYIARAAGA4SNwF-L9IraNH5TjckhD3KIMffb6apPqurhulCDN-YCM5NYtQDTm9VhlpJbwgmhDx-77PZ3X1K39U
+    quotaProjectId: kanjibox-back

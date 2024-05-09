@@ -29,3 +29,9 @@ okta:
     audience: ${OKTA_OAUTH2_AUDIENCE}
     issuer: ${OKTA_OAUTH2_ISSUER}
 
+gcloud:
+  auth:
+    clientId: ${GCLOUD_AUTH_CLIENT_ID}
+    clientSecret: ${GCLOUD_AUTH_CLIENT_SECRET}
+    refreshToken: ${GCLOUD_AUTH_REFRESH_TOKEN}
+    quotaProjectId: ${GCLOUD_AUTH_QUOTA_PROJECT_ID}

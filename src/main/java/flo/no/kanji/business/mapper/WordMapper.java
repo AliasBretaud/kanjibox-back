@@ -4,7 +4,7 @@ import flo.no.kanji.business.model.Word;
 import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.entity.WordEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  *
  * @author Florian
  */
-@Service
+@Component
 public class WordMapper {
 
     @Autowired
