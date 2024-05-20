@@ -1,6 +1,7 @@
 package flo.no.kanji.business.mapper;
 
 
+import flo.no.kanji.business.model.conversation.ChatCommand;
 import flo.no.kanji.business.model.conversation.ChatMessage;
 import flo.no.kanji.business.model.conversation.ChatMessageMistake;
 import flo.no.kanji.integration.entity.conversation.ChatMessageEntity;
@@ -39,6 +40,7 @@ public class ChatMessageMapper {
                 .id(messageEntity.getId())
                 .conversationId(messageEntity.getChatSession().getId())
                 .isAppMessage(messageEntity.getIsAppMessage())
+                .isGenerating(messageEntity.getIsGenerating())
                 .message(messageEntity.getMessage())
                 .mistakes(mistakes)
                 .createdAt(messageEntity.getCreatedAt())
@@ -56,8 +58,8 @@ public class ChatMessageMapper {
             return null;
         }
         return ChatMessageEntity.builder()
-                .isAppMessage(chatMessage.getIsAppMessage())
                 .message(chatMessage.getMessage())
+                .isCommand(ChatCommand.fromValue(chatMessage.getMessage()) != null)
                 .build();
     }
 }

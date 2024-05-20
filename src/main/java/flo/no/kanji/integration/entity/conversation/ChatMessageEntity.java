@@ -1,7 +1,6 @@
 package flo.no.kanji.integration.entity.conversation;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,7 +31,12 @@ public class ChatMessageEntity {
     @Column(name = "is_app_message")
     private Boolean isAppMessage;
 
-    @NotNull
+    @Column(name = "is_generating")
+    private Boolean isGenerating;
+
+    @Column(name = "is_command")
+    private Boolean isCommand;
+
     private String message;
 
     @Column(name = "created_at")

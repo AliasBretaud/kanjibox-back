@@ -32,4 +32,6 @@ public class ChatSession {
     private LocalDateTime lastUpdate;
 
     private List<ChatMessage> messages;
+
+    private String status;
 }

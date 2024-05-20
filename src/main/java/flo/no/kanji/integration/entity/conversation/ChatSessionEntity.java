@@ -35,6 +35,7 @@ public class ChatSessionEntity {
     private UserEntity user;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private VertexAiAgent agent;
 
     @OneToMany(mappedBy = "chatSession")

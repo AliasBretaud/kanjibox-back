@@ -29,10 +29,14 @@ public class ChatMessage {
 
     private Boolean isAppMessage;
 
+    private Boolean isGenerating;
+
     @NotBlank
     private String message;
 
     private List<ChatMessageMistake> mistakes;
 
     private LocalDateTime createdAt;
+
+    private Long nextMessageId;
 }

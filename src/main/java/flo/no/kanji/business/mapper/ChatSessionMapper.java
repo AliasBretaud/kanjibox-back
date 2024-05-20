@@ -2,9 +2,7 @@ package flo.no.kanji.business.mapper;
 
 
 import flo.no.kanji.business.model.conversation.ChatSession;
-import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.integration.entity.conversation.ChatSessionEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,9 +12,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ChatSessionMapper {
-
-    @Autowired
-    private UserService userService;
 
     /**
      * Transforms a Chat session entity to business object
@@ -32,22 +27,6 @@ public class ChatSessionMapper {
                 .id(sessionEntity.getId())
                 .agent(sessionEntity.getAgent())
                 .lastUpdate(sessionEntity.getLastAccess())
-                .build();
-    }
-
-    /**
-     * Transforms a ChatSession business object to entity (before performing save in database)
-     *
-     * @param chatSession session Chat session business object
-     * @return ChatSessionEntity converted object
-     */
-    public ChatSessionEntity toEntity(ChatSession chatSession) {
-        if (chatSession == null) {
-            return null;
-        }
-        return ChatSessionEntity.builder()
-                .agent(chatSession.getAgent())
-                .user(userService.getCurrentUser())
                 .build();
     }
 }

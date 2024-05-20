@@ -3,6 +3,7 @@ package flo.no.kanji.business.service;
 import flo.no.kanji.ai.VertexAiAgent;
 import flo.no.kanji.business.model.conversation.ChatMessage;
 import flo.no.kanji.business.model.conversation.ChatSession;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,14 +24,6 @@ public interface ChatService {
     ChatSession createSession(final VertexAiAgent agent);
 
     /**
-     * Get a single session
-     *
-     * @param sessionId Session UUID
-     * @return Chat session
-     */
-    ChatSession getSession(final UUID sessionId);
-
-    /**
      * Get all the user's chat sessions
      *
      * @return Chat sessions list
@@ -44,7 +37,7 @@ public interface ChatService {
      * @param message   Message body
      * @return Response message from AI agent
      */
-    ChatMessage sendMessage(final UUID sessionId, final ChatMessage message);
+    SseEmitter sendMessage(final UUID sessionId, final ChatMessage message);
 
     /**
      * Delete a chat session
@@ -60,4 +53,12 @@ public interface ChatService {
      * @return List of messages
      */
     List<ChatMessage> getSessionMessages(final UUID id);
+
+    /**
+     * Get a single message
+     *
+     * @param id Message id
+     * @return Message
+     */
+    ChatMessage getMessage(final Long id);
 }
