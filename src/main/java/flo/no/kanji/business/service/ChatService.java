@@ -1,6 +1,6 @@
 package flo.no.kanji.business.service;
 
-import flo.no.kanji.ai.VertexAiAgent;
+import flo.no.kanji.ai.Agent;
 import flo.no.kanji.business.model.conversation.ChatMessage;
 import flo.no.kanji.business.model.conversation.ChatSession;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -21,7 +21,7 @@ public interface ChatService {
      * @param agent Vertex AI agent to use
      * @return Created session
      */
-    ChatSession createSession(final VertexAiAgent agent);
+    ChatSession createSession(final Agent agent);
 
     /**
      * Get all the user's chat sessions

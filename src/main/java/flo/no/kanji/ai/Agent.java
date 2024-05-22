@@ -1,5 +1,5 @@
 package flo.no.kanji.ai;
 
-public enum VertexAiAgent {
+public enum Agent {
     RESTAURANT
 }

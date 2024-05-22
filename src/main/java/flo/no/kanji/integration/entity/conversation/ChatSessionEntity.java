@@ -1,6 +1,6 @@
 package flo.no.kanji.integration.entity.conversation;
 
-import flo.no.kanji.ai.VertexAiAgent;
+import flo.no.kanji.ai.Agent;
 import flo.no.kanji.integration.entity.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -36,7 +36,11 @@ public class ChatSessionEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private VertexAiAgent agent;
+    private Agent agent;
+
+    @NotNull
+    @Column(name = "remote_session_id")
+    private String remoteSessionId;
 
     @OneToMany(mappedBy = "chatSession")
     private List<ChatMessageEntity> messages;

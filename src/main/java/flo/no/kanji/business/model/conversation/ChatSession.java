@@ -1,7 +1,7 @@
 package flo.no.kanji.business.model.conversation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import flo.no.kanji.ai.VertexAiAgent;
+import flo.no.kanji.ai.Agent;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +27,7 @@ public class ChatSession {
     private UUID id;
 
     @NotBlank
-    private VertexAiAgent agent;
+    private Agent agent;
 
     private LocalDateTime lastUpdate;
 

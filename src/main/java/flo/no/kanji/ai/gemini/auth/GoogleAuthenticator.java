@@ -1,4 +1,4 @@
-package flo.no.kanji.ai.auth;
+package flo.no.kanji.ai.gemini.auth;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.UserCredentials;

@@ -1,4 +1,4 @@
-package flo.no.kanji.ai;
+package flo.no.kanji.ai.gemini;
 
 public class AiAgentResponse {
 }
