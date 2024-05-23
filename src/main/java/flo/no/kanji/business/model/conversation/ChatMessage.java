@@ -1,6 +1,5 @@
 package flo.no.kanji.business.model.conversation;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatMessage {
 
     private Long id;

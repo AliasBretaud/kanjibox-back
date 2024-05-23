@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.ai.Agent;
 import flo.no.kanji.ai.openai.model.run.MessageDelta;
+import flo.no.kanji.ai.openai.model.run.MessageType;
 import flo.no.kanji.ai.openai.model.run.ThreadMessage;
 import flo.no.kanji.ai.openai.service.OpenAIService;
 import flo.no.kanji.business.exception.ItemNotFoundException;
@@ -19,9 +20,13 @@ import flo.no.kanji.integration.entity.conversation.ChatSessionEntity;
 import flo.no.kanji.integration.repository.ChatMessageRepository;
 import flo.no.kanji.integration.repository.ChatSessionRepository;
 import flo.no.kanji.util.AuthUtils;
+import flo.no.kanji.util.CharacterUtils;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSourceListener;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -33,6 +38,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Chat business service implementation
@@ -63,6 +69,9 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private OpenAIService openAIService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * @{inheritDoc}
@@ -107,11 +116,15 @@ public class ChatServiceImpl implements ChatService {
 
         // Send back user message
         if (!userMessage.getIsCommand()) {
-            emitMessage(emitter, SseEmitter.event()
-                    .id(userMessage.getId().toString())
-                    .name("USER_MESSAGE")
-                    .data(userMessage, MediaType.APPLICATION_JSON)
-                    .build());
+            try {
+                emitMessage(emitter, SseEmitter.event()
+                        .id(userMessage.getId().toString())
+                        .name("USER_MESSAGE")
+                        .data(objectMapper.writeValueAsString(chatMessageMapper.toBusinessObject(userMessage)))
+                        .build());
+            } catch (JsonProcessingException e) {
+                emitter.completeWithError(e);
+            }
         }
 
         // Run and send response
@@ -184,7 +197,7 @@ public class ChatServiceImpl implements ChatService {
                 .chatSession(session)
                 .isAppMessage(true)
                 .isCommand(false)
-                .isGenerating(true)
+                .isGenerating(false)
                 .build();
     }
 
@@ -196,45 +209,66 @@ public class ChatServiceImpl implements ChatService {
 
             // Create message on assistant
             openAIService.createMessage(remoteSessionId, originMessage.getMessage());
-
-            var flux = openAIService.run(remoteSessionId, Agent.RESTAURANT);
-            flux.subscribe(
-                    (m) -> {
-                        switch (m) {
-                            case ThreadMessage tm -> {
-                                try {
-                                    var response = saveResponse(originMessage, tm);
-                                    emitMessage(emitter,
-                                            SseEmitter.event()
-                                                    .id(tm.getId())
-                                                    .data(response, MediaType.APPLICATION_JSON)
-                                                    .name("ASSISTANT_MESSAGE")
-                                                    .build());
-                                } catch (JsonProcessingException e) {
-                                    throw new RuntimeException(e);
+            final AtomicBoolean streamData = new AtomicBoolean(false);
+            try {
+                openAIService.runTest(remoteSessionId, Agent.RESTAURANT, new EventSourceListener() {
+                    @Override
+                    public void onEvent(@NotNull EventSource eventSource, String id, String type, @NotNull String data) {
+                        try {
+                            if (MessageType.THREAD_MESSAGE.equals(type)) {
+                                var threadMessage = objectMapper.readValue(data, ThreadMessage.class);
+                                var response = saveResponse(originMessage, threadMessage);
+                                emitMessage(emitter,
+                                        SseEmitter.event()
+                                                .id(id)
+                                                .data(objectMapper.writeValueAsString(response))
+                                                .name("ASSISTANT_MESSAGE")
+                                                .build());
+                            } else if (MessageType.THREAD_MESSAGE_DELTA.equals(type)) {
+                                var messageDelta = objectMapper.readValue(data, MessageDelta.class);
+                                var token = messageDelta.getDelta().getContent().getFirst().getText().getValue();
+                                if (token.equals("message")) {
+                                    streamData.set(true);
+                                } else if (token.contains(",")) {
+                                    streamData.set(false);
                                 }
-                            }
-                            case MessageDelta md -> emitMessage(emitter,
-                                    SseEmitter.event()
-                                            .id(md.getId())
-                                            .data(md.getDelta().getContent().getFirst().getText().getValue())
+                                if (streamData.get() && CharacterUtils.isJapanese(token)) {
+                                    emitMessage(emitter, SseEmitter.event()
+                                            .id(id)
+                                            .data(token)
                                             .name("ASSISTANT_MESSAGE_DELTA")
                                             .build());
-                            default -> throw new IllegalStateException("Unexpected value: " + m);
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.error(e.getMessage());
+                            emitter.completeWithError(e);
                         }
-                    },
-                    (e) -> {
-                        log.error(e.getMessage());
-                        emitter.completeWithError(e);
-                    },
-                    () -> completeStream(emitter));
+
+                    }
+
+                    @Override
+                    public void onClosed(@NotNull EventSource eventSource) {
+                        completeStream(emitter);
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull EventSource eventSource, Throwable t, Response response) {
+                        log.error(response.message());
+                        emitter.completeWithError(t);
+                    }
+                });
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                emitter.completeWithError(e);
+            }
         });
     }
 
-    private ChatMessageEntity saveResponse(ChatMessageEntity originMessage,
-                                           ThreadMessage message) throws JsonProcessingException {
+    private ChatMessage saveResponse(ChatMessageEntity originMessage,
+                                     ThreadMessage message) throws JsonProcessingException {
         var response = initAppMessage(originMessage.getChatSession());
-        var messageValue = new ObjectMapper().readValue(
+        var messageValue = objectMapper.readValue(
                 message.getContent().getFirst().getText().getValue(), ChatMessage.class);
         response.setMessage(messageValue.getMessage());
         response.setIsCommand(false);
@@ -248,6 +282,6 @@ public class ChatServiceImpl implements ChatService {
                     .toList());
         }
 
-        return chatMessageRepository.save(response);
+        return chatMessageMapper.toBusinessObject(chatMessageRepository.save(response));
     }
 }

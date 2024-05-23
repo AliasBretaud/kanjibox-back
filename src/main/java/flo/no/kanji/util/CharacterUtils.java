@@ -19,16 +19,24 @@ import static java.lang.Character.UnicodeBlock.*;
  */
 public final class CharacterUtils {
 
-    /** Japanese alphabet (hiragana/katakana/kanji) detetor **/
+    /**
+     * Japanese alphabet (hiragana/katakana/kanji) detetor
+     **/
     private static final MojiDetector mojiDetector = new MojiDetector();
 
-    /** Japanese characters converter **/
+    /**
+     * Japanese characters converter
+     **/
     private static final MojiConverter mojiConverter = new MojiConverter();
 
-    /** Japanese characters tokenizer **/
+    /**
+     * Japanese characters tokenizer
+     **/
     private static final Tokenizer tokenizer = new Tokenizer();
 
-    /** Private constructor : The class provides only static methods so no instantiation needed **/
+    /**
+     * Private constructor : The class provides only static methods so no instantiation needed
+     **/
     private CharacterUtils() {
     }
 
@@ -134,6 +142,23 @@ public final class CharacterUtils {
                 .collect(Collectors.joining());
         var furigana = convertKanaToFurigana(katakanaValue);
         return isHiragana(furigana) ? furigana : null;
+    }
+
+    public static boolean isJapanese(final String value) {
+        return value.chars().mapToObj(c -> (char) c)
+                .allMatch(CharacterUtils::isJapaneseCharacter);
+    }
+
+    private static boolean isJapaneseCharacter(char ch) {
+        UnicodeBlock block = UnicodeBlock.of(ch);
+        return block == UnicodeBlock.HIRAGANA ||
+                block == UnicodeBlock.KATAKANA ||
+                block == UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS ||
+                block == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
+                block == UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION ||
+                block == UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS ||
+                block == UnicodeBlock.CJK_COMPATIBILITY_FORMS ||
+                block == UnicodeBlock.VERTICAL_FORMS;
     }
 
     /**

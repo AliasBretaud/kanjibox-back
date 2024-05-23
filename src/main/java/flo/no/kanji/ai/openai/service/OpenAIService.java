@@ -1,13 +1,19 @@
 package flo.no.kanji.ai.openai.service;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.ai.Agent;
 import flo.no.kanji.ai.openai.model.MessageInput;
 import flo.no.kanji.ai.openai.model.Thread;
-import flo.no.kanji.ai.openai.model.run.*;
+import flo.no.kanji.ai.openai.model.run.Run;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSourceListener;
+import okhttp3.sse.EventSources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,20 +22,17 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
+
 
 @Service
 @Slf4j
 public class OpenAIService {
 
-    private final HttpHeaders defaultHeaders;
-
-    private final ObjectMapper mapper;
-
+    private final Headers headers;
+    @Autowired
+    private ObjectMapper mapper;
     @Value("${openai.api.endpoint.thread}")
     private String THREADS_ENDPOINT;
 
@@ -46,16 +49,12 @@ public class OpenAIService {
     private RestTemplate restTemplate;
 
     @Autowired
-    private WebClient webClient;
-
-    @Autowired
     public OpenAIService(@Value("${openai.api.key}") String apiKey) {
-        defaultHeaders = new HttpHeaders();
-        defaultHeaders.setContentType(MediaType.APPLICATION_JSON);
-        defaultHeaders.set("Authorization", "Bearer " + apiKey);
-        defaultHeaders.set("OpenAI-Beta", "assistants=v2");
-        mapper = new ObjectMapper()
-                .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+        headers = new Headers.Builder()
+                .add(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .add("OpenAI-Beta", "assistants=v2")
+                .add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
     }
 
     public Thread createThread() {
@@ -71,51 +70,29 @@ public class OpenAIService {
         });
     }
 
-    public Flux<Message> run(final String threadId, final Agent agent) {
+    public void runTest(final String threadId, final Agent agent, EventSourceListener listener) throws JsonProcessingException {
         String assistantId = switch (agent) {
             case RESTAURANT -> env.getProperty("openai.api.assistant.restaurant.id");
         };
         var url = String.format(RUNS_ENDPOINT, threadId);
         var run = new Run(assistantId, true);
-
-        var type = new ParameterizedTypeReference<ServerSentEvent<String>>() {
-        };
-
-        return webClient.post()
-                .uri(url)
-                .headers(httpHeaders -> httpHeaders.addAll(defaultHeaders))
-                .bodyValue(run)
-                .retrieve()
-                .bodyToFlux(type)
-                .filter(evt -> MessageType.getMessagesTypes.contains(evt.event()))
-                .map(evt -> {
-                    try {
-                        var message = mapper.readValue(evt.data(), Message.class);
-                        assert evt.event() != null;
-                        message = switch (evt.event()) {
-                            case MessageType.THREAD_MESSAGE -> mapper.readValue(evt.data(), ThreadMessage.class);
-                            case MessageType.THREAD_MESSAGE_DELTA -> mapper.readValue(evt.data(), MessageDelta.class);
-                            default -> throw new Exception("Unknown");
-                        };
-
-                        return message;
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        var JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
+        var requestBody = RequestBody.create(mapper.writeValueAsString(run), JSON);
+        var request = new Request.Builder()
+                .url(url)
+                .headers(headers)
+                .post(requestBody)
+                .build();
+        var okHttpClient = new OkHttpClient.Builder().build();
+        EventSource.Factory factory = EventSources.createFactory(okHttpClient);
+        factory.newEventSource(request, listener);
     }
 
     private <T> T post(String url, Object body, ParameterizedTypeReference<T> returnType) {
-        var entity = new HttpEntity<>(body, defaultHeaders);
-        return restTemplate.exchange(url, HttpMethod.POST, entity, returnType).getBody();
-    }
+        HttpHeaders httpHeaders = new HttpHeaders();
+        headers.names().forEach(name -> httpHeaders.put(name, headers.values(name)));
+        var entity = new HttpEntity<>(body, new HttpHeaders(httpHeaders));
 
-    public boolean isValidJSON(String json) {
-        try {
-            mapper.readTree(json);
-        } catch (JacksonException e) {
-            return false;
-        }
-        return true;
+        return restTemplate.exchange(url, HttpMethod.POST, entity, returnType).getBody();
     }
 }

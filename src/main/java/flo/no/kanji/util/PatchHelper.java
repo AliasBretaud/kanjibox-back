@@ -1,11 +1,9 @@
 package flo.no.kanji.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,17 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatchHelper {
 
-    /** Jackson object mapper (JSON conversions) **/
-    private final ObjectMapper mapper;
-
-    /** Default constructor **/
-    public PatchHelper() {
-        this.mapper = new ObjectMapper()
-                .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .findAndRegisterModules();
-    }
+    /**
+     * Jackson object mapper (JSON conversions)
+     **/
+    @Autowired
+    private ObjectMapper mapper;
 
     /**
      * Merge modification using patch method
