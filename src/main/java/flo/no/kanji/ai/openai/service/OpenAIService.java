@@ -1,19 +1,10 @@
 package flo.no.kanji.ai.openai.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.ai.Agent;
 import flo.no.kanji.ai.openai.model.MessageInput;
 import flo.no.kanji.ai.openai.model.Thread;
 import flo.no.kanji.ai.openai.model.run.Run;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Headers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.sse.EventSource;
-import okhttp3.sse.EventSourceListener;
-import okhttp3.sse.EventSources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,17 +13,21 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 
 @Service
 @Slf4j
 public class OpenAIService {
 
-    private final Headers headers;
-    @Autowired
-    private ObjectMapper mapper;
+    private final HttpHeaders defaultHeaders;
+
+    private final WebClient webClient = WebClient.builder().build();
+
     @Value("${openai.api.endpoint.thread}")
     private String THREADS_ENDPOINT;
 
@@ -50,11 +45,10 @@ public class OpenAIService {
 
     @Autowired
     public OpenAIService(@Value("${openai.api.key}") String apiKey) {
-        headers = new Headers.Builder()
-                .add(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                .add("OpenAI-Beta", "assistants=v2")
-                .add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+        defaultHeaders = new HttpHeaders();
+        defaultHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey);
+        defaultHeaders.add("OpenAI-Beta", "assistants=v2");
+        defaultHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     }
 
     public Thread createThread() {
@@ -70,29 +64,27 @@ public class OpenAIService {
         });
     }
 
-    public void runTest(final String threadId, final Agent agent, EventSourceListener listener) throws JsonProcessingException {
+    public Flux<ServerSentEvent<String>> run(final String threadId, final Agent agent) {
         String assistantId = switch (agent) {
             case RESTAURANT -> env.getProperty("openai.api.assistant.restaurant.id");
         };
         var url = String.format(RUNS_ENDPOINT, threadId);
         var run = new Run(assistantId, true);
-        var JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
-        var requestBody = RequestBody.create(mapper.writeValueAsString(run), JSON);
-        var request = new Request.Builder()
-                .url(url)
-                .headers(headers)
-                .post(requestBody)
-                .build();
-        var okHttpClient = new OkHttpClient.Builder().build();
-        EventSource.Factory factory = EventSources.createFactory(okHttpClient);
-        factory.newEventSource(request, listener);
+
+        var type = new ParameterizedTypeReference<ServerSentEvent<String>>() {
+        };
+
+        return webClient.post()
+                .uri(url)
+                .headers(httpHeaders -> httpHeaders.addAll(defaultHeaders))
+                .bodyValue(run)
+                .retrieve()
+                .bodyToFlux(type);
+
     }
 
     private <T> T post(String url, Object body, ParameterizedTypeReference<T> returnType) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        headers.names().forEach(name -> httpHeaders.put(name, headers.values(name)));
-        var entity = new HttpEntity<>(body, new HttpHeaders(httpHeaders));
-
+        var entity = new HttpEntity<>(body, defaultHeaders);
         return restTemplate.exchange(url, HttpMethod.POST, entity, returnType).getBody();
     }
 }

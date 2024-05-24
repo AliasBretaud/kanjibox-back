@@ -3,6 +3,7 @@ package flo.no.kanji.business.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.ai.Agent;
+import flo.no.kanji.ai.openai.model.run.Message;
 import flo.no.kanji.ai.openai.model.run.MessageDelta;
 import flo.no.kanji.ai.openai.model.run.MessageType;
 import flo.no.kanji.ai.openai.model.run.ThreadMessage;
@@ -22,10 +23,6 @@ import flo.no.kanji.integration.repository.ChatSessionRepository;
 import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
-import okhttp3.sse.EventSource;
-import okhttp3.sse.EventSourceListener;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
@@ -105,6 +102,7 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public SseEmitter sendMessage(UUID sessionId, ChatMessage message) {
+        log.info("CALL SEND");
         var session = getSessionById(sessionId);
         var emitter = new SseEmitter();
 
@@ -209,55 +207,67 @@ public class ChatServiceImpl implements ChatService {
 
             // Create message on assistant
             openAIService.createMessage(remoteSessionId, originMessage.getMessage());
-            final AtomicBoolean streamData = new AtomicBoolean(false);
+
             try {
-                openAIService.runTest(remoteSessionId, Agent.RESTAURANT, new EventSourceListener() {
-                    @Override
-                    public void onEvent(@NotNull EventSource eventSource, String id, String type, @NotNull String data) {
-                        try {
-                            if (MessageType.THREAD_MESSAGE.equals(type)) {
-                                var threadMessage = objectMapper.readValue(data, ThreadMessage.class);
-                                var response = saveResponse(originMessage, threadMessage);
-                                emitMessage(emitter,
-                                        SseEmitter.event()
-                                                .id(id)
-                                                .data(objectMapper.writeValueAsString(response))
-                                                .name("ASSISTANT_MESSAGE")
-                                                .build());
-                            } else if (MessageType.THREAD_MESSAGE_DELTA.equals(type)) {
-                                var messageDelta = objectMapper.readValue(data, MessageDelta.class);
-                                var token = messageDelta.getDelta().getContent().getFirst().getText().getValue();
-                                if (token.equals("message")) {
-                                    streamData.set(true);
-                                } else if (token.contains(",")) {
-                                    streamData.set(false);
-                                }
-                                if (streamData.get() && CharacterUtils.isJapanese(token)) {
-                                    emitMessage(emitter, SseEmitter.event()
-                                            .id(id)
-                                            .data(token)
-                                            .name("ASSISTANT_MESSAGE_DELTA")
-                                            .build());
-                                }
+                final AtomicBoolean streamData = new AtomicBoolean(false);
+                var flux = openAIService.run(remoteSessionId, Agent.RESTAURANT);
+                flux.filter(evt -> MessageType.getMessagesTypes.contains(evt.event()))
+                        .map(evt -> {
+                            try {
+                                var message = objectMapper.readValue(evt.data(), Message.class);
+                                assert evt.event() != null;
+                                message = switch (evt.event()) {
+                                    case MessageType.THREAD_MESSAGE ->
+                                            objectMapper.readValue(evt.data(), ThreadMessage.class);
+                                    case MessageType.THREAD_MESSAGE_DELTA ->
+                                            objectMapper.readValue(evt.data(), MessageDelta.class);
+                                    default -> throw new IllegalArgumentException("Unknown");
+                                };
+                                return message;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
-                        } catch (Exception e) {
-                            log.error(e.getMessage());
-                            emitter.completeWithError(e);
-                        }
-
-                    }
-
-                    @Override
-                    public void onClosed(@NotNull EventSource eventSource) {
-                        completeStream(emitter);
-                    }
-
-                    @Override
-                    public void onFailure(@NotNull EventSource eventSource, Throwable t, Response response) {
-                        log.error(response.message());
-                        emitter.completeWithError(t);
-                    }
-                });
+                        }).subscribe(
+                                (m) -> {
+                                    switch (m) {
+                                        case ThreadMessage tm -> {
+                                            try {
+                                                var response = saveResponse(originMessage, tm);
+                                                var message = objectMapper.writeValueAsString(response);
+                                                emitMessage(emitter,
+                                                        SseEmitter.event()
+                                                                .id(tm.getId())
+                                                                .data(message)
+                                                                .name("ASSISTANT_MESSAGE")
+                                                                .build());
+                                            } catch (JsonProcessingException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                        case MessageDelta md -> {
+                                            var token = md.getDelta().getContent().getFirst().getText().getValue();
+                                            if ("message".equals(token)) {
+                                                streamData.set(true);
+                                            } else if (token != null && token.contains(",")) {
+                                                streamData.set(false);
+                                            }
+                                            if (token != null && streamData.get() && CharacterUtils.isJapanese(token)) {
+                                                emitMessage(emitter,
+                                                        SseEmitter.event()
+                                                                .id(md.getId())
+                                                                .data(token)
+                                                                .name("ASSISTANT_MESSAGE_DELTA")
+                                                                .build());
+                                            }
+                                        }
+                                        default -> throw new IllegalStateException("Unexpected value: " + m);
+                                    }
+                                },
+                                (e) -> {
+                                    log.error(e.getMessage());
+                                    emitter.completeWithError(e);
+                                },
+                                () -> completeStream(emitter));
             } catch (Exception e) {
                 log.error(e.getMessage());
                 emitter.completeWithError(e);
