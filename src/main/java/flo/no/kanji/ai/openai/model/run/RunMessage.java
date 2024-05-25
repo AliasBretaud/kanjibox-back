@@ -3,7 +3,7 @@ package flo.no.kanji.ai.openai.model.run;
 import lombok.Data;
 
 @Data
-public class Message {
+public class RunMessage {
 
     private String id;
 

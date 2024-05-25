@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ThreadMessage extends Message {
+public class ThreadMessage extends RunMessage {
     private String assistantId;
     private String threadId;
     private String runId;

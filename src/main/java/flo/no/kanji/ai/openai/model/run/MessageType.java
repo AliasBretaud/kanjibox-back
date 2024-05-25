@@ -8,7 +8,9 @@ public class MessageType {
 
     public static final String THREAD_MESSAGE = "thread.message.completed";
 
-    public static List<String> getMessagesTypes = List.of(THREAD_MESSAGE_DELTA, THREAD_MESSAGE);
+    public static final String DONE = "done";
+
+    public static List<String> getMessagesTypes = List.of(THREAD_MESSAGE_DELTA, THREAD_MESSAGE, DONE);
 
     private MessageType() {
     }

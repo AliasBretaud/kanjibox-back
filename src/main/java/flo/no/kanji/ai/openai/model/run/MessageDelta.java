@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MessageDelta extends Message {
+public class MessageDelta extends RunMessage {
     private Delta delta;
 
     @Data

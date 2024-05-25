@@ -31,9 +31,6 @@ public class ChatMessageEntity {
     @Column(name = "is_app_message")
     private Boolean isAppMessage;
 
-    @Column(name = "is_generating")
-    private Boolean isGenerating;
-
     @Column(name = "is_command")
     private Boolean isCommand;
 

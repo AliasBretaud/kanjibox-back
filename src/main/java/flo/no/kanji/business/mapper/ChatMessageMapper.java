@@ -40,7 +40,6 @@ public class ChatMessageMapper {
                 .id(messageEntity.getId())
                 .conversationId(messageEntity.getChatSession().getId())
                 .isAppMessage(messageEntity.getIsAppMessage())
-                .isGenerating(messageEntity.getIsGenerating())
                 .message(messageEntity.getMessage())
                 .mistakes(mistakes)
                 .createdAt(messageEntity.getCreatedAt())

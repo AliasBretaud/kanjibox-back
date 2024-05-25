@@ -33,5 +33,7 @@ public class ChatSession {
 
     private List<ChatMessage> messages;
 
+    private Boolean isGenerating;
+
     private String status;
 }
