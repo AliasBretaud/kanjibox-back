@@ -31,6 +31,8 @@ public class ChatMessage {
 
     private Boolean isGenerating;
 
+    private Boolean isError;
+
     @NotBlank
     private String message;
 

@@ -102,8 +102,10 @@ public class ChatServiceImpl implements ChatService {
         var emitter = new SseEmitter();
 
         // Update session
-        session.setIsGenerating(true);
         chatSessionRepository.save(session);
+
+        // Init response
+        var responseMessage = chatMessageRepository.save(initAppMessage(session));
 
         try {
             // Save user message
@@ -114,7 +116,7 @@ public class ChatServiceImpl implements ChatService {
 
             // Send back user message
             if (!userMessage.getIsCommand()) {
-                emitMessage(emitter, session, SseEmitter.event()
+                emitMessage(emitter, responseMessage, SseEmitter.event()
                         .id(userMessage.getId().toString())
                         .name("USER_MESSAGE")
                         .data(objectMapper.writeValueAsString(chatMessageMapper.toBusinessObject(userMessage)))
@@ -123,9 +125,9 @@ public class ChatServiceImpl implements ChatService {
             }
 
             // Run and send response
-            sendMessageToAI(userMessage, emitter);
+            sendMessageToAI(userMessage, responseMessage, emitter);
         } catch (Exception e) {
-            completeStream(session, emitter, e);
+            completeStream(responseMessage, emitter, e);
         }
 
         return emitter;
@@ -169,18 +171,19 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new ItemNotFoundException("Couldn't find session " + id));
     }
 
-    private void emitMessage(SseEmitter emitter, ChatSessionEntity session,
+    private void emitMessage(SseEmitter emitter, ChatMessageEntity message,
                              Set<ResponseBodyEmitter.DataWithMediaType> event) {
         try {
             if (event != null) {
                 emitter.send(event);
             }
         } catch (IOException e) {
-            completeStream(session, emitter, e);
+            completeStream(message, emitter, e);
         }
     }
 
     private void sendMessageToAI(final ChatMessageEntity originMessage,
+                                 final ChatMessageEntity responseMessage,
                                  final SseEmitter emitter) {
         cachedThreadPool.execute(() -> {
             var session = originMessage.getChatSession();
@@ -188,48 +191,39 @@ public class ChatServiceImpl implements ChatService {
 
             // Create message on assistant
             try {
-                send(originMessage, message, session, emitter);
+                final AtomicBoolean streamData = new AtomicBoolean(false);
+                messageListener.setEmitter(emitter);
+                messageListener.setResponse(responseMessage);
+                messageListener.setOriginMessage(originMessage);
+                messageListener.setStreamData(streamData);
+                aiService.sendMessage(session, message)
+                        .doOnNext(messageListener::onNext)
+                        .doOnError(messageListener::onError)
+                        .subscribe();
             } catch (Exception e) {
-                retry(originMessage, message, session, emitter);
+                completeStream(responseMessage, emitter, e);
             }
         });
     }
 
-    private void retry(final ChatMessageEntity originMessage,
-                       final String message,
-                       final ChatSessionEntity session,
-                       final SseEmitter emitter) {
-        try {
-            send(originMessage, message, session, emitter);
-        } catch (Exception e) {
-            completeStream(session, emitter, e);
-        }
+    private ChatMessageEntity initAppMessage(final ChatSessionEntity session) {
+        return ChatMessageEntity.builder()
+                .chatSession(session)
+                .isAppMessage(true)
+                .isGenerating(true)
+                .isCommand(false)
+                .build();
     }
 
-    private void send(final ChatMessageEntity originMessage,
-                      final String message,
-                      final ChatSessionEntity session,
-                      final SseEmitter emitter) {
-        final AtomicBoolean streamData = new AtomicBoolean(false);
-        messageListener.setEmitter(emitter);
-        messageListener.setSession(session);
-        messageListener.setOriginMessage(originMessage);
-        messageListener.setStreamData(streamData);
-        aiService.sendMessage(session, message)
-                .doOnNext(messageListener::onNext)
-                .doOnError(messageListener::onError)
-                .doOnComplete(messageListener::onComplete)
-                .subscribe();
-    }
-
-    private void completeStream(final ChatSessionEntity session, final SseEmitter emitter,
+    private void completeStream(final ChatMessageEntity message, final SseEmitter emitter,
                                 final Throwable e) {
-        session.setIsGenerating(false);
-        chatSessionRepository.save(session);
         if (e != null) {
             emitter.completeWithError(e);
+            message.setIsError(true);
         } else {
             emitter.complete();
         }
+        message.setIsGenerating(false);
+        chatMessageRepository.save(message);
     }
 }

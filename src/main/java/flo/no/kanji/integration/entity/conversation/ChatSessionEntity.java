@@ -38,9 +38,6 @@ public class ChatSessionEntity {
     @Enumerated(EnumType.STRING)
     private Agent agent;
 
-    @Column(name = "is_generating")
-    private Boolean isGenerating;
-
     @NotNull
     @Column(name = "remote_session_id")
     private String remoteSessionId;

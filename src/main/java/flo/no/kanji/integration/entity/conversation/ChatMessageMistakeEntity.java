@@ -19,7 +19,7 @@ public class ChatMessageMistakeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "message_id")
+    @JoinColumn(name = "message_id", nullable = false)
     private ChatMessageEntity message;
 
     private String input;

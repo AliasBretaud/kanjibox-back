@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 public class ChatMessageEntity {
 
-    @OneToMany(mappedBy = "message", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "message", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     List<ChatMessageMistakeEntity> mistakes;
 
     @Id
@@ -35,6 +35,12 @@ public class ChatMessageEntity {
     private Boolean isCommand;
 
     private String message;
+
+    @Column(name = "is_generating")
+    private Boolean isGenerating;
+
+    @Column(name = "is_error")
+    private Boolean isError;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

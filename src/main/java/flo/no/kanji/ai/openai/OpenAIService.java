@@ -26,9 +26,13 @@ import reactor.core.publisher.Flux;
 
 import java.util.Objects;
 
+import static flo.no.kanji.util.FunctionUtils.executeWithRetry;
+
 @Service
 @Slf4j
 public class OpenAIService implements AIService {
+
+    private static final int OPEN_AI_REQUEST_RETRIES = 3;
 
     private final HttpHeaders defaultHeaders;
 
@@ -67,8 +71,8 @@ public class OpenAIService implements AIService {
 
     @Override
     public Flux<Message> sendMessage(ChatSessionEntity session, String message) {
-        createMessage(session.getRemoteSessionId(), message);
-        return run(session);
+        executeWithRetry(() -> createMessage(session.getRemoteSessionId(), message), OPEN_AI_REQUEST_RETRIES);
+        return executeWithRetry(() -> run(session), OPEN_AI_REQUEST_RETRIES);
     }
 
     @Override

@@ -27,7 +27,6 @@ public class ChatSessionMapper {
                 .id(sessionEntity.getId())
                 .agent(sessionEntity.getAgent())
                 .lastUpdate(sessionEntity.getLastAccess())
-                .isGenerating(sessionEntity.getIsGenerating())
                 .build();
     }
 }
