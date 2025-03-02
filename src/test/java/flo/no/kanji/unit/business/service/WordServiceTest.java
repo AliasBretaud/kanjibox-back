@@ -47,8 +47,10 @@ public class WordServiceTest {
     @InjectMocks
     @Spy
     private final WordMapper wordMapper = Mockito.spy(WordMapper.class);
+
     @Spy
     private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
+    
     @Mock
     private KanjiService kanjiService;
 
