@@ -26,7 +26,10 @@ import jakarta.persistence.metamodel.SingularAttribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -44,13 +47,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class WordServiceTest {
 
-    @InjectMocks
     @Spy
-    private final WordMapper wordMapper = Mockito.spy(WordMapper.class);
+    private KanjiMapper kanjiMapper;
 
     @Spy
-    private KanjiMapper kanjiMapper = Mockito.spy(KanjiMapper.class);
-    
+    private WordMapper wordMapper = new WordMapper(kanjiMapper);
+
     @Mock
     private KanjiService kanjiService;
 
