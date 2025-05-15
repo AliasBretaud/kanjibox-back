@@ -19,8 +19,8 @@ import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
 import io.github.aliasbretaud.mojibox.enums.MeaningLanguage;
 import io.github.aliasbretaud.mojibox.enums.ReadingType;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,32 +41,37 @@ import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
 @Service
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class KanjiServiceImpl implements KanjiService {
 
     private final int LISTS_MAX_SIZE = 3;
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
 
-    /** Kanji JPA repository **/
-    @Autowired
-    private KanjiRepository kanjiRepository;
+    /**
+     * Kanji JPA repository
+     **/
+    private final KanjiRepository kanjiRepository;
 
-    /** Kanji business/entity object mapper */
-    @Autowired
-    private KanjiMapper kanjiMapper;
+    /**
+     * Kanji business/entity object mapper
+     */
+    private final KanjiMapper kanjiMapper;
 
-    /** External kanji dictionary */
-    @Autowired
-    private KanjiDictionary kanjiDictionary;
+    /**
+     * External kanji dictionary
+     */
+    private final KanjiDictionary kanjiDictionary;
 
-    /** Kanji updating fields class helper */
-    @Autowired
-    private PatchHelper patchHelper;
+    /**
+     * Kanji updating fields class helper
+     */
+    private final PatchHelper patchHelper;
 
-    /** Japanese alphabets converting service **/
-    @Autowired
-    private MojiConverter converter;
+    /**
+     * Japanese alphabets converting service
+     **/
+    private final MojiConverter converter;
 
     /**
      * {@inheritDoc}
@@ -132,7 +137,7 @@ public class KanjiServiceImpl implements KanjiService {
         var sub = AuthUtils.getUserSub();
         return ObjectUtils.isEmpty(search)
                 ? kanjiRepository.findAllByUserSubOrderByTimeStampDesc(sub, pageable)
-                .map(k -> kanjiMapper.toBusinessObject(k))
+                .map(kanjiMapper::toBusinessObject)
                 : this.searchKanji(search, language, pageable);
     }
 
@@ -188,7 +193,7 @@ public class KanjiServiceImpl implements KanjiService {
 
         var spec = KanjiSpecification.searchKanji(search, language, this.converter);
         // Execute query, mapping and return results
-        return kanjiRepository.findAll(spec, pageable).map(k -> kanjiMapper.toBusinessObject(k));
+        return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
     }
 
     private List<String> findDictionaryTranslations(String kanjiValue, Language language) {

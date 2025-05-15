@@ -4,8 +4,8 @@ import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.Translate.TranslateOption;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.service.TranslationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.web.util.HtmlUtils.htmlUnescape;
@@ -18,10 +18,10 @@ import static org.springframework.web.util.HtmlUtils.htmlUnescape;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GoogleTranslationServiceImpl implements TranslationService {
 
-    @Autowired
-    private Translate googleTranslate;
+    private final Translate googleTranslate;
 
     @Override
     public String translateValue(String value, Language target) {
