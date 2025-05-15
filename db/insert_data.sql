@@ -1,3 +1,8 @@
+-- Clean all tables data
+TRUNCATE kanji CASCADE;
+TRUNCATE word CASCADE;
+TRUNCATE users CASCADE;
+
 --
 -- TOC entry 3334 (class 0 OID 16556)
 -- Dependencies: 210
