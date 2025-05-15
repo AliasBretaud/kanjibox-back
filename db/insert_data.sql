@@ -1,3 +1,13 @@
+-- Clean all tables data
+DELETE FROM word_translation;
+DELETE FROM word_kanji;
+DELETE FROM word;
+DELETE FROM kanji_translation;
+DELETE FROM kanji_kun_yomi;
+DELETE FROM kanji_on_yomi;
+DELETE FROM kanji;
+DELETE FROM users;
+
 --
 -- TOC entry 3334 (class 0 OID 16556)
 -- Dependencies: 210
