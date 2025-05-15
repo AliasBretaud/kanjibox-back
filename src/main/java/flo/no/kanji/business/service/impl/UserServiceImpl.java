@@ -4,16 +4,16 @@ import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.integration.entity.UserEntity;
 import flo.no.kanji.integration.repository.UserRepository;
 import flo.no.kanji.util.AuthUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void createOrUpdateUser(String sub) {

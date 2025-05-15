@@ -3,8 +3,8 @@ package flo.no.kanji.business.mapper;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.entity.WordEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
  *
  * @author Florian
  */
-@Service
+@Component
+@RequiredArgsConstructor
 public class WordMapper {
 
-    @Autowired
-    private KanjiMapper kanjiMapper;
+    private final KanjiMapper kanjiMapper;
 
     /**
      * Transforms a Word entity to business object

@@ -21,7 +21,7 @@ import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
 import flo.no.kanji.util.PatchHelper;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,43 +46,47 @@ import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
  */
 @Service
 @Validated
+@RequiredArgsConstructor
 public class WordServiceImpl implements WordService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    /** Kanji operations business service */
-    @Autowired
-    private KanjiService kanjiService;
+    /**
+     * Kanji operations business service
+     */
+    private final KanjiService kanjiService;
 
-    /** Words JPA repository */
-    @Autowired
-    private WordRepository wordRepository;
+    /**
+     * Words JPA repository
+     */
+    private final WordRepository wordRepository;
 
-    @Autowired
-    private KanjiRepository kanjiRepository;
+    private final KanjiRepository kanjiRepository;
 
-    /** Word business/entity object mapper **/
-    @Autowired
-    private WordMapper wordMapper;
+    /**
+     * Word business/entity object mapper
+     **/
+    private final WordMapper wordMapper;
 
-    /** Kanji business/entity object mapper **/
-    @Autowired
-    private KanjiMapper kanjiMapper;
+    /**
+     * Kanji business/entity object mapper
+     **/
+    private final KanjiMapper kanjiMapper;
 
-    @Autowired
-    private MojiDetector mojiDetector;
+    private final MojiDetector mojiDetector;
+
+    /**
+     * Translation service
+     **/
+    private final TranslationService translationService;
+
+    /**
+     * Word updating fields class helper
+     */
+    private final PatchHelper patchHelper;
 
     @Value("${kanji.translation.auto.enable}")
     private Boolean enableAutoDefaultTranslation;
-
-    /** Translation service **/
-    @Autowired
-    private TranslationService translationService;
-
-    /** Word updating fields class helper */
-    @Autowired
-    private PatchHelper patchHelper;
 
     /**
      * {@inheritDoc}

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,11 +18,13 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/kanjis")
+@RequiredArgsConstructor
 public class KanjiController {
 
-    /** Kanji business service **/
-    @Autowired
-    private KanjiService kanjiService;
+    /**
+     * Kanji business service
+     **/
+    private final KanjiService kanjiService;
 
     /**
      * Find kanji
