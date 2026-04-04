@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import flo.no.kanji.business.exception.InvalidInputException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,33 +30,22 @@ public class PatchHelper {
     }
 
     /**
-     * Merge modification using patch method
+     * Applies a JSON Merge Patch (RFC 7396) onto the given object and returns the patched result.
      *
      * @param <T>        Object class type
-     * @param patch      JSON merge path
-     * @param targetBean Object type
+     * @param targetBean Original object to patch
+     * @param patch      JSON merge patch node
      * @param beanClass  Output object class
-     * @return Validated updated object
+     * @return Patched object
+     * @throws InvalidInputException if the patch payload is malformed
      */
     public <T> T mergePatch(T targetBean, JsonNode patch, Class<T> beanClass) {
         try {
             var mergePatch = JsonMergePatch.fromJson(patch);
             var patched = mergePatch.apply(mapper.convertValue(targetBean, JsonNode.class));
-            return convertAndValidate(patched, beanClass);
+            return mapper.convertValue(patched, beanClass);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException("Invalid patch payload: " + e.getMessage());
         }
-    }
-
-    /**
-     * Converts and validates input value to output merged object
-     *
-     * @param <T>       Return type
-     * @param jsonNode  String JSON of input object
-     * @param beanClass Output bean class
-     * @return Merged entity
-     */
-    private <T> T convertAndValidate(JsonNode jsonNode, Class<T> beanClass) {
-        return mapper.convertValue(jsonNode, beanClass);
     }
 }

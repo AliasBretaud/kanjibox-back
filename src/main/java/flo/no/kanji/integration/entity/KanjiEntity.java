@@ -1,10 +1,7 @@
 package flo.no.kanji.integration.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,10 +13,12 @@ import java.util.List;
  */
 @Entity
 @Table(name = "kanji")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(of = "id")
 public class KanjiEntity {
 
     /** Database technical identifier **/

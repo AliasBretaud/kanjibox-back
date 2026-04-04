@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -19,11 +22,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/kanjis")
 @RequiredArgsConstructor
+@Validated
 public class KanjiController {
 
-    /**
-     * Kanji business service
-     **/
+    /** Kanji business service **/
     private final KanjiService kanjiService;
 
     /**
@@ -32,8 +34,8 @@ public class KanjiController {
      * @param kanjiId Kanji database identifier
      * @return Retrieved kanji business object
      */
-    @GetMapping(path = "/{kanjiId}")
-    public Kanji getKanji(@PathVariable("kanjiId") final Long kanjiId) {
+    @GetMapping("/{kanjiId}")
+    public Kanji getKanji(@PathVariable Long kanjiId) {
         return kanjiService.findById(kanjiId);
     }
 
@@ -46,9 +48,10 @@ public class KanjiController {
      * @return Spring page of retrieved corresponding kanjis
      */
     @GetMapping
-    public Page<Kanji> searchKanjis(@RequestParam(required = false, value = "search") final String search,
-                                    @RequestParam(required = false, value = "lang") final Language lang,
-                                    @ParameterObject @PageableDefault final Pageable pageable) {
+    public Page<Kanji> searchKanjis(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Language lang,
+            @ParameterObject @PageableDefault Pageable pageable) {
         return kanjiService.getKanjis(search, lang, pageable);
     }
 
@@ -61,9 +64,11 @@ public class KanjiController {
      * @return Created kanji
      */
     @PostMapping
-    public Kanji addKanji(@RequestBody Kanji kanji,
-                          @RequestParam(defaultValue = "false", value = "autoDetect") boolean autoDetect,
-                          @RequestParam(defaultValue = "false", value = "preview") boolean preview) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Kanji addKanji(
+            @RequestBody @Valid Kanji kanji,
+            @RequestParam(defaultValue = "false") boolean autoDetect,
+            @RequestParam(defaultValue = "false") boolean preview) {
         return kanjiService.addKanji(kanji, autoDetect, preview);
     }
 
@@ -74,9 +79,8 @@ public class KanjiController {
      * @param patch   Data which have to be modified
      * @return Updated Kanji
      */
-    @PatchMapping(path = "/{kanjiId}")
-    public Kanji updateKanji(@PathVariable Long kanjiId,
-                             @RequestBody JsonNode patch) {
+    @PatchMapping("/{kanjiId}")
+    public Kanji updateKanji(@PathVariable Long kanjiId, @RequestBody JsonNode patch) {
         return kanjiService.patchKanji(kanjiId, patch);
     }
 
@@ -85,8 +89,9 @@ public class KanjiController {
      *
      * @param kanjiId Kanji ID
      */
-    @DeleteMapping(path = "/{kanjiId}")
-    public void deleteKanji(@PathVariable("kanjiId") final Long kanjiId) {
+    @DeleteMapping("/{kanjiId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteKanji(@PathVariable Long kanjiId) {
         kanjiService.deleteKanji(kanjiId);
     }
 }

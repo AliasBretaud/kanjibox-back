@@ -11,7 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  * Global controller for exceptions handling
@@ -22,9 +22,12 @@ import java.sql.Timestamp;
 @Slf4j
 public class ExceptionHelper {
 
-    public static ApiExceptionWrapper buildApiException(final HttpStatus status, final Exception ex) {
-        return new ApiExceptionWrapper(new Timestamp(System.currentTimeMillis()).toString(),
-                status.value(), ex.getClass().getName(), ex.getMessage());
+    private static ApiExceptionWrapper buildApiException(final HttpStatus status, final Exception ex) {
+        return new ApiExceptionWrapper(
+                Instant.now().toString(),
+                status.value(),
+                ex.getClass().getSimpleName(),
+                ex.getMessage());
     }
 
     /**
@@ -39,10 +42,9 @@ public class ExceptionHelper {
             HttpMessageNotReadableException.class,
     })
     public ResponseEntity<Object> handleInvalidInputException(Exception ex) {
-        log.error("Invalid Input Exception: ", ex);
+        log.warn("Bad request: {}", ex.getMessage());
         var status = HttpStatus.BAD_REQUEST;
-        var apiException = buildApiException(status, ex);
-        return new ResponseEntity<>(apiException, status);
+        return new ResponseEntity<>(buildApiException(status, ex), status);
     }
 
     /**
@@ -54,22 +56,19 @@ public class ExceptionHelper {
     @ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<Object> handleItemNotFoundException(ItemNotFoundException ex) {
         var status = HttpStatus.NOT_FOUND;
-        var apiException = buildApiException(status, ex);
-        return new ResponseEntity<>(apiException, status);
+        return new ResponseEntity<>(buildApiException(status, ex), status);
     }
 
     /**
-     * Handling general Exceptions
+     * Handling external service Exceptions
      *
      * @param ex Exception
-     * @return 500 SERVICE_UNAVAILABLE status with returned error
+     * @return 503 SERVICE_UNAVAILABLE status with returned error
      */
     @ExceptionHandler(ExternalServiceError.class)
-    public ResponseEntity<Object> handleExternalServiceException(Exception ex) {
-        log.error("External service Exception: ", ex);
+    public ResponseEntity<Object> handleExternalServiceException(ExternalServiceError ex) {
+        log.error("External service error: ", ex);
         var status = HttpStatus.SERVICE_UNAVAILABLE;
-        var apiException = buildApiException(status, ex);
-        return new ResponseEntity<>(apiException, status);
+        return new ResponseEntity<>(buildApiException(status, ex), status);
     }
-
 }

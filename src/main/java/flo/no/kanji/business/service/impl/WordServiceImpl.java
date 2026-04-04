@@ -1,6 +1,7 @@
 package flo.no.kanji.business.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.moji4j.MojiConverter;
 import com.moji4j.MojiDetector;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
@@ -74,6 +75,8 @@ public class WordServiceImpl implements WordService {
     private final KanjiMapper kanjiMapper;
 
     private final MojiDetector mojiDetector;
+
+    private final MojiConverter mojiConverter;
 
     /**
      * Translation service
@@ -261,8 +264,7 @@ public class WordServiceImpl implements WordService {
      * @return Spring page of retrieved corresponding words
      */
     private Page<Word> searchWord(String search, Pageable pageable) {
-
-        var spec = WordSpecification.searchWord(search);
+        var spec = WordSpecification.searchWord(search, mojiConverter);
         return wordRepository.findAll(spec, pageable).map(wordMapper::toBusinessObject);
     }
 

@@ -44,7 +44,7 @@ import static flo.no.kanji.util.TranslationUtils.getExistingTranslation;
 @RequiredArgsConstructor
 public class KanjiServiceImpl implements KanjiService {
 
-    private final int LISTS_MAX_SIZE = 3;
+    private static final int LISTS_MAX_SIZE = 3;
 
     private final UserService userService;
 
@@ -173,13 +173,15 @@ public class KanjiServiceImpl implements KanjiService {
 
     @Override
     public void deleteKanji(Long kanjiId) {
-        var kanji = kanjiRepository.findById(kanjiId)
+        var entity = kanjiRepository.findById(kanjiId)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found"));
-        if (!kanji.getWords().isEmpty()) {
-            throw new InvalidInputException("Kanji used in words: "
-                    + kanji.getWords().stream().map(WordEntity::getValue).collect(Collectors.joining(",")));
+        if (!entity.getWords().isEmpty()) {
+            var usedInWords = entity.getWords().stream()
+                    .map(WordEntity::getValue)
+                    .collect(Collectors.joining(", "));
+            throw new InvalidInputException("Kanji is still referenced by words: [" + usedInWords + "]");
         }
-        kanjiRepository.delete(kanji);
+        kanjiRepository.delete(entity);
     }
 
     /**

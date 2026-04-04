@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.nio.file.AccessDeniedException;
+import java.time.Instant;
 
 @ControllerAdvice
 public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
@@ -21,7 +22,11 @@ public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({AuthenticationException.class, AccessDeniedException.class})
     public ResponseEntity<Object> handleAuthenticationException(Exception ex) {
         var status = ex instanceof AccessDeniedException ? HttpStatus.FORBIDDEN : HttpStatus.UNAUTHORIZED;
-        var apiException = ExceptionHelper.buildApiException(status, ex);
-        return new ResponseEntity<>(apiException, status);
+        var body = new ApiExceptionWrapper(
+                Instant.now().toString(),
+                status.value(),
+                ex.getClass().getSimpleName(),
+                ex.getMessage());
+        return new ResponseEntity<>(body, status);
     }
 }

@@ -8,11 +8,14 @@ spring:
     username: postgres
     password: root
   jpa:
+    open-in-view: false
     show-sql: false
     properties:
       hibernate:
         format_sql: true
 kanji:
+  cors:
+    allowed-origins: "http://localhost:3000"
   translation:
     auto:
       enable: false

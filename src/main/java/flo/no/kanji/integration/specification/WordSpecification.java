@@ -22,9 +22,10 @@ import java.util.List;
  */
 public class WordSpecification {
 
-    private static final MojiConverter converter = new MojiConverter();
+    private WordSpecification() {
+    }
 
-    public static Specification<WordEntity> searchWord(final String search) {
+    public static Specification<WordEntity> searchWord(final String search, final MojiConverter converter) {
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             var userJoin = root.join(WordEntity_.user, JoinType.INNER);

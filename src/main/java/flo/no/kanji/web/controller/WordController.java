@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.WordService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -19,38 +22,42 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/words")
 @RequiredArgsConstructor
+@Validated
 public class WordController {
 
-    /**
-     * Word business service
-     */
+    /** Word business service */
     private final WordService wordService;
 
     /**
      * Search words by its japanese value
      *
-     * @param search    Word japansese writing value
+     * @param search    Word japanese writing value
+     * @param lang      Translation language filter
      * @param listLimit Max size of the lists contained in the returned object
      * @param pageable  Returned page parameters (limit, number of items per page...)
      * @return Spring page of retrieved corresponding words
      */
     @GetMapping
-    public Page<Word> getWords(@RequestParam(required = false, value = "search") final String search,
-                               @RequestParam(required = false, value = "lang") final Language lang,
-                               @RequestParam(required = false, value = "listLimit") final Integer listLimit,
-                               @ParameterObject @PageableDefault final Pageable pageable) {
+    public Page<Word> getWords(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Language lang,
+            @RequestParam(required = false) Integer listLimit,
+            @ParameterObject @PageableDefault Pageable pageable) {
         return wordService.getWords(search, lang, listLimit, pageable);
     }
 
     /**
      * Saving new word
      *
-     * @param word Word business object
+     * @param word    Word business object
+     * @param preview Return unsaved object
      * @return Created word
      */
     @PostMapping
-    public Word addWord(@RequestBody Word word,
-                        @RequestParam(defaultValue = "false", value = "preview") boolean preview) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Word addWord(
+            @RequestBody @Valid Word word,
+            @RequestParam(defaultValue = "false") boolean preview) {
         return wordService.addWord(word, preview);
     }
 
@@ -61,9 +68,8 @@ public class WordController {
      * @param patch  Data which have to be modified
      * @return Updated Word
      */
-    @PatchMapping(path = "/{wordId}")
-    public Word updateWord(@PathVariable Long wordId,
-                           @RequestBody JsonNode patch) {
+    @PatchMapping("/{wordId}")
+    public Word updateWord(@PathVariable Long wordId, @RequestBody JsonNode patch) {
         return wordService.patchWord(wordId, patch);
     }
 
@@ -72,8 +78,9 @@ public class WordController {
      *
      * @param wordId Word ID
      */
-    @DeleteMapping(path = "/{wordId}")
-    public void deleteWord(@PathVariable("wordId") final Long wordId) {
+    @DeleteMapping("/{wordId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteWord(@PathVariable Long wordId) {
         wordService.deleteWord(wordId);
     }
 }
