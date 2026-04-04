@@ -15,7 +15,7 @@ spring:
 kanji:
   translation:
     auto:
-      enable: true
+      enable: false
 okta:
   oauth2:
     audience: https://kanjibox/api
