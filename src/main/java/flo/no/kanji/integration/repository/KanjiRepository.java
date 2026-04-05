@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * JPA repository for KANJI table
@@ -24,7 +25,16 @@ public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSp
      * @param sub        User sub identifier
      * @return Found kanji
      */
-    KanjiEntity findByValueAndUserSub(String kanjiValue, String sub);
+    Optional<KanjiEntity> findByValueAndUserSub(String kanjiValue, String sub);
+
+    /**
+     * Find a kanji by its id
+     *
+     * @param id  kanji id
+     * @param sub User sub identifier
+     * @return Found kanji
+     */
+    Optional<KanjiEntity> findByIdAndUserSub(Long id, String sub);
 
     /**
      * Find a list of kanji by japanese writing values

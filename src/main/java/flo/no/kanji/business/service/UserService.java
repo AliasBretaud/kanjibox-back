@@ -4,7 +4,5 @@ import flo.no.kanji.integration.entity.UserEntity;
 
 public interface UserService {
 
-    void createOrUpdateUser(final String sub);
-
-    UserEntity getCurrentUser();
+    UserEntity createOrGetBySub(final String sub);
 }

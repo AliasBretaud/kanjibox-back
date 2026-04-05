@@ -31,6 +31,9 @@ public class KanjiControllerTest {
     @MockitoBean
     JwtDecoder jwtDecoder;
 
+    @MockitoBean
+    private com.google.cloud.translate.Translate googleTranslator;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -69,7 +72,7 @@ public class KanjiControllerTest {
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(kanji)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -84,7 +87,7 @@ public class KanjiControllerTest {
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(kanji)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -199,7 +202,7 @@ public class KanjiControllerTest {
     public void deleteKanjiOk() throws Exception {
         mockMvc.perform(delete("/kanjis/14")
                         .with(mockUser()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

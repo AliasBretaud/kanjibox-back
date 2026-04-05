@@ -12,7 +12,6 @@ import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.specification.KanjiSpecification;
-import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.ListUtils;
 import flo.no.kanji.util.PatchHelper;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
@@ -73,14 +72,11 @@ public class KanjiServiceImpl implements KanjiService {
      **/
     private final MojiConverter converter;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Kanji addKanji(@Valid Kanji kanji, boolean autoDetect, boolean preview) {
+    public Kanji addKanji(@Valid Kanji kanji, boolean autoDetect, boolean preview, String userSub) {
 
         // Check duplicate entry
-        checkKanjiAlreadyPresent(kanji);
+        checkKanjiAlreadyPresent(kanji, userSub);
 
         // Handle auto-detect readings
         if (autoDetect) {
@@ -92,12 +88,12 @@ public class KanjiServiceImpl implements KanjiService {
         kanji.setTranslations(translations);
 
         // Built object
-        return preview ? kanji : saveKanji(kanji);
+        return preview ? kanji : saveKanji(kanji, userSub);
     }
 
-    private Kanji saveKanji(final Kanji kanji) {
+    private Kanji saveKanji(final Kanji kanji, String userSub) {
         var entity = kanjiMapper.toEntity(kanji);
-        var user = userService.getCurrentUser();
+        var user = userService.createOrGetBySub(userSub);
         entity.setUser(user);
         return kanjiMapper.toBusinessObject(kanjiRepository.save(entity));
     }
@@ -129,25 +125,18 @@ public class KanjiServiceImpl implements KanjiService {
                 });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Page<Kanji> getKanjis(String search, Language language, Pageable pageable) {
-        var sub = AuthUtils.getUserSub();
+    public Page<Kanji> getKanjis(String search, Language language, Pageable pageable, String userSub) {
         return ObjectUtils.isEmpty(search)
-                ? kanjiRepository.findAllByUserSubOrderByTimeStampDesc(sub, pageable)
+                ? kanjiRepository.findAllByUserSubOrderByTimeStampDesc(userSub, pageable)
                 .map(kanjiMapper::toBusinessObject)
-                : this.searchKanji(search, language, pageable);
+                : this.searchKanji(search, language, pageable, userSub);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Kanji patchKanji(Long kanjiId, JsonNode patch) {
+    public Kanji patchKanji(Long kanjiId, JsonNode patch, String userSub) {
 
-        var initialKanji = this.findById(kanjiId);
+        var initialKanji = this.findById(kanjiId, userSub);
         var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
 
         // Prevent ID update
@@ -156,24 +145,21 @@ public class KanjiServiceImpl implements KanjiService {
         }
 
         var patchedKanjiEntity = kanjiMapper.toEntity(patchedKanji);
-        patchedKanjiEntity.setUser(userService.getCurrentUser());
+        patchedKanjiEntity.setUser(userService.createOrGetBySub(userSub));
         patchedKanjiEntity = kanjiRepository.save(patchedKanjiEntity);
 
         return kanjiMapper.toBusinessObject(patchedKanjiEntity);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Kanji findById(Long kanjiId) {
-        return kanjiMapper.toBusinessObject(kanjiRepository.findById(kanjiId)
+    public Kanji findById(Long kanjiId, String userSub) {
+        return kanjiMapper.toBusinessObject(kanjiRepository.findByIdAndUserSub(kanjiId, userSub)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
     }
 
     @Override
-    public void deleteKanji(Long kanjiId) {
-        var entity = kanjiRepository.findById(kanjiId)
+    public void deleteKanji(Long kanjiId, String userSub) {
+        var entity = kanjiRepository.findByIdAndUserSub(kanjiId, userSub)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found"));
         if (!entity.getWords().isEmpty()) {
             var usedInWords = entity.getWords().stream()
@@ -191,9 +177,9 @@ public class KanjiServiceImpl implements KanjiService {
      * @param pageable Pagination parameter
      * @return The result of search
      */
-    private Page<Kanji> searchKanji(String search, Language language, Pageable pageable) {
+    private Page<Kanji> searchKanji(String search, Language language, Pageable pageable, String userSub) {
 
-        var spec = KanjiSpecification.searchKanji(search, language, this.converter);
+        var spec = KanjiSpecification.searchKanji(search, language, this.converter, userSub);
         // Execute query, mapping and return results
         return kanjiRepository.findAll(spec, pageable).map(kanjiMapper::toBusinessObject);
     }
@@ -209,8 +195,8 @@ public class KanjiServiceImpl implements KanjiService {
                 .orElse(Collections.emptyList());
     }
 
-    private void checkKanjiAlreadyPresent(final Kanji kanji) {
-        Optional.ofNullable(kanjiRepository.findByValueAndUserSub(kanji.getValue(), AuthUtils.getUserSub()))
+    private void checkKanjiAlreadyPresent(final Kanji kanji, String userSub) {
+        kanjiRepository.findByValueAndUserSub(kanji.getValue(), userSub)
                 .ifPresent(k -> {
                     throw new InvalidInputException(
                             String.format("Kanji with value '%s' already exists in database", k.getValue()));

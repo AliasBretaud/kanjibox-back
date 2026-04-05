@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -44,6 +45,9 @@ public class WordControllerTest {
 
     @MockitoBean
     private TranslationService translationService;
+
+    @MockitoBean
+    private com.google.cloud.translate.Translate googleTranslator;
 
     @Autowired
     private MockMvc mockMvc;
@@ -107,7 +111,7 @@ public class WordControllerTest {
 
     @Test
     public void testPostWordOk() throws Exception {
-        when(translationService.translateValue(anyString(), any(Language.class))).thenReturn("auto translation");
+        when(translationService.translateValue(anyString(), any(Language.class))).thenReturn(Optional.of("auto translation"));
         var word = Word.builder()
                 .value("食前")
                 .furiganaValue("しょくぜん")
@@ -118,7 +122,7 @@ public class WordControllerTest {
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(word)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.value", is("食前")))
                 .andExpect(jsonPath("$.furiganaValue", is("しょくぜん")))
@@ -129,7 +133,7 @@ public class WordControllerTest {
 
     @Test
     public void testPostWordOkAutoDetect() throws Exception {
-        when(translationService.translateValue(anyString(), any(Language.class))).thenReturn("auto translation");
+        when(translationService.translateValue(anyString(), any(Language.class))).thenReturn(Optional.of("auto translation"));
         var word = Word.builder()
                 .value("食器")
                 .build();
@@ -138,7 +142,7 @@ public class WordControllerTest {
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(word)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.value", is("食器")))
                 .andExpect(jsonPath("$.furiganaValue", is("しょっき")))
@@ -150,7 +154,7 @@ public class WordControllerTest {
     public void deleteWordOk() throws Exception {
         mockMvc.perform(delete("/words/80")
                         .with(mockUser()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

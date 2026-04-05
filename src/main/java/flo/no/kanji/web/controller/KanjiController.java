@@ -6,11 +6,16 @@ import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.service.KanjiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/kanjis")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Kanji", description = "Endpoints for managing Kanjis and their translations")
 public class KanjiController {
 
     /** Kanji business service **/
@@ -35,8 +41,11 @@ public class KanjiController {
      * @return Retrieved kanji business object
      */
     @GetMapping("/{kanjiId}")
-    public Kanji getKanji(@PathVariable Long kanjiId) {
-        return kanjiService.findById(kanjiId);
+    @Operation(summary = "Get a kanji by its ID", description = "Retrieves a specific kanji from the user's collection.")
+    @ApiResponse(responseCode = "200", description = "Found the kanji")
+    @ApiResponse(responseCode = "404", description = "Kanji not found")
+    public Kanji getKanji(@PathVariable Long kanjiId, @Parameter(hidden = true) JwtAuthenticationToken principal) {
+        return kanjiService.findById(kanjiId, principal.getName());
     }
 
     /**
@@ -48,11 +57,13 @@ public class KanjiController {
      * @return Spring page of retrieved corresponding kanjis
      */
     @GetMapping
+    @Operation(summary = "Search kanjis", description = "Search for kanjis in the user's collection with optional filters.")
     public Page<Kanji> searchKanjis(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Language lang,
-            @ParameterObject @PageableDefault Pageable pageable) {
-        return kanjiService.getKanjis(search, lang, pageable);
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) JwtAuthenticationToken principal) {
+        return kanjiService.getKanjis(search, lang, pageable, principal.getName());
     }
 
     /**
@@ -65,11 +76,15 @@ public class KanjiController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add a new kanji", description = "Creates a new kanji in the user's collection, with optional automatic reading and translation detection.")
+    @ApiResponse(responseCode = "201", description = "Kanji created successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid input or Kanji already exists")
     public Kanji addKanji(
             @RequestBody @Valid Kanji kanji,
             @RequestParam(defaultValue = "false") boolean autoDetect,
-            @RequestParam(defaultValue = "false") boolean preview) {
-        return kanjiService.addKanji(kanji, autoDetect, preview);
+            @RequestParam(defaultValue = "false") boolean preview,
+            @Parameter(hidden = true) JwtAuthenticationToken principal) {
+        return kanjiService.addKanji(kanji, autoDetect, preview, principal.getName());
     }
 
     /**
@@ -80,8 +95,9 @@ public class KanjiController {
      * @return Updated Kanji
      */
     @PatchMapping("/{kanjiId}")
-    public Kanji updateKanji(@PathVariable Long kanjiId, @RequestBody JsonNode patch) {
-        return kanjiService.patchKanji(kanjiId, patch);
+    @Operation(summary = "Patch a kanji", description = "Partially updates an existing kanji using a JSON patch.")
+    public Kanji updateKanji(@PathVariable Long kanjiId, @RequestBody JsonNode patch, @Parameter(hidden = true) JwtAuthenticationToken principal) {
+        return kanjiService.patchKanji(kanjiId, patch, principal.getName());
     }
 
     /**
@@ -91,7 +107,9 @@ public class KanjiController {
      */
     @DeleteMapping("/{kanjiId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteKanji(@PathVariable Long kanjiId) {
-        kanjiService.deleteKanji(kanjiId);
+    @Operation(summary = "Delete a kanji", description = "Removes a kanji from the user's collection.")
+    @ApiResponse(responseCode = "204", description = "Kanji deleted successfully")
+    public void deleteKanji(@PathVariable Long kanjiId, @Parameter(hidden = true) JwtAuthenticationToken principal) {
+        kanjiService.deleteKanji(kanjiId, principal.getName());
     }
 }

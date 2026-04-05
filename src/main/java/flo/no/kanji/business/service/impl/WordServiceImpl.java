@@ -18,11 +18,11 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.integration.specification.WordSpecification;
-import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
 import flo.no.kanji.util.PatchHelper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import flo.no.kanji.util.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -96,10 +96,10 @@ public class WordServiceImpl implements WordService {
      */
     @Override
     @Transactional
-    public Word addWord(@Valid Word word, boolean preview) {
+    public Word addWord(@Valid Word word, boolean preview, String userSub) {
 
         // The word can't be already present in DB in order to be added
-        checkWordAlreadyPresent(word);
+        checkWordAlreadyPresent(word, userSub);
 
         // Initializing kanjis composing the word
         if (CollectionUtils.isEmpty(word.getKanjis())) {
@@ -112,7 +112,7 @@ public class WordServiceImpl implements WordService {
         }
 
         // Word kanjis entities
-        var wordKanjiEntities = getExistingKanjisFromWord(word);
+        var wordKanjiEntities = getExistingKanjisFromWord(word, userSub);
         var kanjisToFetch = getKanjisToFetch(word.getKanjis(), wordKanjiEntities);
 
         // Async tasks
@@ -123,7 +123,9 @@ public class WordServiceImpl implements WordService {
         wordKanjiEntities.addAll(kanjiFutures.stream()
                 .map(CompletableFuture::join)
                 .map(kanjiMapper::toEntity)
+                .peek(k -> k.setUser(userService.createOrGetBySub(userSub)))
                 .toList());
+
         // Getting all the translations
         var translationsMap = wordTranslationFutures.entrySet()
                 .stream()
@@ -136,40 +138,13 @@ public class WordServiceImpl implements WordService {
             word.setKanjis(wordKanjiEntities.stream().map(kanjiMapper::toBusinessObject).toList());
             return word;
         }
-        return saveWord(word, wordKanjiEntities);
+        return saveWord(word, wordKanjiEntities, userSub);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void deleteWord(Long wordId) {
-        var word = wordRepository.findById(wordId)
-                .orElseThrow(() -> new ItemNotFoundException("Word with ID " + wordId + " not found"));
-        wordRepository.delete(word);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Word patchWord(Long wordId, JsonNode patch) {
-        var initialWord = this.findById(wordId);
-        var patchedWord = patchHelper.mergePatch(initialWord, patch, Word.class);
-
-        // Prevent ID update
-        if (!Objects.equals(patchedWord.getId(), wordId)) {
-            throw new InvalidInputException("ID update is forbidden");
-        }
-
-        return saveWord(patchedWord, initialWord.getKanjis()
-                .stream().map(kanjiMapper::toEntity).toList());
-    }
-
-    private Word saveWord(final Word word, List<KanjiEntity> wordKanjis) {
-        var user = userService.getCurrentUser();
+    private Word saveWord(final Word word, List<KanjiEntity> wordKanjis, String userSub) {
+        var user = userService.createOrGetBySub(userSub);
         var entity = wordMapper.toEntity(word);
-        if (!ObjectUtils.isEmpty(wordKanjis)) {
+        if (!CollectionUtils.isEmpty(wordKanjis)) {
             wordKanjis.forEach(k -> k.setUser(user));
         }
         entity.setKanjis(wordKanjis);
@@ -181,12 +156,54 @@ public class WordServiceImpl implements WordService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Word> getWords(String search, Language language, Integer listLimit, Pageable pageable) {
-        var sub = AuthUtils.getUserSub();
-        return ObjectUtils.isEmpty(search)
-                ? wordRepository.findAllByUserSubOrderByTimeStampDesc(sub, pageable)
-                .map(w -> wordMapper.toBusinessObject(w, listLimit))
-                : this.searchWord(search, pageable);
+    public void deleteWord(Long wordId, String userSub) {
+        var entity = wordRepository.findByIdAndUserSub(wordId, userSub)
+                .orElseThrow(() -> new ItemNotFoundException("Word with ID " + wordId + " not found"));
+        wordRepository.delete(entity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Word patchWord(Long wordId, JsonNode patch, String userSub) {
+        var initialEntity = wordRepository.findByIdAndUserSub(wordId, userSub)
+                .orElseThrow(() -> new ItemNotFoundException("Word with ID " + wordId + " not found"));
+        var initialWord = wordMapper.toBusinessObject(initialEntity);
+
+        var patchedWord = patchHelper.mergePatch(initialWord, patch, Word.class);
+
+        // Prevent ID update
+        if (!Objects.equals(patchedWord.getId(), wordId)) {
+            throw new InvalidInputException("ID update is forbidden");
+        }
+
+        return saveWord(patchedWord, initialEntity.getKanjis(), userSub);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<Word> getWords(String search, Language language, Integer listLimit, Pageable pageable, String userSub) {
+
+        Page<Word> result;
+        if (ObjectUtils.isEmpty(search)) {
+            result = wordRepository.findAllByUserSubOrderByTimeStampDesc(userSub, pageable)
+                    .map(wordMapper::toBusinessObject);
+        } else {
+            result = this.searchWord(search, language, listLimit, pageable, userSub);
+        }
+
+        if (listLimit != null && listLimit > 0) {
+            result.forEach(w -> {
+                if (w.getTranslations() != null) {
+                    w.setTranslations(w.getTranslations().entrySet().stream()
+                            .collect(Collectors.toMap(e -> e.getKey(), e -> ListUtils.truncateList(e.getValue(), listLimit))));
+                }
+            });
+        }
+        return result;
     }
 
     private List<CompletableFuture<Kanji>> buildKanjiFutures(List<Kanji> kanjis) {
@@ -209,12 +226,12 @@ public class WordServiceImpl implements WordService {
                 .toList();
     }
 
-    private List<KanjiEntity> getExistingKanjisFromWord(Word word) {
+    private List<KanjiEntity> getExistingKanjisFromWord(Word word, String userSub) {
         return Collections.synchronizedList(
                 new ArrayList<>(kanjiRepository.findByValueInAndUserSub(word.getKanjis()
                         .stream()
                         .map(Kanji::getValue)
-                        .toList(), AuthUtils.getUserSub())));
+                        .toList(), userSub)));
     }
 
     private Map<Language, CompletableFuture<List<String>>> buildTranslationFutures(Word word) {
@@ -231,18 +248,20 @@ public class WordServiceImpl implements WordService {
     }
 
     private CompletableFuture<List<String>> fetchAutoTranslationAsync(Word word, Language lang) {
-        return CompletableFuture.supplyAsync(() -> {
-            var autoTranslation = translationService.translateValue(word.getValue(), lang);
-            return Optional.ofNullable(autoTranslation).map(List::of).orElse(Collections.emptyList());
-        });
+        return CompletableFuture.supplyAsync(() ->
+            translationService.translateValue(word.getValue(), lang)
+                    .map(List::of)
+                    .orElse(Collections.emptyList())
+        );
     }
 
-    private void checkWordAlreadyPresent(final Word word) {
-        var sub = AuthUtils.getUserSub();
-        Optional.ofNullable(wordRepository.findByValueAndUserSub(word.getValue(), sub)).ifPresent(k -> {
-            throw new InvalidInputException(
-                    String.format("Word with value '%s' already exists in database", k.getValue()));
-        });
+
+    private void checkWordAlreadyPresent(final Word word, String userSub) {
+        wordRepository.findByValueAndUserSub(word.getValue(), userSub)
+                .ifPresent(w -> {
+                    throw new InvalidInputException(
+                            String.format("Word with value '%s' already exists in database", w.getValue()));
+                });
     }
 
     /**
@@ -263,14 +282,8 @@ public class WordServiceImpl implements WordService {
      * @param pageable Spring pageable request properties
      * @return Spring page of retrieved corresponding words
      */
-    private Page<Word> searchWord(String search, Pageable pageable) {
-        var spec = WordSpecification.searchWord(search, mojiConverter);
+    private Page<Word> searchWord(String search, Language language, Integer listLimit, Pageable pageable, String userSub) {
+        var spec = WordSpecification.searchWord(search, mojiConverter, userSub);
         return wordRepository.findAll(spec, pageable).map(wordMapper::toBusinessObject);
-    }
-
-    private Word findById(final Long wordId) {
-        var wordEntity = wordRepository.findById(wordId)
-                .orElseThrow(() -> new ItemNotFoundException("Word with ID " + wordId + " not found"));
-        return wordMapper.toBusinessObject(wordEntity);
     }
 }

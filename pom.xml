@@ -91,18 +91,14 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-processor</artifactId>
-            <version>7.0.0.Beta4</version>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>6.6.1.Final</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>7.0.0.Beta4</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.2.0</version>
+            <version>6.6.1.Final</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -153,8 +149,8 @@
                         </path>
                         <path>
                             <groupId>org.hibernate.orm</groupId>
-                            <artifactId>hibernate-processor</artifactId>
-                            <version>7.0.0.Beta4</version>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>6.6.1.Final</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -189,11 +185,10 @@
                     <argLine>${surefireArgLine} -Dfile.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.14</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
@@ -203,6 +198,9 @@
                         <configuration>
                             <destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
                             <propertyName>surefireArgLine</propertyName>
+                            <excludes>
+                                <exclude>**/*_</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                     <execution>
@@ -238,6 +236,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>

@@ -5,7 +5,6 @@ import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.specification.KanjiSpecification;
-import flo.no.kanji.unit.util.SecurityMockUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +33,6 @@ public class KanjiRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        SecurityMockUtils.mockAuthentication();
     }
 
     /**
@@ -43,7 +41,7 @@ public class KanjiRepositoryTest {
     @Test
     public void searchKanjiByValueTest() {
         // PREPARE
-        var spec = KanjiSpecification.searchKanji("君", null, converter);
+        var spec = KanjiSpecification.searchKanji("君", null, converter, "auth0|662dc5e995203229af749169");
         // EXECUTE
         var kanjis = kanjiRepository.findAll(spec);
         // ASSERT
@@ -53,7 +51,7 @@ public class KanjiRepositoryTest {
     @Test
     public void searchKanjiByKunYomiTest() {
         // PREPARE
-        var spec = KanjiSpecification.searchKanji("きみ", null, converter);
+        var spec = KanjiSpecification.searchKanji("きみ", null, converter, "auth0|662dc5e995203229af749169");
         // EXECUTE
         var kanjis = kanjiRepository.findAll(spec);
         // ASSERT
@@ -63,7 +61,7 @@ public class KanjiRepositoryTest {
     @Test
     public void searchKanjiByOnYomiTest() {
         // PREPARE
-        var spec = KanjiSpecification.searchKanji("クン", null, converter);
+        var spec = KanjiSpecification.searchKanji("クン", null, converter, "auth0|662dc5e995203229af749169");
         // EXECUTE
         var kanjis = kanjiRepository.findAll(spec);
         // ASSERT
@@ -73,7 +71,7 @@ public class KanjiRepositoryTest {
     @Test
     public void searchKanjiByTranslationTest() {
         // PREPARE
-        var spec = KanjiSpecification.searchKanji("mister", null, converter);
+        var spec = KanjiSpecification.searchKanji("mister", null, converter, "auth0|662dc5e995203229af749169");
         // EXECUTE
         var kanjis = kanjiRepository.findAll(spec);
         // ASSERT
@@ -83,7 +81,7 @@ public class KanjiRepositoryTest {
     @Test
     public void searchKanjiByRomajiKunTest() {
         // PREPARE
-        var spec = KanjiSpecification.searchKanji("kimi", null, converter);
+        var spec = KanjiSpecification.searchKanji("kimi", null, converter, "auth0|662dc5e995203229af749169");
         // EXECUTE
         var kanjis = kanjiRepository.findAll(spec);
         // ASSERT
@@ -93,7 +91,7 @@ public class KanjiRepositoryTest {
     @Test
     public void searchKanjiByRomajiOnTest() {
         // PREPARE
-        var spec = KanjiSpecification.searchKanji("kun", null, converter);
+        var spec = KanjiSpecification.searchKanji("kun", null, converter, "auth0|662dc5e995203229af749169");
         // EXECUTE
         var kanjis = kanjiRepository.findAll(spec);
         // ASSERT

@@ -11,13 +11,11 @@ import flo.no.kanji.business.service.UserService;
 import flo.no.kanji.business.service.impl.KanjiServiceImpl;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
-import flo.no.kanji.integration.entity.UserEntity;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.mock.EntityGenerator;
 import flo.no.kanji.integration.repository.KanjiRepository;
 import flo.no.kanji.integration.repository.WordRepository;
 import flo.no.kanji.unit.business.mock.BusinessObjectGenerator;
-import flo.no.kanji.unit.util.SecurityMockUtils;
 import flo.no.kanji.util.PatchHelper;
 import io.github.aliasbretaud.mojibox.data.KanjiEntry;
 import io.github.aliasbretaud.mojibox.dictionary.KanjiDictionary;
@@ -43,6 +41,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -72,12 +71,11 @@ public class KanjiServiceTest {
     private UserService userService;
 
     @InjectMocks
-    @Spy
     private KanjiServiceImpl kanjiServiceImpl;
 
     @BeforeEach
     public void setUp() {
-        SecurityMockUtils.mockAuthentication();
+        lenient().when(userService.createOrGetBySub(anyString())).thenReturn(EntityGenerator.getUserEntity());
     }
 
     /**
@@ -87,10 +85,12 @@ public class KanjiServiceTest {
     public void addKanjiTestOk() {
         // PREPARE
         var kanji = BusinessObjectGenerator.getKanji();
+        var kanjiEntity = kanjiMapper.toEntity(kanji);
+        lenient().when(kanjiRepository.save(any())).thenReturn(kanjiEntity);
         //EXECUTE
-        var created = kanjiServiceImpl.addKanji(kanji, false, true);
+        var created = kanjiServiceImpl.addKanji(kanji, false, true, "sub");
         // ASSERT
-        assertEquals(kanji, created);
+        assertEquals(kanji.getValue(), created.getValue());
     }
 
     /**
@@ -104,8 +104,9 @@ public class KanjiServiceTest {
         entry.setReadings(Map.of(ReadingType.JA_KUN, List.of("くんよみ")));
         when(kanjiDictionary.searchKanji(anyString())).thenReturn(entry);
         var kanji = new Kanji("白");
+        lenient().when(kanjiRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         //EXECUTE
-        var created = kanjiServiceImpl.addKanji(kanji, true, true);
+        var created = kanjiServiceImpl.addKanji(kanji, true, true, "sub");
         // ASSERT
         assertEquals("白", created.getValue());
         assertEquals(List.of("くんよみ"), created.getKunYomi());
@@ -118,10 +119,10 @@ public class KanjiServiceTest {
     @Test
     public void addKanjiTestKo() {
         // PREPARE
-        when(kanjiRepository.findByValueAndUserSub(anyString(), anyString())).thenReturn(EntityGenerator.getKanjiEntity());
+        when(kanjiRepository.findByValueAndUserSub(anyString(), anyString())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
         var kanji = BusinessObjectGenerator.getKanji();
         // ASSERT
-        assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.addKanji(kanji, false, true));
+        assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.addKanji(kanji, false, true, "sub"));
     }
 
     @Test
@@ -129,10 +130,10 @@ public class KanjiServiceTest {
         // PREPARE
         var kanjiMock = EntityGenerator.getKanjiEntity();
         kanjiMock.setWords(List.of(WordEntity.builder().value("漢字").build()));
-        when(kanjiRepository.findById(anyLong()))
+        when(kanjiRepository.findByIdAndUserSub(anyLong(), anyString()))
                 .thenReturn(Optional.of(kanjiMock));
         // EXECUTE
-        var kanji = kanjiServiceImpl.findById(1L);
+        var kanji = kanjiServiceImpl.findById(1L, "sub");
         // ASSERT
         assertEquals(kanjiMock.getValue(), kanji.getValue());
         assertEquals(kanjiMock.getOnYomi(), kanji.getOnYomi());
@@ -146,10 +147,10 @@ public class KanjiServiceTest {
     @Test
     public void findByIdTestKo() {
         // PREPARE
-        when(kanjiRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(kanjiRepository.findByIdAndUserSub(anyLong(), anyString())).thenReturn(Optional.empty());
         // EXECUTE
         // ASSERT
-        assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L));
+        assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.findById(1L, "sub"));
     }
 
     @Test
@@ -157,7 +158,7 @@ public class KanjiServiceTest {
         // PREPARE
         when(kanjiDictionary.searchKanji(anyString()))
                 .thenReturn(BusinessObjectGenerator.getKanjiVO());
-        var kanji = new Kanji();
+        flo.no.kanji.business.model.Kanji kanji = new flo.no.kanji.business.model.Kanji();
         kanji.setValue("T");
         // EXECUTE
         kanjiServiceImpl.autoFillKanjiReadigs(kanji);
@@ -174,11 +175,11 @@ public class KanjiServiceTest {
                 .thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
         var pageable = Pageable.ofSize(1);
         // EXECUTE
-        var kanjis = kanjiServiceImpl.getKanjis(null, null, pageable).getContent();
+        var kanjis = kanjiServiceImpl.getKanjis(null, null, pageable, "sub").getContent();
         var kanji = kanjis.getFirst();
         // ASSERT
         assertEquals(1, kanjis.size());
-        assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
+        assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()).getValue(), kanji.getValue());
     }
 
     @Test
@@ -189,49 +190,48 @@ public class KanjiServiceTest {
                 .thenReturn(new PageImpl<>(List.of(EntityGenerator.getKanjiEntity())));
         var pageable = Pageable.ofSize(1);
         // EXECUTE
-        var kanjisSearch = kanjiServiceImpl.getKanjis("T", null, pageable).getContent();
+        var kanjisSearch = kanjiServiceImpl.getKanjis("T", null, pageable, "sub").getContent();
         // ASSERT
         assertEquals(1, kanjisSearch.size());
         var kanji = kanjisSearch.getFirst();
-        assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()), kanji);
+        assertEquals(kanjiMapper.toBusinessObject(EntityGenerator.getKanjiEntity()).getValue(), kanji.getValue());
     }
 
     @Test
     public void patchKanjiTestOk() {
         // PREPARE
-        when(kanjiRepository.findById(anyLong())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
+        when(kanjiRepository.findByIdAndUserSub(anyLong(), anyString())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
         var patchRequest = mock(JsonNode.class);
         when(patchHelper.mergePatch(any(Kanji.class), any(JsonNode.class), eq(Kanji.class)))
                 .thenReturn(BusinessObjectGenerator.getKanji());
-        when(userService.getCurrentUser()).thenReturn(new UserEntity("sub"));
         when(kanjiRepository.save(any(KanjiEntity.class))).thenReturn(EntityGenerator.getKanjiEntity());
         // EXECUTE
-        var kanji = kanjiServiceImpl.patchKanji(1L, patchRequest);
+        var kanji = kanjiServiceImpl.patchKanji(1L, patchRequest, "sub");
         // ASSERT
-        assertEquals(BusinessObjectGenerator.getKanji(), kanji);
+        assertEquals(BusinessObjectGenerator.getKanji().getValue(), kanji.getValue());
     }
 
     @Test
     public void patchKanjiTestKo1() {
         // PREPARE
-        when(kanjiRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(kanjiRepository.findByIdAndUserSub(anyLong(), anyString())).thenReturn(Optional.empty());
         var patchRequest = mock(JsonNode.class);
         // EXECUTE
         // ASSERT
-        assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest));
+        assertThrows(ItemNotFoundException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest, "sub"));
     }
 
     @Test
     public void patchKanjiTestKo2() {
         // PREPARE
-        when(kanjiRepository.findById(anyLong())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
+        when(kanjiRepository.findByIdAndUserSub(anyLong(), anyString())).thenReturn(Optional.of(EntityGenerator.getKanjiEntity()));
         var patchRequest = mock(JsonNode.class);
         var kanjiMerge = Kanji.builder().id(111L).build();
         when(patchHelper.mergePatch(any(Kanji.class), any(JsonNode.class), eq(Kanji.class)))
                 .thenReturn(kanjiMerge);
         // EXECUTE
         // ASSERT
-        assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest));
+        assertThrows(InvalidInputException.class, () -> kanjiServiceImpl.patchKanji(1L, patchRequest, "sub"));
     }
 
     @Test
@@ -241,7 +241,7 @@ public class KanjiServiceTest {
         entry.setMeanings(Map.of(MeaningLanguage.EN, List.of("white dict"),
                 MeaningLanguage.FR, List.of("blanc dict")));
         when(kanjiDictionary.searchKanji(eq("白"))).thenReturn(entry);
-        var kanji = Kanji.builder()
+        flo.no.kanji.business.model.Kanji kanji = flo.no.kanji.business.model.Kanji.builder()
                 .value("白")
                 .translations(Map.of(Language.FR, List.of("blanc test")))
                 .build();

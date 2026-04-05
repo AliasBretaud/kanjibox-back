@@ -1,6 +1,7 @@
 package flo.no.kanji.business.service;
 
 import flo.no.kanji.business.constants.Language;
+import java.util.Optional;
 
 /**
  * Translations service
@@ -16,5 +17,5 @@ public interface TranslationService {
      *          Target language
      * @return The translated value
      */
-    String translateValue(final String value, Language target);
+    Optional<String> translateValue(final String value, Language target);
 }

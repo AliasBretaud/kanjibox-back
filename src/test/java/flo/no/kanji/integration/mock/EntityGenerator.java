@@ -3,6 +3,7 @@ package flo.no.kanji.integration.mock;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
+import flo.no.kanji.integration.entity.UserEntity;
 import flo.no.kanji.integration.entity.WordEntity;
 
 import java.time.LocalDateTime;
@@ -57,4 +58,21 @@ public class EntityGenerator {
 		}
 		return (WordEntity) objectMap.get(key);
 	}
+
+	/**
+	 * Generating UserEntity dummy object
+	 * @return UserEntity
+	 */
+	public static UserEntity getUserEntity() {
+		var key = "userEntity";
+		if (!objectMap.containsKey(key)) {
+			var user = new UserEntity();
+			user.setId(1L);
+			user.setSub("sub");
+			user.setLastConnected(LocalDateTime.now());
+			objectMap.put(key, user);
+		}
+		return (UserEntity) objectMap.get(key);
+	}
 }
+

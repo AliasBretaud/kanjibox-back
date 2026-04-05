@@ -7,7 +7,6 @@ import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.KanjiEntity_;
 import flo.no.kanji.integration.entity.TranslationEntity_;
 import flo.no.kanji.integration.entity.UserEntity_;
-import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.JoinType;
@@ -38,11 +37,12 @@ public class KanjiSpecification {
      */
     public static Specification<KanjiEntity> searchKanji(final String search,
                                                          final Language language,
-                                                         final MojiConverter converter) {
+                                                         final MojiConverter converter,
+                                                         final String userSub) {
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             var userJoin = root.join(KanjiEntity_.user, JoinType.INNER);
-            var userPredicate = builder.equal(userJoin.get(UserEntity_.sub), AuthUtils.getUserSub());
+            var userPredicate = builder.equal(userJoin.get(UserEntity_.sub), userSub);
             predicates.add(userPredicate);
             var characterTypeSearch = CharacterUtils.getCharacterType(search);
             if (characterTypeSearch == null) {

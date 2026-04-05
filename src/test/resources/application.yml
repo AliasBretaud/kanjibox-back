@@ -19,3 +19,5 @@ kanji:
   translation:
     auto:
       enable: true
+  cors:
+    allowed-origins: "*"

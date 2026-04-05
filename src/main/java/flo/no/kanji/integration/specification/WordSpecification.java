@@ -6,7 +6,6 @@ import flo.no.kanji.integration.entity.TranslationEntity_;
 import flo.no.kanji.integration.entity.UserEntity_;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.entity.WordEntity_;
-import flo.no.kanji.util.AuthUtils;
 import flo.no.kanji.util.CharacterUtils;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -25,11 +24,13 @@ public class WordSpecification {
     private WordSpecification() {
     }
 
-    public static Specification<WordEntity> searchWord(final String search, final MojiConverter converter) {
+    public static Specification<WordEntity> searchWord(final String search, 
+                                                         final MojiConverter converter, 
+                                                         final String userSub) {
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
             var userJoin = root.join(WordEntity_.user, JoinType.INNER);
-            var userPredicate = builder.equal(userJoin.get(UserEntity_.sub), AuthUtils.getUserSub());
+            var userPredicate = builder.equal(userJoin.get(UserEntity_.sub), userSub);
             predicates.add(userPredicate);
             var characterTypSearch = CharacterUtils.getCharacterType(search);
             if (characterTypSearch == null) {

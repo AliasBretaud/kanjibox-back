@@ -23,9 +23,10 @@ public interface KanjiService {
      * @param kanji      Kanji business object
      * @param autoDetect Calling external API for auto readings/translations setting (optional)
      * @param preview    Return the unsaved object
+     * @param userSub    Identification of the user adding the kanji
      * @return Created kanji
      */
-    Kanji addKanji(@Valid Kanji kanji, boolean autoDetect, boolean preview);
+    Kanji addKanji(@Valid Kanji kanji, boolean autoDetect, boolean preview, String userSub);
 
     /**
      * Merges the existing kanji translations and fills the ones not provided
@@ -48,31 +49,35 @@ public interface KanjiService {
      * @param search   Japanese kanji value
      * @param language Filter for translations language
      * @param pageable Returned page parameters (limit, number of items per page...)
+     * @param userSub  Identification of the user searching the kanjis
      * @return Spring page of retrieved corresponding kanjis
      */
-    Page<Kanji> getKanjis(String search, Language language, Pageable pageable);
+    Page<Kanji> getKanjis(String search, Language language, Pageable pageable, String userSub);
 
     /**
      * Modify an existing kanji attributes
      *
      * @param kanjiId Technical ID of the kanji present in database
      * @param patch   Data which have to be modified
+     * @param userSub Identification of the user updating the kanji
      * @return Updated Kanji
      */
-    Kanji patchKanji(Long kanjiId, JsonNode patch);
+    Kanji patchKanji(Long kanjiId, JsonNode patch, String userSub);
 
     /**
      * Find a single unit kanji by its ID
      *
      * @param kanjiId Kanji ID
+     * @param userSub Identification of the user finding the kanji
      * @return Kanji entity returned from database
      */
-    Kanji findById(Long kanjiId);
+    Kanji findById(Long kanjiId, String userSub);
 
     /**
      * Delete a kanji
      *
      * @param kanjiId Kanji ID
+     * @param userSub Identification of the user deleting the kanji
      */
-    void deleteKanji(Long kanjiId);
+    void deleteKanji(Long kanjiId, String userSub);
 }
