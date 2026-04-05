@@ -21,6 +21,10 @@ server:
 
 # Business params
 kanji:
+  cors:
+    allowed-origins:
+      - "https://kanjibox.vercel.app"
+      - "https://kanjibox-*.vercel.app"
   translation:
     auto:
       enable: ${AUTO_TRANSLATION_ENABLED:#{false}}
