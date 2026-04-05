@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DeeplTranslatorConfig {
 
-    @Value("${deepl.api.key}")
+    @Value("${deepl.api.key:}")
     private String deeplApiKey;
 
     @Bean
