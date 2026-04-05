@@ -15,7 +15,7 @@ spring:
         format_sql: true
 kanji:
   cors:
-    allowed-origins: "http://localhost:3000"
+    allowed-origins: http://localhost:3000
   translation:
     deepl:
       api-key: ${DEEPL_API_KEY}

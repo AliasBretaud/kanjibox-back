@@ -22,9 +22,9 @@ server:
 # Business params
 kanji:
   cors:
-    allowed-origins:
-      - "https://kanjibox.vercel.app"
-      - "https://kanjibox-*.vercel.app"
+    allowed-origins: >
+      https://kanjibox.vercel.app,
+      https://kanjibox-*.vercel.app
   translation:
     deepl:
       api-key: ${DEEPL_API_KEY}
