@@ -3,11 +3,12 @@ package flo.no.kanji.business.service.impl;
 import com.deepl.api.DeepLClient;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.service.TranslationService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.util.HtmlUtils;
+
 import java.util.Optional;
 
 /**
@@ -21,10 +22,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DeeplTranslationServiceImpl implements TranslationService {
 
+    @Nullable
     private final DeepLClient deeplClient;
 
     @Override
     public Optional<String> translateValue(String value, Language target) {
+        if (deeplClient == null) {
+            return Optional.empty();
+        }
         try {
             var targetLang = target.getValue().toLowerCase();
             if ("en".equals(targetLang)) {
