@@ -12,5 +12,7 @@ spring:
 # Disable translation
 kanji:
   translation:
+    deepl:
+      api-key: fake-key
     auto:
       enable: false

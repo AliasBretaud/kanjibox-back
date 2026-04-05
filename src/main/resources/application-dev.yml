@@ -17,8 +17,10 @@ kanji:
   cors:
     allowed-origins: "http://localhost:3000"
   translation:
+    deepl:
+      api-key: ${DEEPL_API_KEY}
     auto:
-      enable: false
+      enable: true
 okta:
   oauth2:
     audience: https://kanjibox/api
