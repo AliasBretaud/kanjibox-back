@@ -21,6 +21,13 @@ FROM base as build
 RUN ./mvnw package
 
 FROM eclipse-temurin:22_36-jre-alpine as production
+WORKDIR /app
 EXPOSE 8080
-COPY --from=build /app/target/flo-no-kanji-*.jar /flo-no-kanji.jar
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/flo-no-kanji.jar"]
+COPY --from=build /app/target/flo-no-kanji-*.jar /app/app.jar
+ENV JAVA_OPTS="-XX:+UseSerialGC \
+ -XX:+UseContainerSupport \
+ -XX:MaxRAMPercentage=75 \
+ -XX:InitialRAMPercentage=25 \
+ -XX:+ExitOnOutOfMemoryError \
+ -Djava.security.egd=file:/dev/./urandom"
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

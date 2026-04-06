@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Build and Deploy
 
 on:
   push:
@@ -38,3 +38,17 @@ jobs:
           push: true
           target: test
           tags: fbrtd/kanjibox-api:test
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            ./deploy.sh
