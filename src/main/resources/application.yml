@@ -2,6 +2,8 @@
 spring:
   datasource:
     hikari:
+      max-lifetime: 300000
+      idle-timeout: 240000
       data-source-properties:
         useUnicode: true
         characterEncoding: UTF-8
