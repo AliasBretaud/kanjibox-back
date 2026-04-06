@@ -188,6 +188,9 @@
                     <forkCount>2</forkCount>
                     <reuseForks>true</reuseForks>
                     <argLine>${surefireArgLine} -Dfile.encoding=UTF-8</argLine>
+                    <systemPropertyVariables>
+                        <spring.profiles.active>test</spring.profiles.active>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
