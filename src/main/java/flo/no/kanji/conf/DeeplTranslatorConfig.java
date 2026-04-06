@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class DeeplTranslatorConfig {
 
     @Bean
-    @ConditionalOnProperty(name = "kanji.translation.auto.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "kanji.translation.auto.enable", havingValue = "true")
     public DeepLClient deeplClient(@Value("${deepl.api.key}") final String deeplApiKey) {
         return new DeepLClient(deeplApiKey);
     }

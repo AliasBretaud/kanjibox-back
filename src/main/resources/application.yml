@@ -15,6 +15,7 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
+    open-in-view: false
 server:
   error:
     include-stacktrace: never
