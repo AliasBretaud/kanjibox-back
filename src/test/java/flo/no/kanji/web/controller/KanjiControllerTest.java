@@ -31,9 +31,6 @@ public class KanjiControllerTest {
     @MockitoBean
     JwtDecoder jwtDecoder;
 
-    @MockitoBean
-    private com.google.cloud.translate.Translate googleTranslator;
-
     @Autowired
     private MockMvc mockMvc;
 

@@ -36,7 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = "kanji.translation.auto.enable=true")
+@TestPropertySource(properties = {
+    "kanji.translation.auto.enable=true",
+    "deepl.api.key=fake-key-for-testing"
+})
 @Slf4j
 public class WordControllerTest {
 
@@ -47,9 +50,6 @@ public class WordControllerTest {
 
     @MockitoBean
     private TranslationService translationService;
-
-    @MockitoBean
-    private com.google.cloud.translate.Translate googleTranslator;
 
     @Autowired
     private MockMvc mockMvc;
