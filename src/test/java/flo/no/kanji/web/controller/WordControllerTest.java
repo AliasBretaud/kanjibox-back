@@ -1,5 +1,6 @@
 package flo.no.kanji.web.controller;
 
+import com.deepl.api.DeepLClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.model.Word;
@@ -36,10 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = {
-    "kanji.translation.auto.enable=true",
-    "deepl.api.key=fake-key-for-testing"
-})
+@TestPropertySource(properties = "kanji.translation.auto.enable=true")
 @Slf4j
 public class WordControllerTest {
 
@@ -50,6 +48,9 @@ public class WordControllerTest {
 
     @MockitoBean
     private TranslationService translationService;
+
+    @MockitoBean
+    private DeepLClient deepLClient;
 
     @Autowired
     private MockMvc mockMvc;
