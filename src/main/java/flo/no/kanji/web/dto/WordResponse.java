@@ -1,5 +1,6 @@
-package flo.no.kanji.business.model;
+package flo.no.kanji.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import flo.no.kanji.business.constants.Language;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,24 +10,16 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Word domain model
- *
- * @author Florian
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Word {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class WordResponse {
 
     private Long id;
     private String value;
     private Map<Language, List<String>> translations;
     private String furiganaValue;
-    private List<Kanji> kanjis;
-
-    public Word(final String value) {
-        this.value = value;
-    }
+    private List<KanjiResponse> kanjis;
 }

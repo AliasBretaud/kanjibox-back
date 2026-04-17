@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw test:*)",
+      "Bash(java:*)",
+      "Bash(/usr/libexec/java_home -V 2>&1 | head -20)"
+    ]
+  }
+}

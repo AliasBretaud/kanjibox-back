@@ -2,7 +2,7 @@ package flo.no.kanji.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.business.constants.Language;
-import flo.no.kanji.business.model.Kanji;
+import flo.no.kanji.web.dto.KanjiRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -61,20 +61,20 @@ public class KanjiControllerTest {
 
     @Test
     public void testPostKanjiOk1() throws Exception {
-        var kanji = Kanji.builder()
+        var request = KanjiRequest.builder()
                 .value("風")
                 .translations(Map.of(Language.EN, List.of("wind")))
                 .build();
         mockMvc.perform(post("/kanjis")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(kanji)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
     }
 
     @Test
     public void testPostKanjiOk2() throws Exception {
-        var kanji = Kanji.builder()
+        var request = KanjiRequest.builder()
                 .value("古")
                 .kunYomi(List.of("ふる.い"))
                 .onYomi(List.of("コ"))
@@ -83,7 +83,7 @@ public class KanjiControllerTest {
         mockMvc.perform(post("/kanjis")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(kanji)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
     }
 
@@ -94,22 +94,20 @@ public class KanjiControllerTest {
                         .content("")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-
     }
 
     @Test
     public void testPostKanjiKo2() throws Exception {
-        var body = "{}";
         mockMvc.perform(post("/kanjis")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
+                        .content("{}"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testPostKanjiKo3() throws Exception {
-        var kanji = Kanji.builder()
+        var request = KanjiRequest.builder()
                 .value("高")
                 .kunYomi(List.of("tst"))
                 .onYomi(List.of("コウ"))
@@ -118,13 +116,13 @@ public class KanjiControllerTest {
         mockMvc.perform(post("/kanjis")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(kanji)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testPostKanjiKo4() throws Exception {
-        var kanji = Kanji.builder()
+        var request = KanjiRequest.builder()
                 .value("高")
                 .kunYomi(List.of("たか.い"))
                 .onYomi(List.of("tst"))
@@ -133,23 +131,23 @@ public class KanjiControllerTest {
         mockMvc.perform(post("/kanjis")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(kanji)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testPostKanjiKo5() throws Exception {
-        var kanji = new Kanji("");
+        var request = KanjiRequest.builder().value("").build();
         mockMvc.perform(post("/kanjis")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(kanji)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testPostKanjiKo6() throws Exception {
-        var kanji = Kanji.builder()
+        var request = KanjiRequest.builder()
                 .value("kou")
                 .kunYomi(List.of("たかい"))
                 .onYomi(List.of("コウ"))
@@ -158,7 +156,7 @@ public class KanjiControllerTest {
         mockMvc.perform(post("/kanjis")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(kanji)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 

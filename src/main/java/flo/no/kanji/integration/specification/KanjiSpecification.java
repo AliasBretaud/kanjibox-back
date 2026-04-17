@@ -1,13 +1,11 @@
 package flo.no.kanji.integration.specification;
 
-import com.moji4j.MojiConverter;
 import flo.no.kanji.business.constants.Language;
-import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.KanjiEntity_;
 import flo.no.kanji.integration.entity.TranslationEntity_;
 import flo.no.kanji.integration.entity.UserEntity_;
-import flo.no.kanji.util.CharacterUtils;
+import flo.no.kanji.util.SearchQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -24,61 +22,45 @@ import java.util.List;
  */
 public class KanjiSpecification {
 
+    private KanjiSpecification() {
+    }
+
     private static Predicate languageFilter(Language language, Root<KanjiEntity> root, CriteriaBuilder cb) {
         var tr = root.join(KanjiEntity_.translations, JoinType.INNER);
         return cb.equal(tr.get(TranslationEntity_.language), language);
     }
 
-    /**
-     * Kanji search specification
-     *
-     * @param search Input character(s) search
-     * @return Builded search criteria specification
-     */
-    public static Specification<KanjiEntity> searchKanji(final String search,
+    public static Specification<KanjiEntity> searchKanji(final SearchQuery query,
                                                          final Language language,
-                                                         final MojiConverter converter,
                                                          final String userSub) {
-        return (root, query, builder) -> {
+        return (root, criteriaQuery, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
             var userJoin = root.join(KanjiEntity_.user, JoinType.INNER);
-            var userPredicate = builder.equal(userJoin.get(UserEntity_.sub), userSub);
-            predicates.add(userPredicate);
-            var characterTypeSearch = CharacterUtils.getCharacterType(search);
-            if (characterTypeSearch == null) {
-                throw new InvalidInputException("Invalid search value format");
-            }
+            predicates.add(builder.equal(userJoin.get(UserEntity_.sub), userSub));
+
             var translatesJoin = root.join(KanjiEntity_.translations, JoinType.LEFT);
             if (language != null) {
                 predicates.add(languageFilter(language, root, builder));
             }
-            var searchPredicate = switch (characterTypeSearch) {
-                // If search is hiragana only then find in kun yomi readings
-                case HIRAGANA -> builder.equal(root.join(KanjiEntity_.kunYomi), search);
-                // If search is katakana only then find in on yomi readings
-                case KATAKANA -> builder.equal(root.join(KanjiEntity_.onYomi), search);
-                // If search is a kanji then find by its value
-                case KANJI, KANJI_WITH_OKURIGANA -> builder.equal(root.get(KanjiEntity_.value), search);
-                // Romaji
-                case ROMAJI -> {
-                    query.distinct(true);
-                    // Converting search in hiragana and katakana
-                    var kunYomi = converter.convertRomajiToHiragana(search);
-                    var onYomi = converter.convertRomajiToKatakana(search);
 
-                    // Joining tables kun/on yomi and translation for searching query
+            var searchPredicate = switch (query.type()) {
+                case HIRAGANA -> builder.equal(root.join(KanjiEntity_.kunYomi), query.raw());
+                case KATAKANA -> builder.equal(root.join(KanjiEntity_.onYomi), query.raw());
+                case KANJI, KANJI_WITH_OKURIGANA -> builder.equal(root.get(KanjiEntity_.value), query.raw());
+                case ROMAJI -> {
+                    criteriaQuery.distinct(true);
                     var kunYomiJoin = root.join(KanjiEntity_.kunYomi, JoinType.LEFT);
                     var onYomiJoin = root.join(KanjiEntity_.onYomi, JoinType.LEFT);
                     var translatesText = translatesJoin.get(TranslationEntity_.translation);
-
-                    // Query building
-                    yield builder.or(builder.equal(kunYomiJoin, kunYomi), builder.equal(onYomiJoin, onYomi),
-                            builder.like(builder.upper(translatesText), "%" + search.toUpperCase() + "%"));
+                    yield builder.or(
+                            builder.equal(kunYomiJoin, query.hiragana()),
+                            builder.equal(onYomiJoin, query.katakana()),
+                            builder.like(builder.upper(translatesText), "%" + query.raw().toUpperCase() + "%"));
                 }
             };
 
-            // Order results by insertion time
-            query.orderBy(builder.desc(root.get(KanjiEntity_.timeStamp)));
+            criteriaQuery.orderBy(builder.desc(root.get(KanjiEntity_.timeStamp)));
             predicates.add(searchPredicate);
 
             return builder.and(predicates.toArray(new Predicate[0]));

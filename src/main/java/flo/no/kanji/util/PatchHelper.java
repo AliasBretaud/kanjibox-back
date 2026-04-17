@@ -17,16 +17,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatchHelper {
 
-    /** Jackson object mapper (JSON conversions) **/
     private final ObjectMapper mapper;
 
-    /** Default constructor **/
-    public PatchHelper() {
-        this.mapper = new ObjectMapper()
+    public PatchHelper(ObjectMapper baseMapper) {
+        this.mapper = baseMapper.copy()
                 .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .findAndRegisterModules();
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     /**
