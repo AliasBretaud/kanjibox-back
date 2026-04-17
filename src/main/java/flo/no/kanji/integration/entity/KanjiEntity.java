@@ -2,6 +2,7 @@ package flo.no.kanji.integration.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,60 +22,43 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 public class KanjiEntity {
 
-    /** Database technical identifier **/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Kanji japanese style readings
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "kanji_kun_yomi", joinColumns = @JoinColumn(name = "kanji_id"))
     @Column(name = "kun_yomi")
+    @BatchSize(size = 20)
     private List<String> kunYomi;
 
-    /**
-     * Kanji chinese style readings
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "kanji_on_yomi", joinColumns = @JoinColumn(name = "kanji_id"))
     @Column(name = "on_yomi")
+    @BatchSize(size = 20)
     private List<String> onYomi;
 
-    /**
-     * Kanji translations
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "kanji_translation", joinColumns = @JoinColumn(name = "kanji_id"))
+    @BatchSize(size = 20)
     private List<TranslationEntity> translations;
 
-    /**
-     * Kanji creation/update timestamp
-     */
     private LocalDateTime timeStamp;
 
-    /**
-     * Kanji japanese value
-     */
     @Column(name = "`value`", nullable = false)
     private String value;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    /** Associated words **/
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "kanjis")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "kanjis")
+    @BatchSize(size = 20)
     private List<WordEntity> words;
 
-    /**
-     * Default method called before each persist or update operation
-     */
     @PrePersist
     @PreUpdate
     private void setUp() {
-        // Before each creation or update, setting current timestamp
         this.timeStamp = LocalDateTime.now();
     }
 }

@@ -18,30 +18,15 @@ import java.util.Optional;
 public interface WordRepository extends JpaRepository<WordEntity, Long>, JpaSpecificationExecutor<WordEntity> {
 
     /**
-     * Find all words, ordered by creation/modification date
-     *
-     * @param pageable Spring pageable settings
-     * @param sub      User sub identifier
-     * @return Words page
+     * Paginated list — relies on @BatchSize on entity collections rather than EntityGraph
+     * to avoid the Hibernate in-memory pagination warning (HHH90003004).
      */
     Page<WordEntity> findAllByUserSubOrderByTimeStampDesc(String sub, Pageable pageable);
 
-    /**
-     * Find a word by its value
-     *
-     * @param value word value
-     * @param sub   user sub
-     * @return retrieved word
-     */
     Optional<WordEntity> findByValueAndUserSub(String value, String sub);
 
     /**
-     * Find a word by its id
-     *
-     * @param id  word id
-     * @param sub user sub
-     * @return retrieved word
+     * Single-entity lookup — lazy collections are loaded via @BatchSize within the @Transactional context.
      */
     Optional<WordEntity> findByIdAndUserSub(Long id, String sub);
-
 }

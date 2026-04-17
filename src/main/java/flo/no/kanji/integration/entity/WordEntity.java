@@ -2,6 +2,7 @@ package flo.no.kanji.integration.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,49 +22,36 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 public class WordEntity {
 
-    /** Database technical identifier **/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Transcript hiragana value of the word **/
     private String furiganaValue;
 
-    /** Associated kanjis composing the word **/
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    @JoinTable(name = "word_kanji", joinColumns = {@JoinColumn(name = "word_id")}, inverseJoinColumns = {
-            @JoinColumn(name = "kanji_id")})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(name = "word_kanji",
+            joinColumns = {@JoinColumn(name = "word_id")},
+            inverseJoinColumns = {@JoinColumn(name = "kanji_id")})
+    @BatchSize(size = 20)
     private List<KanjiEntity> kanjis;
 
-    /**
-     * Word creation/update timestamp
-     */
     private LocalDateTime timeStamp;
 
-    /**
-     * Word translations
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "word_translation", joinColumns = @JoinColumn(name = "word_id"))
+    @BatchSize(size = 20)
     private List<TranslationEntity> translations;
 
-    /**
-     * Word japanese value (literal kanjis and okuriganas)
-     */
     @Column(name = "`value`")
     private String value;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    /**
-     * Default method called before each persist or update operation
-     */
     @PrePersist
     @PreUpdate
     private void setUp() {
-        // Before each creation or update, setting current timestamp
         this.timeStamp = LocalDateTime.now();
     }
 }
