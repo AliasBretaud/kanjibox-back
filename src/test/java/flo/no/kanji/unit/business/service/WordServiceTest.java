@@ -78,12 +78,17 @@ public class WordServiceTest {
     @Mock
     private PatchHelper patchHelper;
 
+    @Mock
+    private java.util.concurrent.Executor translationExecutor;
+
     @InjectMocks
     private WordServiceImpl wordServiceImpl;
 
     @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(wordServiceImpl, "enableAutoDefaultTranslation", true);
+        lenient().doAnswer(inv -> { ((Runnable) inv.getArgument(0)).run(); return null; })
+                .when(translationExecutor).execute(any());
     }
 
     @Test

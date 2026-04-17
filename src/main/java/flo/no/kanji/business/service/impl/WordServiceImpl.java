@@ -24,6 +24,7 @@ import flo.no.kanji.util.ListUtils;
 import flo.no.kanji.util.PatchHelper;
 import flo.no.kanji.util.SearchQuery;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,6 +63,9 @@ public class WordServiceImpl implements WordService {
     private final MojiConverter mojiConverter;
     private final TranslationService translationService;
     private final PatchHelper patchHelper;
+
+    @Qualifier("translationExecutor")
+    private final Executor translationExecutor;
 
     @Value("${kanji.translation.auto.enable}")
     private Boolean enableAutoDefaultTranslation;
@@ -127,6 +132,7 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Word> getWords(String search, Language language, Integer listLimit, Pageable pageable, String userSub) {
         Page<Word> result;
         if (ObjectUtils.isEmpty(search)) {
@@ -178,7 +184,7 @@ public class WordServiceImpl implements WordService {
                     kanjiService.autoFillKanjiReadigs(kanji);
                     kanji.setTranslations(kanjiService.buildTranslations(kanji));
                     return kanji;
-                }))
+                }, translationExecutor))
                 .toList();
     }
 
@@ -193,7 +199,7 @@ public class WordServiceImpl implements WordService {
                                     ? CompletableFuture.supplyAsync(() ->
                                             translationService.translateValue(word.getValue(), lang)
                                                     .map(List::of)
-                                                    .orElse(Collections.emptyList()))
+                                                    .orElse(Collections.emptyList()), translationExecutor)
                                     : CompletableFuture.completedFuture(existingTranslation);
                         }));
     }
