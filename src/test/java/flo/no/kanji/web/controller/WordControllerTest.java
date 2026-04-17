@@ -3,8 +3,8 @@ package flo.no.kanji.web.controller;
 import com.deepl.api.DeepLClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flo.no.kanji.business.constants.Language;
-import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.TranslationService;
+import flo.no.kanji.web.dto.WordRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -115,7 +115,7 @@ public class WordControllerTest {
     @Test
     public void testPostWordOk() throws Exception {
         when(translationService.translateValue(anyString(), any(Language.class))).thenReturn(Optional.of("auto translation"));
-        var word = Word.builder()
+        var request = WordRequest.builder()
                 .value("食前")
                 .furiganaValue("しょくぜん")
                 .translations(Map.of(Language.EN, List.of("Before meal")))
@@ -124,27 +124,26 @@ public class WordControllerTest {
         mockMvc.perform(post("/words")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(word)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.value", is("食前")))
                 .andExpect(jsonPath("$.furiganaValue", is("しょくぜん")))
                 .andExpect(jsonPath("$.translations", hasEntry(is("en"), contains("Before meal"))))
                 .andExpect(jsonPath("$.translations", hasEntry(is("fr"), contains("auto translation"))));
-
     }
 
     @Test
     public void testPostWordOkAutoDetect() throws Exception {
         when(translationService.translateValue(anyString(), any(Language.class))).thenReturn(Optional.of("auto translation"));
-        var word = Word.builder()
+        var request = WordRequest.builder()
                 .value("食器")
                 .build();
 
         mockMvc.perform(post("/words")
                         .with(mockUser())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(word)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", notNullValue()))
                 .andExpect(jsonPath("$.value", is("食器")))

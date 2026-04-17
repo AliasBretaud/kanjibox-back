@@ -1,12 +1,11 @@
 package flo.no.kanji.integration.specification;
 
-import com.moji4j.MojiConverter;
-import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.integration.entity.TranslationEntity_;
 import flo.no.kanji.integration.entity.UserEntity_;
 import flo.no.kanji.integration.entity.WordEntity;
 import flo.no.kanji.integration.entity.WordEntity_;
 import flo.no.kanji.util.CharacterUtils;
+import flo.no.kanji.util.SearchQuery;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,36 +23,29 @@ public class WordSpecification {
     private WordSpecification() {
     }
 
-    public static Specification<WordEntity> searchWord(final String search, 
-                                                         final MojiConverter converter, 
-                                                         final String userSub) {
-        return (root, query, builder) -> {
+    public static Specification<WordEntity> searchWord(final SearchQuery query, final String userSub) {
+        return (root, criteriaQuery, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
             var userJoin = root.join(WordEntity_.user, JoinType.INNER);
-            var userPredicate = builder.equal(userJoin.get(UserEntity_.sub), userSub);
-            predicates.add(userPredicate);
-            var characterTypSearch = CharacterUtils.getCharacterType(search);
-            if (characterTypSearch == null) {
-                throw new InvalidInputException("Invalid search value format");
-            }
-            var searchPredicate = switch (characterTypSearch) {
-                // Kana value (search based on furigana reading)
-                case HIRAGANA, KATAKANA -> builder.equal(root.get(WordEntity_.furiganaValue),
-                        CharacterUtils.convertKanaToFurigana(search));
-                // Kanji value
-                case KANJI, KANJI_WITH_OKURIGANA -> builder.like(root.get(WordEntity_.value), "%" + search + "%");
-                // Romaji / translation
+            predicates.add(builder.equal(userJoin.get(UserEntity_.sub), userSub));
+
+            var searchPredicate = switch (query.type()) {
+                case HIRAGANA, KATAKANA -> builder.equal(
+                        root.get(WordEntity_.furiganaValue),
+                        CharacterUtils.convertKanaToFurigana(query.raw()));
+                case KANJI, KANJI_WITH_OKURIGANA -> builder.like(
+                        root.get(WordEntity_.value), "%" + query.raw() + "%");
                 case ROMAJI -> {
-                    var valueSearch = converter.convertRomajiToHiragana(search);
                     var translations = root.join(WordEntity_.translations, JoinType.LEFT)
                             .get(TranslationEntity_.translation);
                     yield builder.or(
-                            builder.equal(root.get(WordEntity_.furiganaValue), valueSearch),
-                            builder.like(builder.upper(translations),
-                                    "%" + search.toUpperCase() + "%"));
+                            builder.equal(root.get(WordEntity_.furiganaValue), query.hiragana()),
+                            builder.like(builder.upper(translations), "%" + query.raw().toUpperCase() + "%"));
                 }
             };
-            query.orderBy(builder.desc(root.get(WordEntity_.timeStamp)));
+
+            criteriaQuery.orderBy(builder.desc(root.get(WordEntity_.timeStamp)));
             predicates.add(searchPredicate);
 
             return builder.and(predicates.toArray(new Predicate[0]));

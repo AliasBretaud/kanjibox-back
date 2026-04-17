@@ -4,30 +4,50 @@ import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.entity.WordEntity;
+import flo.no.kanji.web.dto.KanjiRequest;
+import flo.no.kanji.web.dto.KanjiResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
 /**
- * Kanji object bidirectional mapper between Model objects and Entities
+ * Kanji mapper: bidirectional conversion between domain model, JPA entity, and API DTOs.
  *
  * @author Florian
  */
 @Component
 public class KanjiMapper {
 
-    /**
-     * Transforms a Kanji entity to business object
-     *
-     * @param kanjiEntity Input entity
-     * @return Transformed business kanji object
-     */
+    public Kanji toDomain(KanjiRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return Kanji.builder()
+                .value(request.getValue())
+                .translations(request.getTranslations())
+                .kunYomi(request.getKunYomi())
+                .onYomi(request.getOnYomi())
+                .build();
+    }
+
+    public KanjiResponse toResponse(Kanji kanji) {
+        if (kanji == null) {
+            return null;
+        }
+        return KanjiResponse.builder()
+                .id(kanji.getId())
+                .value(kanji.getValue())
+                .translations(kanji.getTranslations())
+                .kunYomi(kanji.getKunYomi())
+                .onYomi(kanji.getOnYomi())
+                .usages(kanji.getUsages())
+                .build();
+    }
+
     public Kanji toBusinessObject(KanjiEntity kanjiEntity) {
         if (kanjiEntity == null) {
             return null;
         }
-        var onYomi = kanjiEntity.getOnYomi();
-        var kunYomi = kanjiEntity.getKunYomi();
         var translations = kanjiEntity.getTranslations() != null ?
                 kanjiEntity.getTranslations().stream()
                         .collect(Collectors.groupingBy(TranslationEntity::getLanguage,
@@ -41,19 +61,13 @@ public class KanjiMapper {
         return Kanji.builder()
                 .id(kanjiEntity.getId())
                 .value(kanjiEntity.getValue())
-                .onYomi(onYomi)
-                .kunYomi(kunYomi)
+                .onYomi(kanjiEntity.getOnYomi())
+                .kunYomi(kanjiEntity.getKunYomi())
                 .translations(translations)
                 .usages(usages)
                 .build();
     }
 
-    /**
-     * Transforms a Kanji business object to entity (before performing save in database)
-     *
-     * @param kanji Kanji business object
-     * @return Kanji entity converted object
-     */
     public KanjiEntity toEntity(Kanji kanji) {
         if (kanji == null) {
             return null;

@@ -5,7 +5,7 @@ import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.integration.entity.KanjiEntity;
 import flo.no.kanji.integration.entity.TranslationEntity;
 import flo.no.kanji.integration.specification.KanjiSpecification;
-import org.junit.jupiter.api.BeforeEach;
+import flo.no.kanji.util.SearchQuery;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * KankiRepository test class
+ * KanjiRepository test class
  *
  * @author Florian
  */
@@ -26,76 +26,46 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 public class KanjiRepositoryTest {
 
+    private static final String USER_SUB = "auth0|662dc5e995203229af749169";
     private final MojiConverter converter = new MojiConverter();
-    /** Test class **/
+
     @Autowired
     private KanjiRepository kanjiRepository;
 
-    @BeforeEach
-    public void setUp() {
-    }
-
-    /**
-     *
-     */
     @Test
     public void searchKanjiByValueTest() {
-        // PREPARE
-        var spec = KanjiSpecification.searchKanji("君", null, converter, "auth0|662dc5e995203229af749169");
-        // EXECUTE
-        var kanjis = kanjiRepository.findAll(spec);
-        // ASSERT
-        assertKanjiEquals(kanjis);
+        var spec = KanjiSpecification.searchKanji(SearchQuery.from("君", converter), null, USER_SUB);
+        assertKanjiEquals(kanjiRepository.findAll(spec));
     }
 
     @Test
     public void searchKanjiByKunYomiTest() {
-        // PREPARE
-        var spec = KanjiSpecification.searchKanji("きみ", null, converter, "auth0|662dc5e995203229af749169");
-        // EXECUTE
-        var kanjis = kanjiRepository.findAll(spec);
-        // ASSERT
-        assertKanjiEquals(kanjis);
+        var spec = KanjiSpecification.searchKanji(SearchQuery.from("きみ", converter), null, USER_SUB);
+        assertKanjiEquals(kanjiRepository.findAll(spec));
     }
 
     @Test
     public void searchKanjiByOnYomiTest() {
-        // PREPARE
-        var spec = KanjiSpecification.searchKanji("クン", null, converter, "auth0|662dc5e995203229af749169");
-        // EXECUTE
-        var kanjis = kanjiRepository.findAll(spec);
-        // ASSERT
-        assertKanjiEquals(kanjis);
+        var spec = KanjiSpecification.searchKanji(SearchQuery.from("クン", converter), null, USER_SUB);
+        assertKanjiEquals(kanjiRepository.findAll(spec));
     }
 
     @Test
     public void searchKanjiByTranslationTest() {
-        // PREPARE
-        var spec = KanjiSpecification.searchKanji("mister", null, converter, "auth0|662dc5e995203229af749169");
-        // EXECUTE
-        var kanjis = kanjiRepository.findAll(spec);
-        // ASSERT
-        assertKanjiEquals(kanjis);
+        var spec = KanjiSpecification.searchKanji(SearchQuery.from("mister", converter), null, USER_SUB);
+        assertKanjiEquals(kanjiRepository.findAll(spec));
     }
 
     @Test
     public void searchKanjiByRomajiKunTest() {
-        // PREPARE
-        var spec = KanjiSpecification.searchKanji("kimi", null, converter, "auth0|662dc5e995203229af749169");
-        // EXECUTE
-        var kanjis = kanjiRepository.findAll(spec);
-        // ASSERT
-        assertKanjiEquals(kanjis);
+        var spec = KanjiSpecification.searchKanji(SearchQuery.from("kimi", converter), null, USER_SUB);
+        assertKanjiEquals(kanjiRepository.findAll(spec));
     }
 
     @Test
     public void searchKanjiByRomajiOnTest() {
-        // PREPARE
-        var spec = KanjiSpecification.searchKanji("kun", null, converter, "auth0|662dc5e995203229af749169");
-        // EXECUTE
-        var kanjis = kanjiRepository.findAll(spec);
-        // ASSERT
-        assertKanjiEquals(kanjis);
+        var spec = KanjiSpecification.searchKanji(SearchQuery.from("kun", converter), null, USER_SUB);
+        assertKanjiEquals(kanjiRepository.findAll(spec));
     }
 
     private void assertKanjiEquals(final List<KanjiEntity> kanjis) {
@@ -111,5 +81,4 @@ public class KanjiRepositoryTest {
                         .map(TranslationEntity::getTranslation).toList());
         assertEquals(LocalDateTime.of(2020, 4, 14, 1, 21, 52), kanji.getTimeStamp());
     }
-
 }
