@@ -6,7 +6,6 @@ import flo.no.kanji.business.constants.Language;
 import flo.no.kanji.business.exception.InvalidInputException;
 import flo.no.kanji.business.mapper.KanjiMapper;
 import flo.no.kanji.business.mapper.WordMapper;
-import flo.no.kanji.business.model.Kanji;
 import flo.no.kanji.business.model.Word;
 import flo.no.kanji.business.service.KanjiService;
 import flo.no.kanji.business.service.TranslationService;
@@ -78,12 +77,18 @@ public class WordServiceTest {
     @Mock
     private PatchHelper patchHelper;
 
+    @Mock
+    private java.util.concurrent.Executor translationExecutor;
+
     @InjectMocks
     private WordServiceImpl wordServiceImpl;
 
     @BeforeEach
     public void setup() {
         ReflectionTestUtils.setField(wordServiceImpl, "enableAutoDefaultTranslation", true);
+        ReflectionTestUtils.setField(wordServiceImpl, "translationExecutor", translationExecutor);
+        lenient().doAnswer(inv -> { ((Runnable) inv.getArgument(0)).run(); return null; })
+                .when(translationExecutor).execute(any());
     }
 
     @Test

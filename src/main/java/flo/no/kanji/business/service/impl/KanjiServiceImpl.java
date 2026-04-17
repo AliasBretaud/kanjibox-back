@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -51,6 +52,7 @@ public class KanjiServiceImpl implements KanjiService {
     private final MojiConverter converter;
 
     @Override
+    @Transactional
     public Kanji addKanji(Kanji kanji, boolean autoDetect, boolean preview, String userSub) {
         checkKanjiAlreadyPresent(kanji, userSub);
         if (autoDetect) {
@@ -80,6 +82,7 @@ public class KanjiServiceImpl implements KanjiService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Kanji> getKanjis(String search, Language language, Pageable pageable, String userSub) {
         return ObjectUtils.isEmpty(search)
                 ? kanjiRepository.findAllByUserSubOrderByTimeStampDesc(userSub, pageable)
@@ -88,6 +91,7 @@ public class KanjiServiceImpl implements KanjiService {
     }
 
     @Override
+    @Transactional
     public Kanji patchKanji(Long kanjiId, JsonNode patch, String userSub) {
         var initialKanji = findById(kanjiId, userSub);
         var patchedKanji = patchHelper.mergePatch(initialKanji, patch, Kanji.class);
@@ -102,18 +106,21 @@ public class KanjiServiceImpl implements KanjiService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Kanji findById(Long kanjiId, String userSub) {
         return kanjiMapper.toBusinessObject(kanjiRepository.findByIdAndUserSub(kanjiId, userSub)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found")));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Kanji> findByValues(List<String> values, String userSub) {
         return kanjiRepository.findByValueInAndUserSub(values, userSub)
                 .stream().map(kanjiMapper::toBusinessObject).toList();
     }
 
     @Override
+    @Transactional
     public void deleteKanji(Long kanjiId, String userSub) {
         var entity = kanjiRepository.findByIdAndUserSub(kanjiId, userSub)
                 .orElseThrow(() -> new ItemNotFoundException("Kanji with ID " + kanjiId + " not found"));

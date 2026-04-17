@@ -18,40 +18,18 @@ import java.util.Optional;
 @Repository
 public interface KanjiRepository extends JpaRepository<KanjiEntity, Long>, JpaSpecificationExecutor<KanjiEntity> {
 
-    /**
-     * Find a kanji by its japanese writing value
-     *
-     * @param kanjiValue japanese writing value
-     * @param sub        User sub identifier
-     * @return Found kanji
-     */
     Optional<KanjiEntity> findByValueAndUserSub(String kanjiValue, String sub);
 
     /**
-     * Find a kanji by its id
-     *
-     * @param id  kanji id
-     * @param sub User sub identifier
-     * @return Found kanji
+     * Single-entity lookup — lazy collections are loaded via @BatchSize within the @Transactional context.
      */
     Optional<KanjiEntity> findByIdAndUserSub(Long id, String sub);
 
-    /**
-     * Find a list of kanji by japanese writing values
-     *
-     * @param kanjiValues japanese writing values
-     * @param sub         User sub identifier
-     * @return Found kanjis
-     */
     List<KanjiEntity> findByValueInAndUserSub(List<String> kanjiValues, String sub);
 
     /**
-     * Find all kanjis, ordered by creation/modification date
-     *
-     * @param pageable Spring pageable settings
-     * @param sub      User sub identifier
-     * @return Kanjis page
+     * Paginated list — relies on @BatchSize on entity collections rather than EntityGraph
+     * to avoid the Hibernate in-memory pagination warning (HHH90003004).
      */
     Page<KanjiEntity> findAllByUserSubOrderByTimeStampDesc(String sub, Pageable pageable);
-
 }
