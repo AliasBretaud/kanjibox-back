@@ -16,3 +16,7 @@ kanji:
       api-key: fake-key
     auto:
       enable: false
+    timeout-seconds: 5
+  rate-limit:
+    capacity: 30
+    refill-per-minute: 20

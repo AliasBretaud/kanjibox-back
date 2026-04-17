@@ -33,6 +33,10 @@ kanji:
       api-key: ${DEEPL_API_KEY}
     auto:
       enable: ${AUTO_TRANSLATION_ENABLED:#{false}}
+    timeout-seconds: 5
+  rate-limit:
+    capacity: 30
+    refill-per-minute: 20
 okta:
   oauth2:
     audience: ${OKTA_OAUTH2_AUDIENCE}
